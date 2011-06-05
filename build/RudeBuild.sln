@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildAddIn", "RudeBuildAddIn.csproj", "{0F73A40E-95BA-4285-9740-3E3B35D0828F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "RudeBuildConsole\RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
