@@ -25,21 +25,10 @@ namespace RudeBuild
 
         private XElement FindCompileItemGroupElement(XNamespace ns, XElement projectElement)
         {
-            XElement compileItemGroupElement = null;
-            foreach (XElement itemGroupElement in projectElement.Elements(ns + "ItemGroup"))
-            {
-                XNode firstNode = itemGroupElement.FirstNode;
-                if (firstNode != null && firstNode.NodeType == XmlNodeType.Element)
-                {
-                    XElement firstElement = (XElement)firstNode;
-                    if (firstElement.Name.LocalName == "ClCompile")
-                    {
-                        compileItemGroupElement = itemGroupElement;
-                        break;
-                    }
-                }
-            }
-            return compileItemGroupElement;
+            var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                                          where itemGroupElement.Elements(ns + "ClCompile").Count() > 0
+                                          select itemGroupElement;
+            return compileItemGroupElement.SingleOrDefault();
         }
 
         private void ReadWrite(string projectFilename, SolutionInfo solutionInfo)
