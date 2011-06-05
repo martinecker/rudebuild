@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace RudeBuildConsole
+namespace RudeBuild
 {
     public class ModifiedTextFileWriter
     {

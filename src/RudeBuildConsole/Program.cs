@@ -2,24 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using RudeBuild;
 
 namespace RudeBuildConsole
 {
     public class Program
     {
-        private CommandLineOptions ParseCommandLineOptions(string[] args)
+        private RunOptions ParseRunOptions(string[] args)
         {
-            Console.WriteLine("RudeBuild");
+            Console.WriteLine("RudeBuild, Version 1.0");
+            Console.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker. This is free, open source software.");
             Console.WriteLine("Arguments: " + string.Join(" ", args));
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             parser.ShowUsageOnEmptyCommandline = true;
             try
             {
-                CommandLineOptions options = new CommandLineOptions();
+                RunOptions options = new RunOptions();
                 parser.ExtractArgumentAttributes(options);
                 parser.ParseCommandLine(args);
-                parser.ShowParsedArguments();
                 return options;
             }
             catch (CommandLineParser.Exceptions.CommandLineException e)
@@ -39,13 +40,15 @@ namespace RudeBuildConsole
         {
             try
             {
-                CommandLineOptions options = ParseCommandLineOptions(args);
+                RunOptions options = ParseRunOptions(args);
                 if (options == null)
                     return 1;
 
                 GlobalSettings globalSettings = new GlobalSettings();
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
+                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
+                projectReaderWriter.ReadWrite(solutionInfo);
             }
             catch (Exception e)
             {

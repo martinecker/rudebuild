@@ -2,10 +2,10 @@ using System.IO;
 using CommandLineParser.Arguments;
 using CommandLineParser.Validation;
 
-namespace RudeBuildConsole
+namespace RudeBuild
 {
     [ArgumentGroupCertification("rebuild,clean", EArgumentGroupCondition.ExactlyOneUsed)]
-    public class CommandLineOptions
+    public class RunOptions
     {
         [FileArgument('s', "solution", FileMustExist = true, Description = "Filename of the solution to build.", Optional = false)]
         public FileInfo Solution;

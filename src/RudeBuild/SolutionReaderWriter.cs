@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace RudeBuildConsole
+namespace RudeBuild
 {
     public class SolutionReaderWriter
     {
@@ -61,6 +61,7 @@ namespace RudeBuildConsole
             VisualStudioVersion version = VisualStudioVersion.VSUnknown;
             List<string> projectFilenames = new List<string>();
             StringBuilder destSolutionText = new StringBuilder();
+            string solutionDirectory = Path.GetDirectoryName(srcFilename);
 
             using (StreamReader reader = new StreamReader(srcFilename))
             {
@@ -75,6 +76,7 @@ namespace RudeBuildConsole
                         string projectFilename = ParseCppProject(ref line, version);
                         if (null != projectFilename)
                         {
+                            projectFilename = Path.Combine(solutionDirectory, projectFilename);
                             if (projectFilenames.Contains(projectFilename))
                             {
                                 throw new InvalidDataException("Solution file is corrupt. It contains two sections for project '" + projectFilename + "'.");
