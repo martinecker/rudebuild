@@ -42,46 +42,50 @@ namespace RudeBuild
             int extensionIndex = line.IndexOf(extension);
             if (extensionIndex <= 0)
             {
-                throw new InvalidDataException("Solution file is corrupt. Found C++ project without project filename.");
+                throw new InvalidDataException("Solution file is corrupt. Found C++ project without project fileName.");
             }
-            int projectFilenameIndex = line.LastIndexOf('"', extensionIndex) + 1;
-            if (projectFilenameIndex <= 0)
+            int projectFileNameIndex = line.LastIndexOf('"', extensionIndex) + 1;
+            if (projectFileNameIndex <= 0)
             {
-                throw new InvalidDataException("Solution file is corrupt. Found C++ project without project filename.");
+                throw new InvalidDataException("Solution file is corrupt. Found C++ project without project fileName.");
             }
 
-            string projectFilename = line.Substring(projectFilenameIndex, extensionIndex - projectFilenameIndex) + extension;
-            string destProjectFilename = _globalSettings.ModifyFilename(projectFilename);
-            line = line.Substring(0, projectFilenameIndex) + destProjectFilename + line.Substring(extensionIndex + extension.Length);
-            return projectFilename;
+            string projectFileName = line.Substring(projectFileNameIndex, extensionIndex - projectFileNameIndex) + extension;
+            string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
+            line = line.Substring(0, projectFileNameIndex) + destProjectFileName + line.Substring(extensionIndex + extension.Length);
+            return projectFileName;
         }
 
-        public SolutionInfo ReadWrite(string srcFilename)
+        public SolutionInfo ReadWrite(string srcFileName)
         {
             VisualStudioVersion version = VisualStudioVersion.VSUnknown;
-            List<string> projectFilenames = new List<string>();
+            List<string> projectFileNames = new List<string>();
             StringBuilder destSolutionText = new StringBuilder();
-            string solutionDirectory = Path.GetDirectoryName(srcFilename);
+            string solutionDirectory = Path.GetDirectoryName(srcFileName);
 
-            using (StreamReader reader = new StreamReader(srcFilename))
+            using (StreamReader reader = new StreamReader(srcFileName))
             {
                 string line;
                 bool isInSourceControlSection = false;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (!ParseVisualStudioVersion(line, "9.00", VisualStudioVersion.VS2005, ref version) &&
-                        !ParseVisualStudioVersion(line, "10.00", VisualStudioVersion.VS2008, ref version) &&
-                        !ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version))
+                    if (line == string.Empty)
                     {
-                        string projectFilename = ParseCppProject(ref line, version);
-                        if (null != projectFilename)
+                        line = null;
+                    }
+                    else if (!ParseVisualStudioVersion(line, "9.00", VisualStudioVersion.VS2005, ref version) &&
+                             !ParseVisualStudioVersion(line, "10.00", VisualStudioVersion.VS2008, ref version) &&
+                             !ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version))
+                    {
+                        string projectFileName = ParseCppProject(ref line, version);
+                        if (null != projectFileName)
                         {
-                            projectFilename = Path.Combine(solutionDirectory, projectFilename);
-                            if (projectFilenames.Contains(projectFilename))
+                            projectFileName = Path.Combine(solutionDirectory, projectFileName);
+                            if (projectFileNames.Contains(projectFileName))
                             {
-                                throw new InvalidDataException("Solution file is corrupt. It contains two sections for project '" + projectFilename + "'.");
+                                throw new InvalidDataException("Solution file is corrupt. It contains two sections for project '" + projectFileName + "'.");
                             }
-                            projectFilenames.Add(projectFilename);
+                            projectFileNames.Add(projectFileName);
                         }
                         else if (line.Contains("GlobalSection(SourceCodeControl)"))
                         {
@@ -110,14 +114,14 @@ namespace RudeBuild
 
             if (version == VisualStudioVersion.VSUnknown)
             {
-                throw new InvalidDataException("Solution file '" + srcFilename + "' is corrupt. It does not contain a Visual Studio version.");
+                throw new InvalidDataException("Solution file '" + srcFileName + "' is corrupt. It does not contain a Visual Studio version.");
             }
 
-            string destFilename = _globalSettings.ModifyFilename(srcFilename);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFilename);
+            string destFileName = _globalSettings.ModifyFileName(srcFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName);
             writer.Write(destSolutionText.ToString());
 
-            return new SolutionInfo(version, projectFilenames);
+            return new SolutionInfo(srcFileName, version, projectFileNames);
         }
     }
 }

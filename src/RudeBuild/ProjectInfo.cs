@@ -5,10 +5,16 @@ namespace RudeBuild
 {
     public class ProjectInfo
     {
-        private string _filename;
-        public string Filename
+        private SolutionInfo _solution;
+        public SolutionInfo Solution
         {
-            get { return _filename; }
+            get { return _solution; }
+        }
+
+        private string _fileName;
+        public string FileName
+        {
+            get { return _fileName; }
         }
 
         private string _name;
@@ -17,17 +23,18 @@ namespace RudeBuild
             get { return _name; }
         }
 
-        private IList<string> _cppFilenames;
-        public IList<string> CppFilenames
+        private IList<string> _cppFileNames;
+        public IList<string> CppFileNames
         {
-            get { return _cppFilenames; }
+            get { return _cppFileNames; }
         }
 
-        public ProjectInfo(string filename, IList<string> cppFilenames)
+        public ProjectInfo(SolutionInfo solution, string fileName, IList<string> cppFileNames)
         {
-            _filename = filename;
-            _cppFilenames = cppFilenames;
-            _name = Path.GetFileNameWithoutExtension(filename);
+            _solution = solution;
+            _fileName = fileName;
+            _cppFileNames = cppFileNames;
+            _name = Path.GetFileNameWithoutExtension(fileName);
         }
     }
 }

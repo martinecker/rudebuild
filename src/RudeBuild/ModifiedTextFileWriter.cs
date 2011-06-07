@@ -4,18 +4,18 @@ namespace RudeBuild
 {
     public class ModifiedTextFileWriter
     {
-        private string _filename;
+        private string _fileName;
 
-        public ModifiedTextFileWriter(string filename)
+        public ModifiedTextFileWriter(string fileName)
         {
-            _filename = filename;
+            _fileName = fileName;
         }
 
         public void Write(string text)
         {
-            if (File.Exists(_filename))
+            if (File.Exists(_fileName))
             {
-                using (StreamReader reader = new StreamReader(_filename))
+                using (StreamReader reader = new StreamReader(_fileName))
                 {
                     string existingText = reader.ReadToEnd();
                     if (existingText == text)
@@ -23,7 +23,7 @@ namespace RudeBuild
                 }
             }
 
-            using (StreamWriter writer = File.CreateText(_filename))
+            using (StreamWriter writer = File.CreateText(_fileName))
             {
                 writer.Write(text);
             }

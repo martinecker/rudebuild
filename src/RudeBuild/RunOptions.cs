@@ -7,7 +7,7 @@ namespace RudeBuild
     [ArgumentGroupCertification("rebuild,clean", EArgumentGroupCondition.ExactlyOneUsed)]
     public class RunOptions
     {
-        [FileArgument('s', "solution", FileMustExist = true, Description = "Filename of the solution to build.", Optional = false)]
+        [FileArgument('s', "solution", FileMustExist = true, Description = "FileName of the solution to build.", Optional = false)]
         public FileInfo Solution;
         [ValueArgument(typeof(string), 'c', "config", Description = "Name of the configuration to build including platform, e.g. Debug|Win32", Optional = false)]
         public string Config;

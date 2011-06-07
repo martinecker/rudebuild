@@ -6,6 +6,14 @@ using RudeBuild;
 
 namespace RudeBuildConsole
 {
+    public class ConsoleOutput : IOutput
+    {
+        public void WriteLine(string line)
+        {
+            Console.WriteLine(line);
+        }
+    }
+
     public class Program
     {
         private RunOptions ParseRunOptions(string[] args)
@@ -44,7 +52,7 @@ namespace RudeBuildConsole
                 if (options == null)
                     return 1;
 
-                GlobalSettings globalSettings = new GlobalSettings();
+                GlobalSettings globalSettings = new GlobalSettings(options, new ConsoleOutput());
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);

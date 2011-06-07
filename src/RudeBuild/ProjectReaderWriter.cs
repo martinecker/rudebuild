@@ -17,9 +17,9 @@ namespace RudeBuild
 
         public void ReadWrite(SolutionInfo solutionInfo)
         {
-            foreach (string projectFilename in solutionInfo.ProjectFilenames)
+            foreach (string projectFileName in solutionInfo.ProjectFileNames)
             {
-                ReadWrite(projectFilename, solutionInfo);
+                ReadWrite(projectFileName, solutionInfo);
             }
         }
 
@@ -31,33 +31,50 @@ namespace RudeBuild
             return compileItemGroupElement.SingleOrDefault();
         }
 
-        private void ReadWrite(string projectFilename, SolutionInfo solutionInfo)
+        private static XElement AddExcludedFromBuild(XNamespace ns, XElement element)
         {
-            XDocument projectDocument = XDocument.Load(projectFilename);
+            element.Add(new XElement(ns + "ExcludedFromBuild", "true"));
+            return element;
+        }
+
+        private void ReadWrite(string projectFileName, SolutionInfo solutionInfo)
+        {
+            XDocument projectDocument = XDocument.Load(projectFileName);
             if (null == projectDocument)
             {
-                throw new InvalidDataException("Couldn't load project file '" + projectFilename + "'.");
+                throw new InvalidDataException("Couldn't load project file '" + projectFileName + "'.");
             }
 
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement projectElement = projectDocument.Element(ns + "Project");
             if (null == projectElement)
             {
-                throw new InvalidDataException("Project file '" + projectFilename + "' is corrupt. Couldn't find Project XML element.");
+                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find Project XML element.");
             }
             XElement compileItemGroupElement = FindCompileItemGroupElement(ns, projectElement);
             if (null == compileItemGroupElement)
             {
-                throw new InvalidDataException("Project file '" + projectFilename + "' is corrupt. Couldn't find ItemGroup XML element with the source files to compile.");
+                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find ItemGroup XML element with the source files to compile.");
             }
 
-            var cppFilenames = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+            var cppFileNames = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
                                select compileElement.Attribute("Include").Value;
 
-            ProjectInfo projectInfo = new ProjectInfo(projectFilename, cppFilenames.ToList());
-            
-            string destProjectFilename = _globalSettings.ModifyFilename(projectFilename);
-            projectDocument.Save(destProjectFilename);
+            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList());
+
+            UnityFileMerger merger = new UnityFileMerger(_globalSettings);
+            merger.Process(projectInfo);
+
+            compileItemGroupElement.ReplaceAll(
+                from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+                select AddExcludedFromBuild(ns, compileElement));
+            compileItemGroupElement.Add(
+                from unityFileName in merger.UnityFilePaths
+                select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+
+            string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName);
+            writer.Write(projectDocument.ToString());
         }
     }
 }

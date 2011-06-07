@@ -13,6 +13,18 @@ namespace RudeBuild
 
     public class SolutionInfo
     {
+        private string _filePath;
+        public string FilePath
+        {
+            get { return _filePath; }
+        }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+        }
+
         private VisualStudioVersion _version;
         public VisualStudioVersion Version
         {
@@ -25,20 +37,22 @@ namespace RudeBuild
             get { return _projectNames; }
         }
 
-        private IList<string> _projectFilenames;
-        public IList<string> ProjectFilenames
+        private IList<string> _projectFileNames;
+        public IList<string> ProjectFileNames
         {
-            get { return _projectFilenames; }
+            get { return _projectFileNames; }
         }
 
-        public SolutionInfo(VisualStudioVersion version, IList<string> projectFilenames)
+        public SolutionInfo(string filePath, VisualStudioVersion version, IList<string> projectFileNames)
         {
-            _projectFilenames = projectFilenames;
+            _filePath = Path.GetFullPath(filePath);
+            _name = Path.GetFileNameWithoutExtension(filePath);
+            _projectFileNames = projectFileNames;
             _version = version;
             _projectNames = new List<string>();
-            foreach (string projectFilename in projectFilenames)
+            foreach (string projectFileName in projectFileNames)
             {
-                _projectNames.Add(Path.GetFileNameWithoutExtension(projectFilename));
+                _projectNames.Add(Path.GetFileNameWithoutExtension(projectFileName));
             }
         }
     }
