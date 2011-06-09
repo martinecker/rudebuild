@@ -23,39 +23,40 @@ namespace RudeBuild
             }
         }
 
-        private XElement FindCompileItemGroupElement(XNamespace ns, XElement projectElement)
+        private XElement FindCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
         {
-            var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-                                          where itemGroupElement.Elements(ns + "ClCompile").Count() > 0
-                                          select itemGroupElement;
-            return compileItemGroupElement.SingleOrDefault();
-        }
-
-        private static XElement AddExcludedFromBuild(XNamespace ns, XElement element)
-        {
-            element.Add(new XElement(ns + "ExcludedFromBuild", "true"));
-            return element;
-        }
-
-        private void ReadWrite(string projectFileName, SolutionInfo solutionInfo)
-        {
-            XDocument projectDocument = XDocument.Load(projectFileName);
-            if (null == projectDocument)
-            {
-                throw new InvalidDataException("Couldn't load project file '" + projectFileName + "'.");
-            }
-
-            XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement projectElement = projectDocument.Element(ns + "Project");
             if (null == projectElement)
             {
                 throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find Project XML element.");
             }
-            XElement compileItemGroupElement = FindCompileItemGroupElement(ns, projectElement);
-            if (null == compileItemGroupElement)
+
+            var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                                          where itemGroupElement.Elements(ns + "ClCompile").Count() > 0
+                                          select itemGroupElement;
+            XElement result = compileItemGroupElement.SingleOrDefault();
+            if (null == result)
             {
                 throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find ItemGroup XML element with the source files to compile.");
             }
+            return result;
+        }
+
+        private static XElement AddExcludedFromBuild(XNamespace ns, XElement element)
+        {
+            XName excludedName = ns + "ExcludedFromBuild";
+            XElement existingExlude = element.Element(excludedName);
+            if (existingExlude != null)
+            {
+                existingExlude.Remove();
+            }
+            element.Add(new XElement(excludedName, "true"));
+            return element;
+        }
+
+        private UnityFileMerger ReadWriteVS2010(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns)
+        {
+            XElement compileItemGroupElement = FindCompileItemGroupElement(projectFileName, ns, projectDocument);
 
             var cppFileNames = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
                                select compileElement.Attribute("Include").Value;
@@ -71,6 +72,82 @@ namespace RudeBuild
             compileItemGroupElement.Add(
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+
+            return merger;
+        }
+
+        private void ReadWriteVS2010Filters(string projectFileName, UnityFileMerger merger)
+        {
+            string projectFiltersFileName = projectFileName + ".filters";
+            if (!File.Exists(projectFiltersFileName))
+                return;
+
+            XDocument projectFiltersDocument = XDocument.Load(projectFiltersFileName);
+            if (null == projectFiltersDocument)
+            {
+                throw new InvalidDataException("Couldn't load project filters file '" + projectFiltersFileName + "'.");
+            }
+
+            XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
+            XElement compileItemGroupElement = FindCompileItemGroupElement(projectFileName, ns, projectFiltersDocument);
+
+            compileItemGroupElement.Add(
+                from unityFileName in merger.UnityFilePaths
+                select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+
+            string destProjectFiltersFileName = _globalSettings.ModifyFileName(projectFiltersFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName);
+            writer.Write(projectFiltersDocument.ToString());
+        }
+
+        private static bool IsValidCppFileName(string fileName)
+        {
+            string extension = Path.GetExtension(fileName);
+            return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
+        }
+
+        private void ReadWritePreVS2010(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns)
+        {
+            var cppFileNameElements = 
+                from cppFileElement in projectDocument.Descendants(ns + "File")
+                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value)
+                select cppFileElement;
+            var cppFileNames = 
+                from cppFileElement in cppFileNameElements
+                select cppFileElement.Attribute("RelativePath").Value;
+
+            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList());
+
+            UnityFileMerger merger = new UnityFileMerger(_globalSettings);
+            merger.Process(projectInfo);
+
+            cppFileNameElements.Remove();
+            
+            XElement filesElement = projectDocument.Descendants(ns + "Files").Single();
+            filesElement.Add(
+                from unityFileName in merger.UnityFilePaths
+                select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
+        }
+
+        private void ReadWrite(string projectFileName, SolutionInfo solutionInfo)
+        {
+            XDocument projectDocument = XDocument.Load(projectFileName);
+            if (null == projectDocument)
+            {
+                throw new InvalidDataException("Couldn't load project file '" + projectFileName + "'.");
+            }
+
+            XNamespace ns = projectDocument.Root.Name.Namespace;
+
+            if (solutionInfo.Version == VisualStudioVersion.VS2010)
+            {
+                UnityFileMerger merger = ReadWriteVS2010(projectFileName, solutionInfo, projectDocument, ns);
+                ReadWriteVS2010Filters(projectFileName, merger);
+            }
+            else
+            {
+                ReadWritePreVS2010(projectFileName, solutionInfo, projectDocument, ns);
+            }
 
             string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName);
