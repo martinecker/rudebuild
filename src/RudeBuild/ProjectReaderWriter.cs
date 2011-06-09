@@ -59,6 +59,7 @@ namespace RudeBuild
             XElement compileItemGroupElement = FindCompileItemGroupElement(projectFileName, ns, projectDocument);
 
             var cppFileNames = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+                               where !compileElement.HasElements
                                select compileElement.Attribute("Include").Value;
 
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList());
@@ -110,7 +111,7 @@ namespace RudeBuild
         {
             var cppFileNameElements = 
                 from cppFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value)
+                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && !cppFileElement.HasElements
                 select cppFileElement;
             var cppFileNames = 
                 from cppFileElement in cppFileNameElements
