@@ -98,7 +98,10 @@ namespace RudeBuild
 
             string destProjectFiltersFileName = _globalSettings.ModifyFileName(projectFiltersFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName);
-            writer.Write(projectFiltersDocument.ToString());
+            if (writer.Write(projectFiltersDocument.ToString()))
+            {
+                _globalSettings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
+            }
         }
 
         private static bool IsValidCppFileName(string fileName)
@@ -152,7 +155,10 @@ namespace RudeBuild
 
             string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName);
-            writer.Write(projectDocument.ToString());
+            if (writer.Write(projectDocument.ToString()))
+            {
+                _globalSettings.Output.WriteLine("Creating project file " + destProjectFileName);
+            }
         }
     }
 }

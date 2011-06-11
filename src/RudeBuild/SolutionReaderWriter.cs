@@ -119,7 +119,10 @@ namespace RudeBuild
 
             string destFileName = _globalSettings.ModifyFileName(srcFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName);
-            writer.Write(destSolutionText.ToString());
+            if (writer.Write(destSolutionText.ToString()))
+            {
+                _globalSettings.Output.WriteLine("Creating solution file " + destFileName);
+            }
 
             return new SolutionInfo(srcFileName, version, projectFileNames);
         }

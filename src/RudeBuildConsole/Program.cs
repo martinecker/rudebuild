@@ -57,13 +57,21 @@ namespace RudeBuildConsole
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
                 projectReaderWriter.ReadWrite(solutionInfo);
+
+                ProcessLauncher processLauncher = new ProcessLauncher();
+                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
+                {
+                    Console.WriteLine("Stopping build...");
+                    processLauncher.Stop();
+                    cancelArgs.Cancel = true;
+                };
+                return processLauncher.Run(solutionInfo, globalSettings);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 return -1;
             }
-            return 0;
         }
 
         static int Main(string[] args)

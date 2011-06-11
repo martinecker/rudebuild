@@ -53,6 +53,9 @@
     <Compile Include="..\src\RudeBuild\ModifiedTextFileWriter.cs">
       <Link>ModifiedTextFileWriter.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuild\ProcessLauncher.cs">
+      <Link>ProcessLauncher.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuild\ProjectInfo.cs" />
     <Compile Include="..\src\RudeBuild\AssemblyInfo.cs" />
     <Compile Include="..\src\RudeBuild\ProjectReaderWriter.cs">

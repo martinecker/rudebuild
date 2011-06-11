@@ -66,9 +66,11 @@ namespace RudeBuild
             WritePostfix(text);
 
             string destFileName = Path.Combine(_cachePath, projectInfo.Name + fileIndex + ".cpp");
-            _globalSettings.Output.WriteLine("Creating unity file: " + projectInfo.Name + fileIndex);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName);
-            writer.Write(text.ToString());
+            if (writer.Write(text.ToString()))
+            {
+                _globalSettings.Output.WriteLine("Creating unity file " + projectInfo.Name + fileIndex);
+            }
 
             _unityFilePaths.Add(destFileName);
         }

@@ -11,7 +11,7 @@ namespace RudeBuild
             _fileName = fileName;
         }
 
-        public void Write(string text)
+        public bool Write(string text)
         {
             if (File.Exists(_fileName))
             {
@@ -19,7 +19,7 @@ namespace RudeBuild
                 {
                     string existingText = reader.ReadToEnd();
                     if (existingText == text)
-                        return;
+                        return false;
                 }
             }
 
@@ -27,6 +27,7 @@ namespace RudeBuild
             {
                 writer.Write(text);
             }
+            return true;
         }
     }
 }
