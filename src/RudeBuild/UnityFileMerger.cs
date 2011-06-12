@@ -111,7 +111,7 @@ namespace RudeBuild
                 currentUnityFileContents.AppendLine("#ifdef RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
                 currentUnityFileContents.AppendLine("#pragma message(\"" + Path.GetFileName(cppFileName) + "\")");
                 currentUnityFileContents.AppendLine("#endif");
-                currentUnityFileContents.AppendLine("#include \"" + cppFileName + "\"");
+                currentUnityFileContents.AppendLine("#include \"" + cppFilePath + "\"");
             }
 
             if (currentUnityFileSize > 0)

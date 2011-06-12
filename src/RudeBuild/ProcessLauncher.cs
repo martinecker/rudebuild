@@ -42,11 +42,13 @@ namespace RudeBuild
             else if (settings.RunOptions.Rebuild)
                 buildCommand = "Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", solutionInfo.FilePath, buildCommand, settings.RunOptions.Config);
-            if (settings.RunOptions.Project != string.Empty)
+            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", settings.ModifyFileName(solutionInfo.FilePath), buildCommand, settings.RunOptions.Config);
+            if (settings.RunOptions.Project != null)
             {
                 info.Arguments += string.Format(" /project \"{0}\"", settings.RunOptions.Project);
             }
+
+            settings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
 
             return process;
         }
@@ -60,7 +62,7 @@ namespace RudeBuild
             {
                 _process = CreateProcessObject(solutionInfo, settings);
                 _process.Start();
-                processRunning = _process.WaitForExit(100);
+                processRunning = !_process.WaitForExit(100);
             }
 
             while (processRunning)
@@ -72,7 +74,7 @@ namespace RudeBuild
                         _process = null;
                         return exitCode;
                     }
-                    processRunning = _process.WaitForExit(100);
+                    processRunning = !_process.WaitForExit(100);
                 }
             }
 
