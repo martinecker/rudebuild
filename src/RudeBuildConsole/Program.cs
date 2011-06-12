@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 using RudeBuild;
 
 namespace RudeBuildConsole
@@ -11,17 +12,27 @@ namespace RudeBuildConsole
         public void WriteLine(string line)
         {
             Console.WriteLine(line);
+            Debug.WriteLine(line);
+        }
+
+        public void WriteLine()
+        {
+            Console.WriteLine();
+            Debug.WriteLine("");
         }
     }
 
     public class Program
     {
+        private IOutput _output;
+
         private RunOptions ParseRunOptions(string[] args)
         {
-            Console.WriteLine("RudeBuild, Version 1.0");
-            Console.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker. This is free, open source software.");
-            Console.WriteLine("Arguments: " + string.Join(" ", args));
-            Console.WriteLine("");
+            _output.WriteLine("RudeBuild, Version 1.0");
+            _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker. This is free, open source software.");
+            _output.WriteLine();
+            _output.WriteLine("Arguments: " + string.Join(" ", args));
+            _output.WriteLine();
 
             CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
             parser.ShowUsageOnEmptyCommandline = true;
@@ -35,42 +46,44 @@ namespace RudeBuildConsole
             catch (CommandLineParser.Exceptions.CommandLineException e)
             {
                 parser.ShowUsage();
-                Console.WriteLine(e.Message);
+                _output.WriteLine(e.Message);
             }
             catch (System.IO.FileNotFoundException e)
             {
                 parser.ShowUsage();
-                Console.WriteLine(e.Message);
+                _output.WriteLine(e.Message);
             }
             return null;
         }
 
         private int Run(string[] args)
         {
+            _output = new ConsoleOutput();
+
             try
             {
                 RunOptions options = ParseRunOptions(args);
                 if (options == null)
                     return 1;
 
-                GlobalSettings globalSettings = new GlobalSettings(options, new ConsoleOutput());
+                GlobalSettings globalSettings = new GlobalSettings(options, _output);
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
                 projectReaderWriter.ReadWrite(solutionInfo);
 
-                ProcessLauncher processLauncher = new ProcessLauncher();
+                ProcessLauncher processLauncher = new ProcessLauncher(globalSettings);
                 Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
                 {
-                    Console.WriteLine("Stopping build...");
+                    _output.WriteLine("Stopping build...");
                     processLauncher.Stop();
                     cancelArgs.Cancel = true;
                 };
-                return processLauncher.Run(solutionInfo, globalSettings);
+                return processLauncher.Run(solutionInfo);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                _output.WriteLine(e.Message);
                 return -1;
             }
         }

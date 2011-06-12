@@ -15,7 +15,14 @@ namespace RudeBuild
         public string Project;
         [SwitchArgument('r', "rebuild", false, Description = "Does a full rebuild of the build target")]
         public bool Rebuild;
-        [SwitchArgument('l', "clean", false, Description = "Cleans the solution. Also deletes all RudeBuild-generated intermediate files.")]
+        [SwitchArgument('l', "clean", false, Description = "Cleans the solution. Also deletes all RudeBuild-generated intermediate cache files.")]
         public bool Clean;
+        [SwitchArgument('h', "cleanCache", false, Description = "Deletes all RudeBuild-generated intermediate cache files for the given solution, i.e. the cached unity .cpp files and the generated solution and project files.")]
+        public bool CleanCache;
+
+        public bool ShouldForceWriteCachedFiles()
+        {
+            return Rebuild || Clean || CleanCache;
+        }
     }
 }

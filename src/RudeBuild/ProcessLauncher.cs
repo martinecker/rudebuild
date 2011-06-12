@@ -6,9 +6,15 @@ namespace RudeBuild
 {
     public class ProcessLauncher
     {
+        private GlobalSettings _globalSettings;
         private object _processLock = new object();
         private Process _process = null;
         private bool _stopped = false;
+
+        public ProcessLauncher(GlobalSettings globalSettings)
+        {
+            _globalSettings = globalSettings;
+        }
 
         private string GetDevEnvPath(SolutionInfo solutionInfo)
         {
@@ -27,42 +33,51 @@ namespace RudeBuild
             return devEnvPath;
         }
 
-        private Process CreateProcessObject(SolutionInfo solutionInfo, GlobalSettings settings)
+        private Process CreateProcessObject(SolutionInfo solutionInfo)
         {
             Process process = new Process();
             ProcessStartInfo info = process.StartInfo;
             info.CreateNoWindow = true;
             info.UseShellExecute = false;
+            info.ErrorDialog = false;
             info.RedirectStandardOutput = true;
+            process.OutputDataReceived += delegate(object sendingProcess, DataReceivedEventArgs line)
+            {
+                _globalSettings.Output.WriteLine(line.Data);
+            };
+            
             info.FileName = GetDevEnvPath(solutionInfo);
 
             string buildCommand = "Build";
-            if (settings.RunOptions.Clean)
+            if (_globalSettings.RunOptions.Clean)
                 buildCommand = "Clean";
-            else if (settings.RunOptions.Rebuild)
+            else if (_globalSettings.RunOptions.Rebuild)
                 buildCommand = "Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", settings.ModifyFileName(solutionInfo.FilePath), buildCommand, settings.RunOptions.Config);
-            if (settings.RunOptions.Project != null)
+            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _globalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _globalSettings.RunOptions.Config);
+            if (_globalSettings.RunOptions.Project != null)
             {
-                info.Arguments += string.Format(" /project \"{0}\"", settings.RunOptions.Project);
+                info.Arguments += string.Format(" /project \"{0}\"", _globalSettings.RunOptions.Project);
             }
 
-            settings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
+            _globalSettings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
 
             return process;
         }
 
-        public int Run(SolutionInfo solutionInfo, GlobalSettings settings)
+        public int Run(SolutionInfo solutionInfo)
         {
-            bool processRunning = true;
+            bool processRunning = false;
             int exitCode = -1;
 
             lock (_processLock)
             {
-                _process = CreateProcessObject(solutionInfo, settings);
-                _process.Start();
-                processRunning = !_process.WaitForExit(100);
+                _process = CreateProcessObject(solutionInfo);
+                if (_process.Start())
+                {
+                    _process.BeginOutputReadLine();
+                    processRunning = !_process.WaitForExit(100);
+                }
             }
 
             while (processRunning)
@@ -71,16 +86,20 @@ namespace RudeBuild
                 {
                     if (_stopped)
                     {
-                        _process = null;
-                        return exitCode;
+                        processRunning = false;
                     }
-                    processRunning = !_process.WaitForExit(100);
+                    else
+                    {
+                        processRunning = !_process.WaitForExit(100);
+                        if (!processRunning)
+                            exitCode = _process.ExitCode;
+                    }
                 }
             }
 
             lock (_processLock)
             {
-                exitCode = _process.ExitCode;
+                _process.Close();
                 _process = null;
             }
             return exitCode;

@@ -118,7 +118,7 @@ namespace RudeBuild
             }
 
             string destFileName = _globalSettings.ModifyFileName(srcFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(destSolutionText.ToString()))
             {
                 _globalSettings.Output.WriteLine("Creating solution file " + destFileName);

@@ -97,7 +97,7 @@ namespace RudeBuild
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
             string destProjectFiltersFileName = _globalSettings.ModifyFileName(projectFiltersFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {
                 _globalSettings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
@@ -154,7 +154,7 @@ namespace RudeBuild
             }
 
             string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectDocument.ToString()))
             {
                 _globalSettings.Output.WriteLine("Creating project file " + destProjectFileName);
