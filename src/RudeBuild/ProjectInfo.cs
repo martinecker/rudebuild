@@ -29,12 +29,19 @@ namespace RudeBuild
             get { return _cppFileNames; }
         }
 
-        public ProjectInfo(SolutionInfo solution, string fileName, IList<string> cppFileNames)
+        private string _precompiledHeaderFileName;
+        public string PrecompiledHeaderFileName
+        {
+            get { return _precompiledHeaderFileName; }
+        }
+
+        public ProjectInfo(SolutionInfo solution, string fileName, IList<string> cppFileNames, string precompiledHeaderFileName)
         {
             _solution = solution;
             _fileName = fileName;
             _cppFileNames = cppFileNames;
             _name = Path.GetFileNameWithoutExtension(fileName);
+            _precompiledHeaderFileName = precompiledHeaderFileName;
         }
     }
 }

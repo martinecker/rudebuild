@@ -45,8 +45,13 @@ namespace RudeBuild
             Directory.CreateDirectory(_cachePath);
         }
 
-        private void WritePrefix(StringBuilder text)
+        private void WritePrefix(ProjectInfo projectInfo, StringBuilder text)
         {
+            if (!_globalSettings.RunOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
+            {
+                text.AppendLine("#include \"" + projectInfo.PrecompiledHeaderFileName + "\"");
+                text.AppendLine();
+            }
             text.AppendLine("#ifdef _MSC_VER");
             text.AppendLine("#define RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
             text.AppendLine("#endif");
@@ -82,7 +87,7 @@ namespace RudeBuild
             _unityFilePaths = new List<string>();
 
             StringBuilder currentUnityFileContents = new StringBuilder();
-            WritePrefix(currentUnityFileContents);
+            WritePrefix(projectInfo, currentUnityFileContents);
 
             int currentUnityFileIndex = 1;
             long currentUnityFileSize = 0;
@@ -104,7 +109,7 @@ namespace RudeBuild
 
                     currentUnityFileSize = 0;
                     currentUnityFileContents.Clear();
-                    WritePrefix(currentUnityFileContents);
+                    WritePrefix(projectInfo, currentUnityFileContents);
                     ++currentUnityFileIndex;
                 }
 

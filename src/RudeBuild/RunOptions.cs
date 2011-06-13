@@ -19,6 +19,8 @@ namespace RudeBuild
         public bool Clean;
         [SwitchArgument('h', "cleanCache", false, Description = "Deletes all RudeBuild-generated intermediate cache files for the given solution, i.e. the cached unity .cpp files and the generated solution and project files.")]
         public bool CleanCache;
+        [SwitchArgument('d', "disablePCH", false, Description = "Disables precompiled headers if the compiled project uses it. Precompiled headers are often times not a win when using unity builds.")]
+        public bool DisablePrecompiledHeaders;
 
         public bool ShouldForceWriteCachedFiles()
         {

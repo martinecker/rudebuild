@@ -62,7 +62,7 @@ namespace RudeBuild
                                where !compileElement.HasElements
                                select compileElement.Attribute("Include").Value;
 
-            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList());
+            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), null);
 
             UnityFileMerger merger = new UnityFileMerger(_globalSettings);
             merger.Process(projectInfo);
@@ -110,17 +110,57 @@ namespace RudeBuild
             return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
         }
 
+        private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
+        {
+            var configElements = 
+                from configElement in projectDocument.Descendants(ns + "Configuration")
+                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _globalSettings.RunOptions.Config
+                select configElement;
+            return configElements.SingleOrDefault();
+        }
+
+        private string GetPrecompiledHeader(XDocument projectDocument, XNamespace ns)
+        {
+            XElement configElement = GetConfigurationElement(projectDocument, ns);
+            if (null != configElement)
+            {
+                var precompiledHeaderAttributes =
+                    from toolElement in configElement.Elements(ns + "Tool")
+                    where toolElement.Attribute(ns + "UsePrecompiledHeader") != null && toolElement.Attribute(ns + "UsePrecompiledHeader").Value == "2"
+                    select toolElement.Attribute(ns + "PrecompiledHeaderThrough");
+                XAttribute precompiledHeader = precompiledHeaderAttributes.SingleOrDefault();
+                if (null != precompiledHeader)
+                {
+                    return precompiledHeader.Value;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
+        {
+            var pchAttributes =
+                from pchAttribute in projectDocument.Descendants().Attributes(ns + "UsePrecompiledHeader")
+                select pchAttribute;
+            foreach (XAttribute pchAttribute in pchAttributes.ToList())
+            {
+                pchAttribute.Value = "0";
+            }
+        }
+
         private void ReadWritePreVS2010(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns)
         {
             var cppFileNameElements = 
                 from cppFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && !cppFileElement.HasElements
+                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && !cppFileElement.HasElements     // Exclude any files that have special handling, such as precompiled headers, etc.
                 select cppFileElement;
             var cppFileNames = 
                 from cppFileElement in cppFileNameElements
                 select cppFileElement.Attribute("RelativePath").Value;
 
-            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList());
+            string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
+            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
 
             UnityFileMerger merger = new UnityFileMerger(_globalSettings);
             merger.Process(projectInfo);
@@ -131,6 +171,11 @@ namespace RudeBuild
             filesElement.Add(
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
+
+            if (_globalSettings.RunOptions.DisablePrecompiledHeaders)
+            {
+                DisablePrecompiledHeaders(projectDocument, ns);
+            }
         }
 
         private void ReadWrite(string projectFileName, SolutionInfo solutionInfo)
