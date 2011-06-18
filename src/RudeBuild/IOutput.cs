@@ -4,5 +4,7 @@ namespace RudeBuild
     {
         void WriteLine(string line);
         void WriteLine();
+        void Activate();
+        void Clear();
     }
 }

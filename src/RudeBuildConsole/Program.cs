@@ -20,6 +20,15 @@ namespace RudeBuildConsole
             Console.WriteLine();
             Debug.WriteLine("");
         }
+
+        public void Activate()
+        {
+        }
+
+        public void Clear()
+        {
+            Console.Clear();
+        }
     }
 
     public class Program
@@ -29,7 +38,8 @@ namespace RudeBuildConsole
         private RunOptions ParseRunOptions(string[] args)
         {
             _output.WriteLine("RudeBuild, Version 1.0");
-            _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker. This is free, open source software.");
+            _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker.");
+            _output.WriteLine("This is free, open source software under the zlib license.");
             _output.WriteLine();
             _output.WriteLine("Arguments: " + string.Join(" ", args));
             _output.WriteLine();

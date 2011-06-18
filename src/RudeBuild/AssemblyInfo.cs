@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RudeBuild")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("PlayGroovy")]
+[assembly: AssemblyCompany("Martin Ecker/PlayGroovy")]
 [assembly: AssemblyProduct("RudeBuild")]
-[assembly: AssemblyCopyright("Copyright © PlayGroovy 2011")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker/PlayGroovy 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
