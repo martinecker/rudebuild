@@ -60,6 +60,9 @@
     <Compile Include="..\src\RudeBuildAddIn\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Builder.cs">
+      <Link>Builder.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\CommandManager.cs">
       <Link>CommandManager.cs</Link>
     </Compile>

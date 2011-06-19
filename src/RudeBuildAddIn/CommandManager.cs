@@ -20,7 +20,7 @@ namespace RudeBuildAddIn
             _vsCommands = (Commands2)Application.Commands;
         }
 
-        public void RegisterCommand(ICommand command, string name, string caption, string toolTip, string icon)
+        public void RegisterCommand(string name, string caption, string toolTip, string icon, ICommand command)
         {
             EnvDTE.Command vsCommand = _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
             command.Initialize(name, caption, toolTip, icon, vsCommand);
