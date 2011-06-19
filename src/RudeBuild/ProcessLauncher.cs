@@ -57,7 +57,10 @@ namespace RudeBuild
             info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _globalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _globalSettings.RunOptions.Config);
             if (_globalSettings.RunOptions.Project != null)
             {
-                info.Arguments += string.Format(" /project \"{0}\"", _globalSettings.FileNamePrefix + _globalSettings.RunOptions.Project);
+                string projectName = _globalSettings.RunOptions.Project;
+                if (solutionInfo.Version == VisualStudioVersion.VS2010)     // VS2010 expects the project file name instead of the actual project name on the command line.
+                    projectName = _globalSettings.FileNamePrefix + projectName;
+                info.Arguments += string.Format(" /project \"{0}\"", projectName);
             }
 
             _globalSettings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
