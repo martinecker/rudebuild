@@ -57,7 +57,7 @@ namespace RudeBuild
             info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _globalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _globalSettings.RunOptions.Config);
             if (_globalSettings.RunOptions.Project != null)
             {
-                info.Arguments += string.Format(" /project \"{0}\"", _globalSettings.RunOptions.Project);
+                info.Arguments += string.Format(" /project \"{0}\"", _globalSettings.FileNamePrefix + _globalSettings.RunOptions.Project);
             }
 
             _globalSettings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);

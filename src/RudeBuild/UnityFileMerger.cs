@@ -41,7 +41,8 @@ namespace RudeBuild
             string solutionDirectory = projectInfo.Solution.Name + "_" + GetMD5Hash(projectInfo.Solution.FilePath);
             string config = _globalSettings.RunOptions.Config.Replace('|', '-');
 
-            _cachePath = Path.Combine(_globalSettings.CachePath, solutionDirectory, config);
+            _cachePath = Path.Combine(_globalSettings.CachePath, solutionDirectory);
+            _cachePath = Path.Combine(_cachePath, config);
             Directory.CreateDirectory(_cachePath);
         }
 
@@ -108,7 +109,7 @@ namespace RudeBuild
                     WriteUnityFile(projectInfo, currentUnityFileContents, currentUnityFileIndex);
 
                     currentUnityFileSize = 0;
-                    currentUnityFileContents.Clear();
+                    currentUnityFileContents = new StringBuilder();
                     WritePrefix(projectInfo, currentUnityFileContents);
                     ++currentUnityFileIndex;
                 }

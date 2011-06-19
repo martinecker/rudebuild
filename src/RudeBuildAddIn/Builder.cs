@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Diagnostics;
 using RudeBuild;
 
 namespace RudeBuildAddIn
@@ -9,6 +11,7 @@ namespace RudeBuildAddIn
     {
         private EnvDTE80.DTE2 _application;
         private IOutput _output;
+        private Stopwatch _stopwatch;
 
         private object _lock = new object();
         private ProcessLauncher _processLauncher;
@@ -41,6 +44,7 @@ namespace RudeBuildAddIn
         {
             _application = application;
             _output = output;
+            _stopwatch = new Stopwatch();
         }
 
         public void Build(RunOptions options)
@@ -63,12 +67,26 @@ namespace RudeBuildAddIn
 
         private void BuildThread(GlobalSettings globalSettings)
         {
+            _output.Clear();
+            _output.Activate();
+            _output.WriteLine("RudeBuild building...");
+            _output.WriteLine();
+
+            _stopwatch.Reset();
+            _stopwatch.Start();
+
             SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
             SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(globalSettings.RunOptions.Solution.FullName);
             ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
             projectReaderWriter.ReadWrite(solutionInfo);
 
             int exitCode = _processLauncher.Run(solutionInfo);
+            
+            _stopwatch.Stop();
+            TimeSpan ts = _stopwatch.Elapsed;
+            string buildTimeText = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            _output.WriteLine("Build time: " + buildTimeText);
+            
             lock (_lock)
             {
                 _lastBuildWasSuccessful = _isBeingStopped ? false : exitCode == 0;
@@ -84,6 +102,7 @@ namespace RudeBuildAddIn
                 lock (_lock)
                 {
                     _isBeingStopped = true;
+                    _output.WriteLine("Stopping build...");
                     Thread stopThread = new Thread(delegate() { StopThread(); });
                     stopThread.Start();
                 }
@@ -107,6 +126,7 @@ namespace RudeBuildAddIn
                 {
                     _lastBuildWasStopped = true;
                     _isBeingStopped = false;
+                    _output.WriteLine("Build stopped.");
                 }
             }
         }

@@ -6,41 +6,52 @@ namespace RudeBuildAddIn
 	public class OutputPane : IOutput
 	{
         private EnvDTE.Window _window;
+        private EnvDTE.OutputWindow _outputWindow;
 		private EnvDTE.OutputWindowPane _outputPane;
 
         public OutputPane(EnvDTE80.DTE2 application, string name)
 		{
             _window = application.Windows.Item(EnvDTE.Constants.vsWindowKindOutput);
-            EnvDTE.OutputWindow outputWindow = (EnvDTE.OutputWindow)_window.Object;
-            var outputWindowPane = from EnvDTE.OutputWindowPane pane in outputWindow.OutputWindowPanes
+            if (null == _window)
+                return;
+            _outputWindow = _window.Object as EnvDTE.OutputWindow;
+            if (null == _outputWindow)
+                return;
+            var outputWindowPane = from EnvDTE.OutputWindowPane pane in _outputWindow.OutputWindowPanes
                                    where pane.Name == name
                                    select pane;
             _outputPane = outputWindowPane.SingleOrDefault();
             if (_outputPane == null)
             {
-                _outputPane = outputWindow.OutputWindowPanes.Add(name);
+                _outputPane = _outputWindow.OutputWindowPanes.Add(name);
             }
 		}
 
 		public void WriteLine(string line)
 		{
-            _outputPane.OutputString(line + "\r\n");
+            if (null != _outputPane)
+                _outputPane.OutputString(line + "\r\n");
 		}
 
         public void WriteLine()
         {
-            _outputPane.OutputString("\r\n");
+            if (null != _outputPane)
+                _outputPane.OutputString("\r\n");
         }
 
 		public void Activate()
 		{
-			_outputPane.Activate();
-            _window.Activate();
+            if (null != _outputPane)
+            {
+                _outputPane.Activate();
+                _window.Activate();
+            }
 		}
 
 		public void Clear()
 		{
-			_outputPane.Clear();
+            if (null != _outputPane) 
+                _outputPane.Clear();
 		}
 	}
 }

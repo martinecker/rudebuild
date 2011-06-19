@@ -12,6 +12,8 @@
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>RudeBuildAddIn</AssemblyName>
     <DeploymentDirectory>..\bin\</DeploymentDirectory>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,10 +52,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -69,14 +68,32 @@
     <Compile Include="..\src\RudeBuildAddIn\CommandRegistry.cs">
       <Link>CommandRegistry.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\AboutCommand.cs">
+      <Link>Commands\AboutCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildCommandBase.cs">
+      <Link>Commands\BuildCommandBase.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildProjectCommand.cs">
+      <Link>Commands\BuildProjectCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildSolutionCommand.cs">
+      <Link>Commands\BuildSolutionCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\GlobalSettingsCommand.cs">
+      <Link>Commands\GlobalSettingsCommand.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\Commands\ICommand.cs">
       <Link>Commands\ICommand.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\SolutionSettingsCommand.cs">
+      <Link>Commands\SolutionSettingsCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\StopBuildCommand.cs">
+      <Link>Commands\StopBuildCommand.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\Connect.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Icons.Designer.cs">
-      <Link>Icons.Designer.cs</Link>
     </Compile>
     <Compile Include="..\src\RudeBuildAddIn\OutputPane.cs">
       <Link>OutputPane.cs</Link>
@@ -139,10 +156,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="C:\Users\asgard\Documents\Visual Studio 2010\Addins\RudeBuild - For Testing.AddIn">
-      <Link>RudeBuild - For Testing.AddIn</Link>
+    <Content Include="..\src\RudeBuildAddIn\RudeBuild.AddIn">
+      <SubType>Designer</SubType>
     </Content>
-    <Content Include="..\src\RudeBuildAddIn\RudeBuild.AddIn" />
     <None Include="..\src\RudeBuildAddIn\Resources\StopBuild.bmp">
       <Link>Resources\StopBuild.bmp</Link>
     </None>
@@ -175,30 +191,12 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>set SDKDIR="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+mkdir "$(ProjectDir)$(OutDir)en-US"
+cd "$(ProjectDir)..\src\RudeBuildAddIn"
+%25SDKDIR%25\resgen Icons.resx
+%25SDKDIR%25\al /embed:Icons.resources /culture:en-US /out:"$(ProjectDir)$(OutDir)en-US\RudeBuild.resources.dll"
+del Icons.resources</PostBuildEvent>
   </PropertyGroup>
   <ProjectExtensions />
-  <Target Name="AfterBuild">
-    <PropertyGroup>
-      <DllName>$(AssemblyName).dll</DllName>
-      <PdbName>$(AssemblyName).pdb</PdbName>
-      <DocFileName>$(AssemblyName).xml</DocFileName>
-    </PropertyGroup>
-    <Delete Condition="Exists('$(DeploymentDirectory)$(DllName)')" Files="$(DeploymentDirectory)$(DllName)">
-    </Delete>
-    <Delete Condition="Exists('$(DeploymentDirectory)$(PdbName)')" Files="$(DeploymentDirectory)$(PdbName)">
-    </Delete>
-    <Delete Condition="Exists('$(DeploymentDirectory)$(DocFileName)')" Files="$(DeploymentDirectory)$(DocFileName)">
-    </Delete>
-    <Copy Condition="Exists('$(OutputPath)$(DllName)')" SourceFiles="$(OutputPath)$(DllName)" DestinationFolder="$(DeploymentDirectory)">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
-    </Copy>
-    <Copy Condition="Exists('$(OutputPath)$(PdbName)')" SourceFiles="$(OutputPath)$(PdbName)" DestinationFolder="$(DeploymentDirectory)">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
-    </Copy>
-    <Copy Condition="Exists('$(OutputPath)$(DocFileName)')" SourceFiles="$(OutputPath)$(DocFileName)" DestinationFolder="$(DeploymentDirectory)">
-      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
-    </Copy>
-  </Target>
 </Project>
