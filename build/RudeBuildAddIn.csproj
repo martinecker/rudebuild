@@ -159,6 +159,9 @@
     <Content Include="..\src\RudeBuildAddIn\RudeBuild.AddIn">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="..\src\RudeBuildAddIn\RudeBuildTest.AddIn">
+      <Link>RudeBuildTest.AddIn</Link>
+    </Content>
     <None Include="..\src\RudeBuildAddIn\Resources\StopBuild.bmp">
       <Link>Resources\StopBuild.bmp</Link>
     </None>

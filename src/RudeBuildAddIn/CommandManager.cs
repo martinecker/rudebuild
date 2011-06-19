@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -79,9 +80,18 @@ namespace RudeBuildAddIn
             return result.SingleOrDefault();
         }
 
+        public IList<CommandBar> FindCommandBars(string name)
+        {
+            CommandBars commandBars = (CommandBars)Application.CommandBars;
+            var result = from CommandBar commandBar in commandBars
+                         where commandBar.Name == name
+                         select commandBar;
+            return result.ToList();
+        }
+
         public CommandBar FindPopupCommandBar(CommandBar parentCommandBar, string popupCommandBarName)
         {
-            if (parentCommandBar == null)
+            if (null == parentCommandBar)
                 return null;
 
             var commandBarControl = from CommandBarControl control in parentCommandBar.Controls
@@ -100,7 +110,7 @@ namespace RudeBuildAddIn
 
         public CommandBarControl FindCommandBarControlByCaption(CommandBar commandBar, string caption)
         {
-            if (commandBar == null)
+            if (null == commandBar)
                 return null;
 
             string captionText = caption.Replace("&", string.Empty);
@@ -117,7 +127,7 @@ namespace RudeBuildAddIn
 
         public CommandBarControl FindCommandBarControlByTag(CommandBar commandBar, string tag)
         {
-            if (commandBar == null)
+            if (null == commandBar)
                 return null;
 
             var commandBarControl = from CommandBarControl control in commandBar.Controls
@@ -147,14 +157,14 @@ namespace RudeBuildAddIn
             return commandBar;
         }
 
-        public CommandBar AddPopupCommandBar(string parentCommandBarName, string popupCommandBarName, string caption, int insertIndex = 1, bool beginGroup = false)
+        public CommandBar AddPopupCommandBar(CommandBar parentCommandBar, string popupCommandBarName, string caption, int insertIndex = 1, bool beginGroup = false)
         {
-            CommandBar commandBar = FindPopupCommandBar(parentCommandBarName, popupCommandBarName);
+            if (null == parentCommandBar)
+                return null;
+
+            CommandBar commandBar = FindPopupCommandBar(parentCommandBar, popupCommandBarName);
             if (null == commandBar)
             {
-                CommandBar parentCommandBar = FindCommandBar(parentCommandBarName);
-                if (null == parentCommandBar)
-                    return null;
                 CommandBarPopup commandBarPopup = parentCommandBar.Controls.Add(MsoControlType.msoControlPopup, Before: insertIndex, Temporary: true) as CommandBarPopup;
                 if (null == commandBarPopup)
                     return null;
@@ -167,16 +177,33 @@ namespace RudeBuildAddIn
             return commandBar;
         }
 
+        public CommandBar AddPopupCommandBar(string parentCommandBarName, string popupCommandBarName, string caption, int insertIndex = 1, bool beginGroup = false)
+        {
+            CommandBar commandBar = FindPopupCommandBar(parentCommandBarName, popupCommandBarName);
+            if (null != commandBar)
+                return commandBar;
+
+            CommandBar parentCommandBar = FindCommandBar(parentCommandBarName);
+            if (null == parentCommandBar)
+                return null;
+            return AddPopupCommandBar(parentCommandBar, popupCommandBarName, caption, insertIndex, beginGroup);
+        }
+
         public void AddCommandToCommandBar(CommandBar commandBar, string commandName, int insertIndex = 1, bool beginGroup = false, MsoButtonStyle style = MsoButtonStyle.msoButtonIconAndCaption)
         {
             ICommand command = GetCommand(commandName);
-            if (command != null && FindCommandBarControlByTag(commandBar, commandName) == null)
+            if (null == command)
+                return;
+
+            CommandBarControl existingControl = FindCommandBarControlByTag(commandBar, commandName);
+            if (null != existingControl)
             {
-                CommandBarButton commandBarButton = (CommandBarButton)command.VSCommand.AddControl(commandBar, insertIndex);
-                commandBarButton.Tag = commandName;
-                commandBarButton.BeginGroup = beginGroup;
-                commandBarButton.Style = style;
+                existingControl.Delete();
             }
+            CommandBarButton commandBarButton = (CommandBarButton)command.VSCommand.AddControl(commandBar, insertIndex);
+            commandBarButton.Tag = commandName;
+            commandBarButton.BeginGroup = beginGroup;
+            commandBarButton.Style = style;
         }
 
         #endregion
