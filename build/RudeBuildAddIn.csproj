@@ -50,9 +50,12 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +100,12 @@
     </Compile>
     <Compile Include="..\src\RudeBuildAddIn\OutputPane.cs">
       <Link>OutputPane.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Installer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Installer.Designer.cs">
+      <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

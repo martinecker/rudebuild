@@ -1,7 +1,13 @@
 RudeBuild, Version 1.0
 ----------------------
+
 A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.
 This is free, open source software under the zlib license.
+
+For more information and latest updates please visit:
+http://rudebuild.sourceforge.net
+
+----------------------
 
 RudeBuild is a non-intrusive bulk/unity C++ build tool that seamlessly 
 integrates into Visual Studio 2008 and 2010. It can speed up build times 
@@ -26,5 +32,7 @@ in both File1.cpp and File2.cpp.
 The command line version of RudeBuild is useful for automated builds, for
 example on build servers. A solution file, build configuration and optionally
 a project name must be specified on the command line.
+
+----------------------
 
 RudeBuild is written in C# and requires the .NET framework 3.5 or higher.

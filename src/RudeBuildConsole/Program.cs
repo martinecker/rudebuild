@@ -41,6 +41,9 @@ namespace RudeBuildConsole
             _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker.");
             _output.WriteLine("This is free, open source software under the zlib license.");
             _output.WriteLine();
+            _output.WriteLine("For more information and latest updates please visit:");
+            _output.WriteLine("http://rudebuild.sourceforge.net");
+
             _output.WriteLine("Arguments: " + string.Join(" ", args));
             _output.WriteLine();
 
