@@ -5,9 +5,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
+             xmlns:RudeBuildAddIn="clr-namespace:RudeBuildAddIn"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Title="RudeBuild Global Settings" Width="500" Height="175">
+    <Window.Resources>
+        <RudeBuildAddIn:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="28*" />
@@ -23,7 +27,7 @@
                  Text="{Binding Path=FileNamePrefix}"/>
         <Label Height="25" Margin="10,0,0,0" Grid.Row="2">Max. Unity File Size (KBs):</Label>
         <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,0,6,0" Grid.Row="2"
-                 Text="{Binding Path=MaxUnityFileSizeInBytes}"/>
+                 Text="{Binding Path=MaxUnityFileSizeInBytes, Converter={StaticResource bytesToKiloBytesConverter}}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Width="Auto" Margin="0,0,6,6" Grid.Row="3">
             <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,0,0" Name="okButton" Width="75" Click="OnOK" />
             <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="10,0,0,0" Name="cancelButton" Width="75" Click="OnCancel" />
