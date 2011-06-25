@@ -82,6 +82,10 @@ namespace RudeBuildConsole
                 GlobalSettings globalSettings = new GlobalSettings();
                 globalSettings.Write();
                 Settings settings = new Settings(globalSettings, options, _output);
+
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
@@ -94,7 +98,15 @@ namespace RudeBuildConsole
                     processLauncher.Stop();
                     cancelArgs.Cancel = true;
                 };
-                return processLauncher.Run(solutionInfo);
+                
+                int exitCode = processLauncher.Run(solutionInfo);
+
+                stopwatch.Stop();
+                TimeSpan ts = stopwatch.Elapsed;
+                string buildTimeText = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+                _output.WriteLine("Build time: " + buildTimeText);
+
+                return exitCode;
             }
             catch (Exception e)
             {
