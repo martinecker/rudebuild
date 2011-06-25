@@ -17,14 +17,14 @@ namespace RudeBuild
             }
         }
 
-        public string CachePath { get; private set; }
-        public string FileNamePrefix { get; private set; }
+        public string CachePath { get; set; }
+        public string FileNamePrefix { get; set; }
 
         private long _maxUnityFileSizeInBytes;
         public long MaxUnityFileSizeInBytes
         {
             get { return _maxUnityFileSizeInBytes; }
-            private set { _maxUnityFileSizeInBytes = value; }
+            set { _maxUnityFileSizeInBytes = value; }
         }
 
         public GlobalSettings()

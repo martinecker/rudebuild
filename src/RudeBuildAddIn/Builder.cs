@@ -64,6 +64,7 @@ namespace RudeBuildAddIn
             if (IsBuilding)
                 return;
 
+            _globalSettings.Read();
             Settings settings = new Settings(_globalSettings, options, _output);
 
             lock (_lock)

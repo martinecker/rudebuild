@@ -4,16 +4,22 @@ namespace RudeBuildAddIn
 {
     public class GlobalSettingsCommand : CommandBase
     {
+        private Builder _builder;
+
+        public GlobalSettingsCommand(Builder builder)
+        {
+            _builder = builder;
+        }
+
         public override void Execute(CommandManager commandManager)
         {
-            GlobalSettings globalSettings = new GlobalSettings();
-            GlobalSettingsDialog dialog = new GlobalSettingsDialog(globalSettings);
+            GlobalSettingsDialog dialog = new GlobalSettingsDialog();
             dialog.ShowDialog();
         }
 
         public override bool IsEnabled(CommandManager commandManager)
         {
-            return true;
+            return !_builder.IsBuilding;
         }
     }
 }

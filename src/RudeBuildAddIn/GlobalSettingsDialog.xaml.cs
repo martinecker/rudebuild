@@ -15,22 +15,26 @@ using RudeBuild;
 
 namespace RudeBuildAddIn
 {
-    /// <summary>
-    /// Interaction logic for GlobalSettingsDialog.xaml
-    /// </summary>
     public partial class GlobalSettingsDialog : Window
     {
         private GlobalSettings _globalSettings;
 
-        public GlobalSettingsDialog(GlobalSettings globalSettings)
+        public GlobalSettingsDialog()
         {
-            _globalSettings = globalSettings;
             InitializeComponent();
+            _globalSettings = new GlobalSettings();
+            _window.DataContext = _globalSettings;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void OnOK(object sender, RoutedEventArgs e)
         {
+            _globalSettings.Write();
+            DialogResult = true;
+        }
 
+        private void OnCancel(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
         }
     }
 }
