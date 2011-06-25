@@ -7,7 +7,7 @@ namespace RudeBuild
 {
     public class UnityFileMerger
     {
-        private GlobalSettings _globalSettings;
+        private Settings _settings;
         private string _cachePath;
         private IList<string> _unityFilePaths;
         public IList<string> UnityFilePaths
@@ -15,9 +15,9 @@ namespace RudeBuild
             get { return _unityFilePaths; }
         }
 
-        public UnityFileMerger(GlobalSettings globalSettings)
+        public UnityFileMerger(Settings settings)
         {
-            _globalSettings = globalSettings;
+            _settings = settings;
         }
 
         private static string GetMD5Hash(string input)
@@ -39,16 +39,16 @@ namespace RudeBuild
         private void CreateCachePath(ProjectInfo projectInfo)
         {
             string solutionDirectory = projectInfo.Solution.Name + "_" + GetMD5Hash(projectInfo.Solution.FilePath);
-            string config = _globalSettings.RunOptions.Config.Replace('|', '-');
+            string config = _settings.RunOptions.Config.Replace('|', '-');
 
-            _cachePath = Path.Combine(_globalSettings.CachePath, solutionDirectory);
+            _cachePath = Path.Combine(_settings.GlobalSettings.CachePath, solutionDirectory);
             _cachePath = Path.Combine(_cachePath, config);
             Directory.CreateDirectory(_cachePath);
         }
 
         private void WritePrefix(ProjectInfo projectInfo, StringBuilder text)
         {
-            if (!_globalSettings.RunOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
+            if (!_settings.RunOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
             {
                 text.AppendLine("#include \"" + projectInfo.PrecompiledHeaderFileName + "\"");
                 text.AppendLine();
@@ -72,10 +72,10 @@ namespace RudeBuild
             WritePostfix(text);
 
             string destFileName = Path.Combine(_cachePath, projectInfo.Name + fileIndex + ".cpp");
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(text.ToString()))
             {
-                _globalSettings.Output.WriteLine("Creating unity file " + projectInfo.Name + fileIndex);
+                _settings.Output.WriteLine("Creating unity file " + projectInfo.Name + fileIndex);
             }
 
             _unityFilePaths.Add(destFileName);
@@ -98,13 +98,13 @@ namespace RudeBuild
                 string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
                 if (!File.Exists(cppFilePath))
                 {
-                    _globalSettings.Output.WriteLine("Input file '" + cppFileName + "' does not exist. Skipping.");
+                    _settings.Output.WriteLine("Input file '" + cppFileName + "' does not exist. Skipping.");
                     continue;
                 }
 
                 FileInfo fileInfo = new FileInfo(cppFilePath);
                 currentUnityFileSize += fileInfo.Length;
-                if (currentUnityFileSize > _globalSettings.MaxUnityFileSize)
+                if (currentUnityFileSize > _settings.GlobalSettings.MaxUnityFileSizeInBytes)
                 {
                     WriteUnityFile(projectInfo, currentUnityFileContents, currentUnityFileIndex);
 

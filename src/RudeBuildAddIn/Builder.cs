@@ -9,6 +9,8 @@ namespace RudeBuildAddIn
 {
     public class Builder
     {
+        private GlobalSettings _globalSettings;
+
         private EnvDTE80.DTE2 _application;
         private IOutput _output;
         private Stopwatch _stopwatch;
@@ -45,6 +47,16 @@ namespace RudeBuildAddIn
             _application = application;
             _output = output;
             _stopwatch = new Stopwatch();
+
+            _globalSettings = new GlobalSettings();
+            try
+            {
+                _globalSettings.Write();
+            }
+            catch (System.Exception ex)
+            {
+                _output.WriteLine(ex.Message);
+            }
         }
 
         public void Build(RunOptions options)
@@ -52,20 +64,20 @@ namespace RudeBuildAddIn
             if (IsBuilding)
                 return;
 
-            GlobalSettings globalSettings = new GlobalSettings(options, _output);
+            Settings settings = new Settings(_globalSettings, options, _output);
 
             lock (_lock)
             {
-                _processLauncher = new ProcessLauncher(globalSettings);
+                _processLauncher = new ProcessLauncher(settings);
                 _lastBuildWasStopped = false;
                 _isBeingStopped = false;
-                _buildThread = new Thread(delegate() { BuildThread(globalSettings); });
+                _buildThread = new Thread(delegate() { BuildThread(settings); });
                 _buildThread.IsBackground = true;
                 _buildThread.Start();
             }
         }
 
-        private void BuildThread(GlobalSettings globalSettings)
+        private void BuildThread(Settings settings)
         {
             _output.Clear();
             _output.Activate();
@@ -75,18 +87,27 @@ namespace RudeBuildAddIn
             _stopwatch.Reset();
             _stopwatch.Start();
 
-            SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
-            SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(globalSettings.RunOptions.Solution.FullName);
-            ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
-            projectReaderWriter.ReadWrite(solutionInfo);
+            int exitCode = -1;
+            try
+            {
+                SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
+                SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(settings.RunOptions.Solution.FullName);
+                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
+                projectReaderWriter.ReadWrite(solutionInfo);
 
-            int exitCode = _processLauncher.Run(solutionInfo);
-            
+                exitCode = _processLauncher.Run(solutionInfo);
+            }
+            catch (System.Exception ex)
+            {
+                _output.WriteLine("Build failed. An error occurred while building:");
+                _output.WriteLine(ex.Message);
+            }
+
             _stopwatch.Stop();
             TimeSpan ts = _stopwatch.Elapsed;
             string buildTimeText = string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             _output.WriteLine("Build time: " + buildTimeText);
-            
+
             lock (_lock)
             {
                 _lastBuildWasSuccessful = _isBeingStopped ? false : exitCode == 0;
@@ -101,6 +122,9 @@ namespace RudeBuildAddIn
             {
                 lock (_lock)
                 {
+                    if (_isBeingStopped)
+                        return;
+
                     _isBeingStopped = true;
                     _output.WriteLine("Stopping build...");
                     Thread stopThread = new Thread(delegate() { StopThread(); });
@@ -120,13 +144,21 @@ namespace RudeBuildAddIn
             }
             if (processLauncher != null && buildThread != null)
             {
-                processLauncher.Stop();
-                buildThread.Join();
+                try
+                {
+                    processLauncher.Stop();
+                    buildThread.Join();
+                    _output.WriteLine("Build stopped.");
+                }
+                catch (System.Exception ex)
+                {
+                    _output.WriteLine("An error occurred trying to stop the build:");
+                    _output.WriteLine(ex.Message);
+                }
                 lock (_lock)
                 {
                     _lastBuildWasStopped = true;
                     _isBeingStopped = false;
-                    _output.WriteLine("Build stopped.");
                 }
             }
         }

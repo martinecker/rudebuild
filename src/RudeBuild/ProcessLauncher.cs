@@ -6,14 +6,14 @@ namespace RudeBuild
 {
     public class ProcessLauncher
     {
-        private GlobalSettings _globalSettings;
+        private Settings _settings;
         private object _processLock = new object();
         private Process _process = null;
         private bool _stopped = false;
 
-        public ProcessLauncher(GlobalSettings globalSettings)
+        public ProcessLauncher(Settings settings)
         {
-            _globalSettings = globalSettings;
+            _settings = settings;
         }
 
         private string GetDevEnvPath(SolutionInfo solutionInfo)
@@ -43,67 +43,73 @@ namespace RudeBuild
             info.RedirectStandardOutput = true;
             process.OutputDataReceived += delegate(object sendingProcess, DataReceivedEventArgs line)
             {
-                _globalSettings.Output.WriteLine(line.Data);
+                _settings.Output.WriteLine(line.Data);
             };
             
             info.FileName = GetDevEnvPath(solutionInfo);
 
             string buildCommand = "Build";
-            if (_globalSettings.RunOptions.Clean)
+            if (_settings.RunOptions.Clean)
                 buildCommand = "Clean";
-            else if (_globalSettings.RunOptions.Rebuild)
+            else if (_settings.RunOptions.Rebuild)
                 buildCommand = "Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _globalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _globalSettings.RunOptions.Config);
-            if (_globalSettings.RunOptions.Project != null)
+            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.RunOptions.Config);
+            if (_settings.RunOptions.Project != null)
             {
-                string projectName = _globalSettings.RunOptions.Project;
+                string projectName = _settings.RunOptions.Project;
                 if (solutionInfo.Version == VisualStudioVersion.VS2010)     // VS2010 expects the project file name instead of the actual project name on the command line.
-                    projectName = _globalSettings.FileNamePrefix + projectName;
+                    projectName = _settings.GlobalSettings.FileNamePrefix + projectName;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
             }
 
-            _globalSettings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
+            _settings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
 
             return process;
         }
 
         public int Run(SolutionInfo solutionInfo)
         {
-            bool processRunning = false;
             int exitCode = -1;
 
-            lock (_processLock)
+            try
             {
-                _process = CreateProcessObject(solutionInfo);
-                if (_process.Start())
+                bool processRunning = false;
+                lock (_processLock)
                 {
-                    _process.BeginOutputReadLine();
-                    processRunning = !_process.WaitForExit(100);
+                    _stopped = false;
+                    _process = CreateProcessObject(solutionInfo);
+                    if (_process.Start())
+                    {
+                        _process.BeginOutputReadLine();
+                        processRunning = !_process.WaitForExit(100);
+                    }
+                }
+
+                while (processRunning)
+                {
+                    lock (_processLock)
+                    {
+                        if (_stopped)
+                        {
+                            processRunning = false;
+                        }
+                        else
+                        {
+                            processRunning = !_process.WaitForExit(100);
+                            if (!processRunning)
+                                exitCode = _process.ExitCode;
+                        }
+                    }
                 }
             }
-
-            while (processRunning)
+            finally
             {
                 lock (_processLock)
                 {
-                    if (_stopped)
-                    {
-                        processRunning = false;
-                    }
-                    else
-                    {
-                        processRunning = !_process.WaitForExit(100);
-                        if (!processRunning)
-                            exitCode = _process.ExitCode;
-                    }
+                    _process.Close();
+                    _process = null;
                 }
-            }
-
-            lock (_processLock)
-            {
-                _process.Close();
-                _process = null;
             }
             return exitCode;
         }
@@ -115,6 +121,8 @@ namespace RudeBuild
                 if (null == _process)
                     return;
 
+                _stopped = false;
+
                 Process killProcess = new System.Diagnostics.Process();
                 ProcessStartInfo info = killProcess.StartInfo;
                 info.UseShellExecute = false;
@@ -124,9 +132,8 @@ namespace RudeBuild
                 if (killProcess.Start())
                 {
                     killProcess.WaitForExit();
+                    _stopped = true;
                 }
-
-                _stopped = true;
             }
         }
     }

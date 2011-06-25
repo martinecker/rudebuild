@@ -6,11 +6,11 @@ namespace RudeBuild
 {
     public class SolutionReaderWriter
     {
-        private GlobalSettings _globalSettings;
+        private Settings _settings;
 
-        public SolutionReaderWriter(GlobalSettings globalSettings)
+        public SolutionReaderWriter(Settings settings)
         {
-            _globalSettings = globalSettings;
+            _settings = settings;
         }
 
         private bool ParseVisualStudioVersion(string line, string solutionFormatVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
@@ -51,7 +51,7 @@ namespace RudeBuild
             }
 
             string projectFileName = line.Substring(projectFileNameIndex, extensionIndex - projectFileNameIndex) + extension;
-            string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
+            string destProjectFileName = _settings.GlobalSettings.ModifyFileName(projectFileName);
             line = line.Substring(0, projectFileNameIndex) + destProjectFileName + line.Substring(extensionIndex + extension.Length);
             return projectFileName;
         }
@@ -117,11 +117,11 @@ namespace RudeBuild
                 throw new InvalidDataException("Solution file '" + srcFileName + "' is corrupt. It does not contain a Visual Studio version.");
             }
 
-            string destFileName = _globalSettings.ModifyFileName(srcFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
+            string destFileName = _settings.GlobalSettings.ModifyFileName(srcFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(destSolutionText.ToString()))
             {
-                _globalSettings.Output.WriteLine("Creating solution file " + destFileName);
+                _settings.Output.WriteLine("Creating solution file " + destFileName);
             }
 
             return new SolutionInfo(srcFileName, version, projectFileNames);

@@ -8,11 +8,11 @@ namespace RudeBuild
 {
     internal abstract class SingleProjectReaderWriterBase
     {
-        protected GlobalSettings _globalSettings;
+        protected Settings _settings;
 
-        public SingleProjectReaderWriterBase(GlobalSettings globalSettings)
+        public SingleProjectReaderWriterBase(Settings settings)
         {
-            _globalSettings = globalSettings;
+            _settings = settings;
         }
 
         public abstract void ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns);
@@ -20,14 +20,14 @@ namespace RudeBuild
 
     internal class SingleProjectReaderWriterVS2010 : SingleProjectReaderWriterBase
     {
-        public SingleProjectReaderWriterVS2010(GlobalSettings globalSettings)
-            : base(globalSettings)
+        public SingleProjectReaderWriterVS2010(Settings settings)
+            : base(settings)
         {
         }
 
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
         {
-            string configCondition = "'$(Configuration)|$(Platform)'=='" + _globalSettings.RunOptions.Config + "'";
+            string configCondition = "'$(Configuration)|$(Platform)'=='" + _settings.RunOptions.Config + "'";
 
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
@@ -113,11 +113,11 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
-            string destProjectFiltersFileName = _globalSettings.ModifyFileName(projectFiltersFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
+            string destProjectFiltersFileName = _settings.GlobalSettings.ModifyFileName(projectFiltersFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {
-                _globalSettings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
+                _settings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
             }
         }
 
@@ -134,7 +134,7 @@ namespace RudeBuild
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
 
-            UnityFileMerger merger = new UnityFileMerger(_globalSettings);
+            UnityFileMerger merger = new UnityFileMerger(_settings);
             merger.Process(projectInfo);
 
             foreach (XElement cppFileNameElement in cppFileNameElements)
@@ -146,7 +146,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
-            if (_globalSettings.RunOptions.DisablePrecompiledHeaders)
+            if (_settings.RunOptions.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
@@ -157,8 +157,8 @@ namespace RudeBuild
 
     internal class SingleProjectReaderWriterPreVS2010 : SingleProjectReaderWriterBase
     {
-        public SingleProjectReaderWriterPreVS2010(GlobalSettings globalSettings)
-            : base(globalSettings)
+        public SingleProjectReaderWriterPreVS2010(Settings settings)
+            : base(settings)
         {
         }
 
@@ -172,7 +172,7 @@ namespace RudeBuild
         {
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "Configuration")
-                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _globalSettings.RunOptions.Config
+                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _settings.RunOptions.Config
                 select configElement;
             return configElements.SingleOrDefault();
         }
@@ -220,7 +220,7 @@ namespace RudeBuild
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
 
-            UnityFileMerger merger = new UnityFileMerger(_globalSettings);
+            UnityFileMerger merger = new UnityFileMerger(_settings);
             merger.Process(projectInfo);
 
             cppFileNameElements.Remove();
@@ -230,7 +230,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
 
-            if (_globalSettings.RunOptions.DisablePrecompiledHeaders)
+            if (_settings.RunOptions.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
@@ -239,20 +239,20 @@ namespace RudeBuild
 
     public class ProjectReaderWriter
     {
-        private GlobalSettings _globalSettings;
+        private Settings _settings;
 
-        public ProjectReaderWriter(GlobalSettings globalSettings)
+        public ProjectReaderWriter(Settings settings)
         {
-            _globalSettings = globalSettings;
+            _settings = settings;
         }
 
         public void ReadWrite(SolutionInfo solutionInfo)
         {
             SingleProjectReaderWriterBase singleProjectReaderWriter = null;
             if (solutionInfo.Version == VisualStudioVersion.VS2010)
-                singleProjectReaderWriter = new SingleProjectReaderWriterVS2010(_globalSettings);
+                singleProjectReaderWriter = new SingleProjectReaderWriterVS2010(_settings);
             else
-                singleProjectReaderWriter = new SingleProjectReaderWriterPreVS2010(_globalSettings);
+                singleProjectReaderWriter = new SingleProjectReaderWriterPreVS2010(_settings);
             
             foreach (string projectFileName in solutionInfo.ProjectFileNames)
             {
@@ -271,11 +271,11 @@ namespace RudeBuild
             XNamespace ns = projectDocument.Root.Name.Namespace;
             singleProjectReaderWriter.ReadWrite(projectFileName, solutionInfo, projectDocument, ns);
 
-            string destProjectFileName = _globalSettings.ModifyFileName(projectFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _globalSettings.RunOptions.ShouldForceWriteCachedFiles());
+            string destProjectFileName = _settings.GlobalSettings.ModifyFileName(projectFileName);
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectDocument.ToString()))
             {
-                _globalSettings.Output.WriteLine("Creating project file " + destProjectFileName);
+                _settings.Output.WriteLine("Creating project file " + destProjectFileName);
             }
         }
     }

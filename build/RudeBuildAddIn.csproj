@@ -107,6 +107,9 @@
     <Compile Include="..\src\RudeBuildAddIn\Installer.Designer.cs">
       <DependentUpon>Installer.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml.cs">
+      <DependentUpon>GlobalSettingsDialog.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -198,6 +201,12 @@
       <Project>{344A8E8A-9F1B-45F8-B03D-03CE5534572D}</Project>
       <Name>RudeBuild</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>

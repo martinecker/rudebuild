@@ -64,6 +64,9 @@
     <Compile Include="..\src\RudeBuild\RunOptions.cs">
       <Link>RunOptions.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuild\Settings.cs">
+      <Link>Settings.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuild\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>

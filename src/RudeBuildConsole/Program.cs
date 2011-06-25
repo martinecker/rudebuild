@@ -79,13 +79,15 @@ namespace RudeBuildConsole
                 if (options == null)
                     return 1;
 
-                GlobalSettings globalSettings = new GlobalSettings(options, _output);
-                SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(globalSettings);
+                GlobalSettings globalSettings = new GlobalSettings();
+                globalSettings.Write();
+                Settings settings = new Settings(globalSettings, options, _output);
+                SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
-                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(globalSettings);
+                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                 projectReaderWriter.ReadWrite(solutionInfo);
 
-                ProcessLauncher processLauncher = new ProcessLauncher(globalSettings);
+                ProcessLauncher processLauncher = new ProcessLauncher(settings);
                 Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
                 {
                     _output.WriteLine("Stopping build...");
