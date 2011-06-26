@@ -33,19 +33,8 @@ namespace RudeBuild
             return devEnvPath;
         }
 
-        private Process CreateProcessObject(SolutionInfo solutionInfo)
+        private void SetupDevEnvProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
         {
-            Process process = new Process();
-            ProcessStartInfo info = process.StartInfo;
-            info.CreateNoWindow = true;
-            info.UseShellExecute = false;
-            info.ErrorDialog = false;
-            info.RedirectStandardOutput = true;
-            process.OutputDataReceived += delegate(object sendingProcess, DataReceivedEventArgs line)
-            {
-                _settings.Output.WriteLine(line.Data);
-            };
-            
             info.FileName = GetDevEnvPath(solutionInfo);
 
             string buildCommand = "Build";
@@ -61,6 +50,73 @@ namespace RudeBuild
                 if (solutionInfo.Version == VisualStudioVersion.VS2010)     // VS2010 expects the project file name instead of the actual project name on the command line.
                     projectName = _settings.GlobalSettings.FileNamePrefix + projectName;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
+            }
+        }
+
+        private string GetIncrediBuildPath()
+        {
+            string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
+            RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
+            string incrediBuildPath = (string)registryKey.GetValue("Folder");
+            incrediBuildPath = Path.Combine(incrediBuildPath, "BuildConsole.exe");
+            return incrediBuildPath;
+        }
+
+        private void SetupIncrediBuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
+        {
+            info.FileName = GetIncrediBuildPath();
+
+            string buildCommand = string.Empty;
+            if (_settings.RunOptions.Clean)
+                buildCommand = "/Clean";
+            else if (_settings.RunOptions.Rebuild)
+                buildCommand = "/Rebuild";
+
+            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.RunOptions.Config);
+            if (_settings.RunOptions.Project != null)
+            {
+                string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.RunOptions.Project;
+                info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
+            }
+        }
+
+        private Process CreateProcessObject(SolutionInfo solutionInfo)
+        {
+            Process process = new Process();
+            ProcessStartInfo info = process.StartInfo;
+            info.CreateNoWindow = true;
+            info.UseShellExecute = false;
+            info.ErrorDialog = false;
+            info.RedirectStandardOutput = true;
+            process.OutputDataReceived += delegate(object sendingProcess, DataReceivedEventArgs line)
+            {
+                _settings.Output.WriteLine(line.Data);
+            };
+
+            bool useDevEnvBuildTool = true;
+            if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild)
+            {
+                useDevEnvBuildTool = false;
+                try
+                {
+                    SetupIncrediBuildProcessObject(solutionInfo, ref info);
+                    if (!File.Exists(info.FileName))
+                        useDevEnvBuildTool = true;
+                }
+                catch
+                {
+                    useDevEnvBuildTool = true;
+                }
+
+                if (useDevEnvBuildTool)
+                {
+                    _settings.Output.WriteLine("Warning: RudeBuild is setup to use IncrediBuild, but IncrediBuild doesn't seem to be installed properly. Falling back to using a regular Visual Studio build.");
+                }
+            }
+
+            if (useDevEnvBuildTool)
+            {
+                SetupDevEnvProcessObject(solutionInfo, ref info);
             }
 
             _settings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
