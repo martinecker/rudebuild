@@ -14,7 +14,14 @@ namespace RudeBuildAddIn
         public override void Execute(CommandManager commandManager)
         {
             GlobalSettingsDialog dialog = new GlobalSettingsDialog();
-            dialog.ShowDialog();
+            try
+            {
+                dialog.ShowDialog();
+            }
+            finally
+            {
+                dialog.Close();
+            }
         }
 
         public override bool IsEnabled(CommandManager commandManager)

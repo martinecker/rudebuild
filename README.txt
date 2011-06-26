@@ -36,3 +36,5 @@ a project name must be specified on the command line.
 ----------------------
 
 RudeBuild is written in C# and requires the .NET framework 3.5 or higher.
+It also uses the CommandLineParser library that is available here: http://commandline.codeplex.com/
+

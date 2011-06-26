@@ -79,8 +79,8 @@ namespace RudeBuildConsole
                 if (options == null)
                     return 1;
 
-                GlobalSettings globalSettings = new GlobalSettings();
-                globalSettings.Write();
+                GlobalSettings globalSettings = GlobalSettings.Load();
+                globalSettings.Save();
                 Settings settings = new Settings(globalSettings, options, _output);
 
                 Stopwatch stopwatch = new Stopwatch();

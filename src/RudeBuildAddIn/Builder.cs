@@ -48,14 +48,14 @@ namespace RudeBuildAddIn
             _output = output;
             _stopwatch = new Stopwatch();
 
-            _globalSettings = new GlobalSettings();
             try
             {
-                _globalSettings.Write();
+                _globalSettings = GlobalSettings.Load();
+                _globalSettings.Save();
             }
             catch (System.Exception ex)
             {
-                _output.WriteLine(ex.Message);
+                _output.WriteLine("Error saving global settings: " + ex.Message);
             }
         }
 
@@ -64,7 +64,7 @@ namespace RudeBuildAddIn
             if (IsBuilding)
                 return;
 
-            _globalSettings.Read();
+            _globalSettings = GlobalSettings.Load();
             Settings settings = new Settings(_globalSettings, options, _output);
 
             lock (_lock)

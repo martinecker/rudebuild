@@ -22,13 +22,13 @@ namespace RudeBuildAddIn
         public GlobalSettingsDialog()
         {
             InitializeComponent();
-            _globalSettings = new GlobalSettings();
+            _globalSettings = GlobalSettings.Load();
             _window.DataContext = _globalSettings;
         }
 
         private void OnOK(object sender, RoutedEventArgs e)
         {
-            _globalSettings.Write();
+            _globalSettings.Save();
             DialogResult = true;
         }
 

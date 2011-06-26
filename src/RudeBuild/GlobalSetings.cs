@@ -1,13 +1,21 @@
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
+using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace RudeBuild
 {
+    public enum BuildTool
+    {
+        VisualStudio,
+        IncrediBuild
+    }
+
     public class GlobalSettings
     {
+        //[XmlIgnore]
         public const string ConfigFileName = "RudeBuild.GlobalSettings.config";
-        public string ConfigFilePath 
+        //[XmlIgnore]
+        public static string ConfigFilePath 
         {
             get
             {
@@ -17,27 +25,29 @@ namespace RudeBuild
             }
         }
 
+        [DefaultValue("C:\\RudeBuildCache")]
         public string CachePath { get; set; }
+        [DefaultValue("RudeBuild_")]
         public string FileNamePrefix { get; set; }
-
-        private long _maxUnityFileSizeInBytes;
-        public long MaxUnityFileSizeInBytes
-        {
-            get { return _maxUnityFileSizeInBytes; }
-            set { _maxUnityFileSizeInBytes = value; }
-        }
+        [DefaultValue(50 * 1024)]
+        public long MaxUnityFileSizeInBytes { get; set; }
+        [DefaultValue(BuildTool.VisualStudio)]
+        public BuildTool BuildTool { get; set; }
 
         public GlobalSettings()
         {
             SetToDefaults();
-            Read();
         }
 
         public void SetToDefaults()
         {
-            CachePath = "C:\\RudeBuildCache";
-            FileNamePrefix = "RudeBuild_";
-            MaxUnityFileSizeInBytes = 500 * 1024;
+            foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(this))
+            {
+                DefaultValueAttribute attribute = property.Attributes[typeof(DefaultValueAttribute)] as DefaultValueAttribute;
+                if (null == attribute)
+                    continue;
+                property.SetValue(this, attribute.Value);
+            }
         }
 
         public string ModifyFileName(string fileName)
@@ -46,43 +56,28 @@ namespace RudeBuild
             return modifiedFileName;
         }
 
-        public void Read()
+        public static GlobalSettings Load()
         {
             if (!File.Exists(ConfigFilePath))
-                return;
-
-            XDocument document = XDocument.Load(ConfigFilePath);
-            XElement element = document.Descendants("CachePath").SingleOrDefault();
-            if (null != element)
-                CachePath = (string)element.Value;
-            element = document.Descendants("FileNamePrefix").SingleOrDefault();
-            if (null != element)
-                FileNamePrefix = (string)element.Value;
-            element = document.Descendants("MaxUnityFileSizeInBytes").SingleOrDefault();
-            if (null != element)
             {
-                try
-                {
-                    MaxUnityFileSizeInBytes = System.Int64.Parse((string)element.Value);
-                }
-                catch (System.Exception)
-                {
-                    // Just ignore it and use the default value.
-                }
+                return new GlobalSettings();
+            }
+
+            using (TextReader textReader = new StreamReader(ConfigFilePath))
+            {
+                XmlSerializer deserializer = new XmlSerializer(typeof(GlobalSettings));
+                GlobalSettings globalSettings = (GlobalSettings)deserializer.Deserialize(textReader);
+                return globalSettings;
             }
         }
 
-        public void Write()
+        public void Save()
         {
-            XDocument document = new XDocument(
-                new XElement("RudeBuildGlobalSettings",
-                    new XElement("CachePath", CachePath),
-                    new XElement("FileNamePrefix", FileNamePrefix),
-                    new XElement("MaxUnityFileSizeInBytes", MaxUnityFileSizeInBytes)
-                    )
-                );
-
-            document.Save(ConfigFilePath);
+            using (TextWriter textWriter = new StreamWriter(ConfigFilePath))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(GlobalSettings));
+                serializer.Serialize(textWriter, this);
+            }
         }
     }
 }
