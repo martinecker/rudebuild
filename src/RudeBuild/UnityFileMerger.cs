@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using System.Security.Cryptography;
 
 namespace RudeBuild
 {
@@ -20,29 +19,9 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        private static string GetMD5Hash(string input)
+        private void CreateCachePath(SolutionInfo solutionInfo)
         {
-            MD5 md5Hasher = MD5.Create();
-
-            // Convert the input string to a byte array and compute the hash.
-            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-
-            // Convert to a 32 character hexadecimal output string.
-            StringBuilder result = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
-            {
-                result.Append(data[i].ToString("x2"));
-            }
-            return result.ToString();
-        }
-
-        private void CreateCachePath(ProjectInfo projectInfo)
-        {
-            string solutionDirectory = projectInfo.Solution.Name + "_" + GetMD5Hash(projectInfo.Solution.FilePath);
-            string config = _settings.BuildOptions.Config.Replace('|', '-');
-
-            _cachePath = Path.Combine(_settings.GlobalSettings.CachePath, solutionDirectory);
-            _cachePath = Path.Combine(_cachePath, config);
+            _cachePath = _settings.GetCachePath(solutionInfo);
             Directory.CreateDirectory(_cachePath);
         }
 
@@ -83,7 +62,7 @@ namespace RudeBuild
 
         public void Process(ProjectInfo projectInfo)
         {
-            CreateCachePath(projectInfo);
+            CreateCachePath(projectInfo.Solution);
 
             _unityFilePaths = new List<string>();
 

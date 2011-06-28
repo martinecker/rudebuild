@@ -13,46 +13,24 @@ namespace RudeBuild
 
     public class SolutionInfo
     {
-        private string _filePath;
-        public string FilePath
-        {
-            get { return _filePath; }
-        }
+        public string FilePath { get; private set; }
+        public string Name { get; private set; }
+        public VisualStudioVersion Version { get; private set; }
+        public IList<string> ProjectNames { get; private set; }
+        public IList<string> ProjectFileNames { get; private set; }
+        public string Contents { get; private set; }
 
-        private string _name;
-        public string Name
+        public SolutionInfo(string filePath, VisualStudioVersion version, IList<string> projectFileNames, string contents)
         {
-            get { return _name; }
-        }
-
-        private VisualStudioVersion _version;
-        public VisualStudioVersion Version
-        {
-            get { return _version; }
-        }
-
-        private IList<string> _projectNames;
-        public IList<string> ProjectNames
-        {
-            get { return _projectNames; }
-        }
-
-        private IList<string> _projectFileNames;
-        public IList<string> ProjectFileNames
-        {
-            get { return _projectFileNames; }
-        }
-
-        public SolutionInfo(string filePath, VisualStudioVersion version, IList<string> projectFileNames)
-        {
-            _filePath = Path.GetFullPath(filePath);
-            _name = Path.GetFileNameWithoutExtension(filePath);
-            _projectFileNames = projectFileNames;
-            _version = version;
-            _projectNames = new List<string>();
+            FilePath = Path.GetFullPath(filePath);
+            Name = Path.GetFileNameWithoutExtension(filePath);
+            ProjectFileNames = projectFileNames;
+            Version = version;
+            Contents = contents;
+            ProjectNames = new List<string>();
             foreach (string projectFileName in projectFileNames)
             {
-                _projectNames.Add(Path.GetFileNameWithoutExtension(projectFileName));
+                ProjectNames.Add(Path.GetFileNameWithoutExtension(projectFileName));
             }
         }
     }

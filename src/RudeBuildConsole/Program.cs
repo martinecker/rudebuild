@@ -86,20 +86,29 @@ namespace RudeBuildConsole
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
-                SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
-                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
-                projectReaderWriter.ReadWrite(solutionInfo);
-
-                ProcessLauncher processLauncher = new ProcessLauncher(settings);
-                Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
+                int exitCode = 0;
+                if (options.CleanCache)
                 {
-                    _output.WriteLine("Stopping build...");
-                    processLauncher.Stop();
-                    cancelArgs.Cancel = true;
-                };
-                
-                int exitCode = processLauncher.Run(solutionInfo);
+                    CacheCleaner cacheCleaner = new CacheCleaner();
+                    cacheCleaner.Run(settings);
+                }
+                else
+                {
+                    SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
+                    SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
+                    ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
+                    projectReaderWriter.ReadWrite(solutionInfo);
+
+                    ProcessLauncher processLauncher = new ProcessLauncher(settings);
+                    Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
+                    {
+                        _output.WriteLine("Stopping build...");
+                        processLauncher.Stop();
+                        cancelArgs.Cancel = true;
+                    };
+
+                    exitCode = processLauncher.Run(solutionInfo);
+                }
 
                 stopwatch.Stop();
                 TimeSpan ts = stopwatch.Elapsed;

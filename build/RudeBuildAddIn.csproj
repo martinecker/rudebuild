@@ -86,6 +86,9 @@
     <Compile Include="..\src\RudeBuildAddIn\Commands\BuildSolutionCommand.cs">
       <Link>Commands\BuildSolutionCommand.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\Commands\CleanCacheCommand.cs">
+      <Link>Commands\CleanCacheCommand.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\Commands\GlobalSettingsCommand.cs">
       <Link>Commands\GlobalSettingsCommand.cs</Link>
     </Compile>

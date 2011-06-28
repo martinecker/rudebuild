@@ -43,7 +43,7 @@ namespace RudeBuild
             else if (_settings.BuildOptions.Rebuild)
                 buildCommand = "Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
             if (_settings.BuildOptions.Project != null)
             {
                 string projectName = _settings.BuildOptions.Project;
@@ -72,7 +72,7 @@ namespace RudeBuild
             else if (_settings.BuildOptions.Rebuild)
                 buildCommand = "/Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
             if (_settings.BuildOptions.Project != null)
             {
                 string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;

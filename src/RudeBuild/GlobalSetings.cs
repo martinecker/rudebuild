@@ -14,9 +14,7 @@ namespace RudeBuild
 
     public class GlobalSettings
     {
-        //[XmlIgnore]
         public const string ConfigFileName = "RudeBuild.GlobalSettings.config";
-        //[XmlIgnore]
         public static string ConfigFilePath 
         {
             get
@@ -50,12 +48,6 @@ namespace RudeBuild
                     continue;
                 property.SetValue(this, attribute.Value);
             }
-        }
-
-        public string ModifyFileName(string fileName)
-        {
-            string modifiedFileName = Path.Combine(Path.GetDirectoryName(fileName), FileNamePrefix + Path.GetFileName(fileName));
-            return modifiedFileName;
         }
 
         public static GlobalSettings Load()

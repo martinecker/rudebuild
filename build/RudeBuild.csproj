@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\src\RudeBuild\CacheCleaner.cs">
+      <Link>CacheCleaner.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuild\DisplayValueAttribute.cs">
       <Link>DisplayValueAttribute.cs</Link>
     </Compile>

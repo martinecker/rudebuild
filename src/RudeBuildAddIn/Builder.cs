@@ -67,6 +67,13 @@ namespace RudeBuildAddIn
             _globalSettings = GlobalSettings.Load();
             Settings settings = new Settings(_globalSettings, options, _output);
 
+            if (options.CleanCache)
+            {
+                CacheCleaner cacheCleaner = new CacheCleaner();
+                cacheCleaner.Run(settings);
+                return;
+            }
+
             lock (_lock)
             {
                 _processLauncher = new ProcessLauncher(settings);

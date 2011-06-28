@@ -51,12 +51,12 @@ namespace RudeBuild
             }
 
             string projectFileName = line.Substring(projectFileNameIndex, extensionIndex - projectFileNameIndex) + extension;
-            string destProjectFileName = _settings.GlobalSettings.ModifyFileName(projectFileName);
+            string destProjectFileName = _settings.ModifyFileName(projectFileName);
             line = line.Substring(0, projectFileNameIndex) + destProjectFileName + line.Substring(extensionIndex + extension.Length);
             return projectFileName;
         }
 
-        public SolutionInfo ReadWrite(string srcFileName)
+        public SolutionInfo Read(string srcFileName)
         {
             VisualStudioVersion version = VisualStudioVersion.VSUnknown;
             List<string> projectFileNames = new List<string>();
@@ -117,14 +117,24 @@ namespace RudeBuild
                 throw new InvalidDataException("Solution file '" + srcFileName + "' is corrupt. It does not contain a Visual Studio version.");
             }
 
-            string destFileName = _settings.GlobalSettings.ModifyFileName(srcFileName);
+            return new SolutionInfo(srcFileName, version, projectFileNames, destSolutionText.ToString());
+        }
+
+        public void Write(SolutionInfo solutionInfo)
+        {
+            string destFileName = _settings.ModifyFileName(solutionInfo.FilePath);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
-            if (writer.Write(destSolutionText.ToString()))
+            if (writer.Write(solutionInfo.Contents))
             {
                 _settings.Output.WriteLine("Creating solution file " + destFileName);
             }
+        }
 
-            return new SolutionInfo(srcFileName, version, projectFileNames);
+        public SolutionInfo ReadWrite(string srcFileName)
+        {
+            SolutionInfo solutionInfo = Read(srcFileName);
+            Write(solutionInfo);
+            return solutionInfo;
         }
     }
 }

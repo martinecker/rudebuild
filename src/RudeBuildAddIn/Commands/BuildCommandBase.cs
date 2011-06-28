@@ -9,7 +9,8 @@ namespace RudeBuildAddIn
         {
             Build,
             Rebuild,
-            Clean
+            Clean,
+            CleanCache
         }
 
         public Builder Builder { get; private set; }

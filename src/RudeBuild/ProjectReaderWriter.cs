@@ -113,7 +113,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
-            string destProjectFiltersFileName = _settings.GlobalSettings.ModifyFileName(projectFiltersFileName);
+            string destProjectFiltersFileName = _settings.ModifyFileName(projectFiltersFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {
@@ -271,7 +271,7 @@ namespace RudeBuild
             XNamespace ns = projectDocument.Root.Name.Namespace;
             singleProjectReaderWriter.ReadWrite(projectFileName, solutionInfo, projectDocument, ns);
 
-            string destProjectFileName = _settings.GlobalSettings.ModifyFileName(projectFileName);
+            string destProjectFileName = _settings.ModifyFileName(projectFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectDocument.ToString()))
             {
