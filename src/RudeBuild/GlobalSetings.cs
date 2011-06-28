@@ -6,7 +6,9 @@ namespace RudeBuild
 {
     public enum BuildTool
     {
+        [DisplayValue("Visual Studio")]
         VisualStudio,
+        [DisplayValue("IncrediBuild")]
         IncrediBuild
     }
 

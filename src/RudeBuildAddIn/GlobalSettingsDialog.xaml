@@ -9,11 +9,13 @@
              Title="RudeBuild Global Settings" Width="500" Height="200">
     <Window.Resources>
         <RudeBuildAddIn:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
+        <RudeBuildAddIn:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
+        <!--
         <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type System:Enum}" x:Key="buildToolEnumValues">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="RudeBuild:BuildTool" />
             </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
+        </ObjectDataProvider> -->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -33,8 +35,8 @@
         <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,0,6,0" Grid.Row="2"
                  Text="{Binding Path=MaxUnityFileSizeInBytes, Converter={StaticResource bytesToKiloBytesConverter}}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="3">Build Tool:</Label>
-        <ComboBox Height="28" Name="_comboBoxBuildTool" Width="Auto" Margin="150,0,6,0" Grid.Row="3"
-                  ItemsSource="{Binding Source={StaticResource buildToolEnumValues}}" SelectedValue="{Binding Path=BuildTool}"/>
+        <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,0,6,0" Grid.Row="3"
+                  ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Width="Auto" Margin="0,0,0,0" Grid.Row="4">
             <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Name="okButton" Width="75" Click="OnOK" />
             <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Name="cancelButton" Width="75" Click="OnCancel" />

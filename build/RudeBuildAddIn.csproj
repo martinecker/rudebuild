@@ -101,6 +101,9 @@
     <Compile Include="..\src\RudeBuildAddIn\Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\EnumDisplayer.cs">
+      <Link>EnumDisplayer.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\OutputPane.cs">
       <Link>OutputPane.cs</Link>
     </Compile>
