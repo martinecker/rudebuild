@@ -10,12 +10,6 @@
     <Window.Resources>
         <RudeBuildAddIn:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
         <RudeBuildAddIn:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
-        <!--
-        <ObjectDataProvider MethodName="GetValues" ObjectType="{x:Type System:Enum}" x:Key="buildToolEnumValues">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="RudeBuild:BuildTool" />
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider> -->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

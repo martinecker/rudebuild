@@ -38,15 +38,15 @@ namespace RudeBuild
             info.FileName = GetDevEnvPath(solutionInfo);
 
             string buildCommand = "Build";
-            if (_settings.RunOptions.Clean)
+            if (_settings.BuildOptions.Clean)
                 buildCommand = "Clean";
-            else if (_settings.RunOptions.Rebuild)
+            else if (_settings.BuildOptions.Rebuild)
                 buildCommand = "Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.RunOptions.Config);
-            if (_settings.RunOptions.Project != null)
+            info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+            if (_settings.BuildOptions.Project != null)
             {
-                string projectName = _settings.RunOptions.Project;
+                string projectName = _settings.BuildOptions.Project;
                 if (solutionInfo.Version == VisualStudioVersion.VS2010)     // VS2010 expects the project file name instead of the actual project name on the command line.
                     projectName = _settings.GlobalSettings.FileNamePrefix + projectName;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
@@ -67,15 +67,15 @@ namespace RudeBuild
             info.FileName = GetIncrediBuildPath();
 
             string buildCommand = string.Empty;
-            if (_settings.RunOptions.Clean)
+            if (_settings.BuildOptions.Clean)
                 buildCommand = "/Clean";
-            else if (_settings.RunOptions.Rebuild)
+            else if (_settings.BuildOptions.Rebuild)
                 buildCommand = "/Rebuild";
 
-            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.RunOptions.Config);
-            if (_settings.RunOptions.Project != null)
+            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.GlobalSettings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+            if (_settings.BuildOptions.Project != null)
             {
-                string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.RunOptions.Project;
+                string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
                 info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
             }
         }

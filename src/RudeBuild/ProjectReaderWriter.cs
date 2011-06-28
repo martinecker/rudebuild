@@ -27,7 +27,7 @@ namespace RudeBuild
 
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
         {
-            string configCondition = "'$(Configuration)|$(Platform)'=='" + _settings.RunOptions.Config + "'";
+            string configCondition = "'$(Configuration)|$(Platform)'=='" + _settings.BuildOptions.Config + "'";
 
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
@@ -114,7 +114,7 @@ namespace RudeBuild
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
             string destProjectFiltersFileName = _settings.GlobalSettings.ModifyFileName(projectFiltersFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {
                 _settings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
@@ -146,7 +146,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
-            if (_settings.RunOptions.DisablePrecompiledHeaders)
+            if (_settings.BuildOptions.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
@@ -172,7 +172,7 @@ namespace RudeBuild
         {
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "Configuration")
-                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _settings.RunOptions.Config
+                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _settings.BuildOptions.Config
                 select configElement;
             return configElements.SingleOrDefault();
         }
@@ -230,7 +230,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
 
-            if (_settings.RunOptions.DisablePrecompiledHeaders)
+            if (_settings.BuildOptions.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
@@ -272,7 +272,7 @@ namespace RudeBuild
             singleProjectReaderWriter.ReadWrite(projectFileName, solutionInfo, projectDocument, ns);
 
             string destProjectFileName = _settings.GlobalSettings.ModifyFileName(projectFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectDocument.ToString()))
             {
                 _settings.Output.WriteLine("Creating project file " + destProjectFileName);

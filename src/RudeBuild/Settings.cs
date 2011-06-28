@@ -8,10 +8,10 @@ namespace RudeBuild
             get { return _globalSettings; }
         }
 
-        private RunOptions _runOptions;
-        public RunOptions RunOptions
+        private BuildOptions _buildOptions;
+        public BuildOptions BuildOptions
         {
-            get { return _runOptions; }
+            get { return _buildOptions; }
         }
 
         private IOutput _output;
@@ -20,10 +20,10 @@ namespace RudeBuild
             get { return _output; }
         }
 
-        public Settings(GlobalSettings globalSettings, RunOptions runOptions, IOutput output)
+        public Settings(GlobalSettings globalSettings, BuildOptions buildOptions, IOutput output)
         {
             _globalSettings = globalSettings;
-            _runOptions = runOptions;
+            _buildOptions = buildOptions;
             _output = output;
         }
     }

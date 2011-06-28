@@ -35,7 +35,7 @@ namespace RudeBuildConsole
     {
         private IOutput _output;
 
-        private RunOptions ParseRunOptions(string[] args)
+        private BuildOptions ParseBuildOptions(string[] args)
         {
             _output.WriteLine("RudeBuild, Version 1.0");
             _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker.");
@@ -51,7 +51,7 @@ namespace RudeBuildConsole
             parser.ShowUsageOnEmptyCommandline = true;
             try
             {
-                RunOptions options = new RunOptions();
+                BuildOptions options = new BuildOptions();
                 parser.ExtractArgumentAttributes(options);
                 parser.ParseCommandLine(args);
                 return options;
@@ -75,7 +75,7 @@ namespace RudeBuildConsole
 
             try
             {
-                RunOptions options = ParseRunOptions(args);
+                BuildOptions options = ParseBuildOptions(args);
                 if (options == null)
                     return 1;
 

@@ -11,7 +11,7 @@ namespace RudeBuildAddIn
 
         public override void Execute(CommandManager commandManager)
         {
-            RunOptions options = new RunOptions();
+            BuildOptions options = new BuildOptions();
             options.Solution = GetSolutionFileInfo(commandManager);
             options.Config = GetActiveSolutionConfig(commandManager);
             options.Clean = BuildMode == Mode.Clean;

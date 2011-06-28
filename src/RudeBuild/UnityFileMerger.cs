@@ -39,7 +39,7 @@ namespace RudeBuild
         private void CreateCachePath(ProjectInfo projectInfo)
         {
             string solutionDirectory = projectInfo.Solution.Name + "_" + GetMD5Hash(projectInfo.Solution.FilePath);
-            string config = _settings.RunOptions.Config.Replace('|', '-');
+            string config = _settings.BuildOptions.Config.Replace('|', '-');
 
             _cachePath = Path.Combine(_settings.GlobalSettings.CachePath, solutionDirectory);
             _cachePath = Path.Combine(_cachePath, config);
@@ -48,7 +48,7 @@ namespace RudeBuild
 
         private void WritePrefix(ProjectInfo projectInfo, StringBuilder text)
         {
-            if (!_settings.RunOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
+            if (!_settings.BuildOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
             {
                 text.AppendLine("#include \"" + projectInfo.PrecompiledHeaderFileName + "\"");
                 text.AppendLine();
@@ -72,7 +72,7 @@ namespace RudeBuild
             WritePostfix(text);
 
             string destFileName = Path.Combine(_cachePath, projectInfo.Name + fileIndex + ".cpp");
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.RunOptions.ShouldForceWriteCachedFiles());
+            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(text.ToString()))
             {
                 _settings.Output.WriteLine("Creating unity file " + projectInfo.Name + fileIndex);

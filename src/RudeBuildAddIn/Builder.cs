@@ -59,7 +59,7 @@ namespace RudeBuildAddIn
             }
         }
 
-        public void Build(RunOptions options)
+        public void Build(BuildOptions options)
         {
             if (IsBuilding)
                 return;
@@ -92,7 +92,7 @@ namespace RudeBuildAddIn
             try
             {
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
-                SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(settings.RunOptions.Solution.FullName);
+                SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(settings.BuildOptions.Solution.FullName);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                 projectReaderWriter.ReadWrite(solutionInfo);
 
