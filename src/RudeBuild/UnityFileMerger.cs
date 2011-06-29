@@ -1,9 +1,27 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
 namespace RudeBuild
 {
+    public static class ListShuffleExtension
+    {
+        private static Random random = new System.Random();
+
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            int n = list.Count;
+            for (int i = 0; i < n; ++i)
+            {
+                int r = i + (int)(random.Next(n - i));
+                T t = list[r];
+                list[r] = list[i];
+                list[i] = t;
+            }
+        }
+    }
+
     public class UnityFileMerger
     {
         private Settings _settings;
@@ -72,7 +90,13 @@ namespace RudeBuild
             int currentUnityFileIndex = 1;
             long currentUnityFileSize = 0;
 
-            foreach (string cppFileName in projectInfo.CppFileNames)
+            IList<string> cppFileNames = projectInfo.CppFileNames;
+            if (_settings.GlobalSettings.RandomizeOrderOfUnityMergedFiles)
+            {
+                cppFileNames.Shuffle();
+            }
+
+            foreach (string cppFileName in cppFileNames)
             {
                 string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
                 if (!File.Exists(cppFilePath))

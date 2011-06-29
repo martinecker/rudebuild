@@ -6,13 +6,14 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
              xmlns:RudeBuildAddIn="clr-namespace:RudeBuildAddIn"
-             Title="RudeBuild Global Settings" Width="500" Height="230">
+             Title="RudeBuild Global Settings" Width="500" Height="260">
     <Window.Resources>
         <RudeBuildAddIn:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
         <RudeBuildAddIn:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="36*" />
             <RowDefinition Height="36*" />
             <RowDefinition Height="36*" />
             <RowDefinition Height="36*" />
@@ -34,7 +35,9 @@
                   ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
         <CheckBox Content="Exclude Writable Files from Unity Merge" Margin="8,6,6,0" Grid.Row="4"
                   IsChecked="{Binding Path=ExcludeWritableFilesFromUnityMerge}" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Width="Auto" Margin="0,0,0,0" Grid.Row="5">
+        <CheckBox Content="Randomize Order of Unity Merged Files per Build" Margin="8,6,6,0" Grid.Row="5"
+                  IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Width="Auto" Margin="0,0,0,0" Grid.Row="6">
             <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Name="okButton" Width="75" Click="OnOK" />
             <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Name="cancelButton" Width="75" Click="OnCancel" />
         </StackPanel>

@@ -77,6 +77,9 @@ namespace RudeBuild
         [DefaultValue(false)]
         public bool ExcludeWritableFilesFromUnityMerge { get; set; }
 
+        [DefaultValue(false)]
+        public bool RandomizeOrderOfUnityMergedFiles { get; set; }
+
         public GlobalSettings()
         {
             SetToDefaults();
