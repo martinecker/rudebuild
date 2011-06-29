@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -25,12 +26,51 @@ namespace RudeBuild
             }
         }
 
+        private string _cachePath;
         [DefaultValue("C:\\RudeBuildCache")]
-        public string CachePath { get; set; }
+        public string CachePath
+        {
+            get { return _cachePath; }
+            set
+            {
+                char[] invalidChars = Path.GetInvalidPathChars();
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException("You must specify a valid cache path.");
+                if (-1 != value.IndexOfAny(invalidChars))
+                    throw new ArgumentException("The cache path contains not valid characters for a path.");
+                _cachePath = value;
+            }
+        }
+
+        private string _fileNamePrefix;
         [DefaultValue("RudeBuild_")]
-        public string FileNamePrefix { get; set; }
+        public string FileNamePrefix
+        {
+            get { return _fileNamePrefix; }
+            set
+            {
+                char[] invalidChars = Path.GetInvalidFileNameChars();
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentException("You must specify a valid file name prefix.");
+                if (-1 != value.IndexOfAny(invalidChars))
+                    throw new ArgumentException("The file name prefix contains not valid characters for file names.");
+                _fileNamePrefix = value;
+            }
+        }
+
+        private long _maxUnityFileSizeInBytes;
         [DefaultValue(50 * 1024)]
-        public long MaxUnityFileSizeInBytes { get; set; }
+        public long MaxUnityFileSizeInBytes
+        {
+            get { return _maxUnityFileSizeInBytes; }
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentException("The maximum unity file size needs to be positive.");
+                _maxUnityFileSizeInBytes = value;
+            }
+        }
+
         [DefaultValue(BuildTool.VisualStudio)]
         public BuildTool BuildTool { get; set; }
 

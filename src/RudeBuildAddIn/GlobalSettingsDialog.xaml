@@ -21,13 +21,13 @@
         </Grid.RowDefinitions>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="0">Cache Path:</Label>
         <TextBox Height="25" Name="_textBoxCachePath" Width="Auto" Margin="150,0,6,0" Grid.Row="0"
-                 Text="{Binding Path=CachePath}"/>
+                 Text="{Binding Path=CachePath,ValidatesOnExceptions=True}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="1">Filename Prefix:</Label>
         <TextBox Height="25" Name="_textBoxFileNamePrefix" Width="Auto" Margin="150,0,6,0" Grid.Row="1"
-                 Text="{Binding Path=FileNamePrefix}"/>
+                 Text="{Binding Path=FileNamePrefix,ValidatesOnExceptions=True}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="2">Max. Unity File Size (KBs):</Label>
         <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,0,6,0" Grid.Row="2"
-                 Text="{Binding Path=MaxUnityFileSizeInBytes, Converter={StaticResource bytesToKiloBytesConverter}}"/>
+                 Text="{Binding Path=MaxUnityFileSizeInBytes,ValidatesOnExceptions=True, Converter={StaticResource bytesToKiloBytesConverter}}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="3">Build Tool:</Label>
         <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,0,6,0" Grid.Row="3"
                   ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
