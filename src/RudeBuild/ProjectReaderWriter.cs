@@ -43,9 +43,12 @@ namespace RudeBuild
             {
                 XElement precompiledHeaderElement = configElement.Descendants(ns + "PrecompiledHeader").SingleOrDefault();
                 XElement precompiledHeaderFileElement = configElement.Descendants(ns + "PrecompiledHeaderFile").SingleOrDefault();
-                if (null != precompiledHeaderElement && null != precompiledHeaderFileElement && precompiledHeaderElement.Value == "Use")
+                if (null != precompiledHeaderElement && precompiledHeaderElement.Value == "Use")
                 {
-                    return precompiledHeaderFileElement.Value;
+                    if (null != precompiledHeaderFileElement)
+                        return precompiledHeaderFileElement.Value;
+                    else
+                        return "StdAfx.h";
                 }
             }
 
@@ -180,20 +183,21 @@ namespace RudeBuild
         private string GetPrecompiledHeader(XDocument projectDocument, XNamespace ns)
         {
             XElement configElement = GetConfigurationElement(projectDocument, ns);
-            if (null != configElement)
-            {
-                var precompiledHeaderAttributes =
-                    from toolElement in configElement.Elements(ns + "Tool")
-                    where toolElement.Attribute(ns + "UsePrecompiledHeader") != null && toolElement.Attribute(ns + "UsePrecompiledHeader").Value == "2"
-                    select toolElement.Attribute(ns + "PrecompiledHeaderThrough");
-                XAttribute precompiledHeader = precompiledHeaderAttributes.SingleOrDefault();
-                if (null != precompiledHeader)
-                {
-                    return precompiledHeader.Value;
-                }
-            }
+            if (null == configElement)
+                return string.Empty;
 
-            return string.Empty;
+            XElement precompiledHeaderElement =
+                (from toolElement in configElement.Elements(ns + "Tool")
+                where toolElement.Attribute(ns + "UsePrecompiledHeader") != null && toolElement.Attribute(ns + "UsePrecompiledHeader").Value == "2"
+                select toolElement).SingleOrDefault();
+            if (null == precompiledHeaderElement)
+                return string.Empty;
+
+            XAttribute precompiledHeader = precompiledHeaderElement.Attribute(ns + "PrecompiledHeaderThrough");
+            if (null != precompiledHeader)
+                return precompiledHeader.Value;
+            else
+                return "StdAfx.h";
         }
 
         private void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
