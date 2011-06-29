@@ -74,6 +74,9 @@ namespace RudeBuild
         [DefaultValue(BuildTool.VisualStudio)]
         public BuildTool BuildTool { get; set; }
 
+        [DefaultValue(false)]
+        public bool ExcludeWritableFilesFromUnityMerge { get; set; }
+
         public GlobalSettings()
         {
             SetToDefaults();

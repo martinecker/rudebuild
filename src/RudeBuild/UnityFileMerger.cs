@@ -77,11 +77,14 @@ namespace RudeBuild
                 string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
                 if (!File.Exists(cppFilePath))
                 {
-                    _settings.Output.WriteLine("Input file '" + cppFileName + "' does not exist. Skipping.");
+                    _settings.Output.WriteLine("Input file '" + cppFilePath + "' does not exist. Skipping.");
                     continue;
                 }
 
                 FileInfo fileInfo = new FileInfo(cppFilePath);
+                if (_settings.GlobalSettings.ExcludeWritableFilesFromUnityMerge && !fileInfo.IsReadOnly)
+                    continue;
+
                 currentUnityFileSize += fileInfo.Length;
                 if (currentUnityFileSize > _settings.GlobalSettings.MaxUnityFileSizeInBytes)
                 {
