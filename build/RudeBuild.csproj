@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\src\RudeBuild\BuildOptions.cs">
+      <Link>BuildOptions.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuild\CacheCleaner.cs">
       <Link>CacheCleaner.cs</Link>
     </Compile>
@@ -66,9 +69,6 @@
     <Compile Include="..\src\RudeBuild\AssemblyInfo.cs" />
     <Compile Include="..\src\RudeBuild\ProjectReaderWriter.cs">
       <Link>ProjectReaderWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\RunOptions.cs">
-      <Link>RunOptions.cs</Link>
     </Compile>
     <Compile Include="..\src\RudeBuild\Settings.cs">
       <Link>Settings.cs</Link>
