@@ -96,6 +96,7 @@ namespace RudeBuildConsole
                 {
                     SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
                     SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
+                    settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo); 
                     ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                     projectReaderWriter.ReadWrite(solutionInfo);
 

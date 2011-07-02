@@ -100,6 +100,7 @@ namespace RudeBuildAddIn
             {
                 SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(settings.BuildOptions.Solution.FullName);
+                settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                 projectReaderWriter.ReadWrite(solutionInfo);
 

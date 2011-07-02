@@ -70,6 +70,9 @@
     <Compile Include="..\src\RudeBuild\ProjectReaderWriter.cs">
       <Link>ProjectReaderWriter.cs</Link>
     </Compile>
+    <Compile Include="..\src\RudeBuild\SerializableDictionary.cs">
+      <Link>SerializableDictionary.cs</Link>
+    </Compile>
     <Compile Include="..\src\RudeBuild\Settings.cs">
       <Link>Settings.cs</Link>
     </Compile>
@@ -78,6 +81,9 @@
     </Compile>
     <Compile Include="..\src\RudeBuild\SolutionReaderWriter.cs">
       <Link>SolutionReaderWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\src\RudeBuild\SolutionSettings.cs">
+      <Link>SolutionSettings.cs</Link>
     </Compile>
     <Compile Include="..\src\RudeBuild\UnityFileMerger.cs">
       <Link>UnityFileMerger.cs</Link>

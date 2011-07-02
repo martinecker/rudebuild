@@ -1,9 +1,33 @@
+using System;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
 using System.Security.Cryptography;
 
 namespace RudeBuild
 {
+    public static class ObjectDefaultSetterExtension
+    {
+        public static object DefaultForType(Type targetType)
+        {
+            return targetType.IsValueType ? Activator.CreateInstance(targetType) : null;
+        }
+        
+        public static void SetToDefaults(this object obj)
+        {
+            foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(obj))
+            {
+                if (property.IsReadOnly)
+                    continue;
+                DefaultValueAttribute attribute = property.Attributes[typeof(DefaultValueAttribute)] as DefaultValueAttribute;
+                if (null == attribute)
+                    property.SetValue(obj, DefaultForType(property.PropertyType));
+                else
+                    property.SetValue(obj, attribute.Value);
+            }
+        }
+    }
+
     public class Settings
     {
         private GlobalSettings _globalSettings;
@@ -17,6 +41,8 @@ namespace RudeBuild
         {
             get { return _buildOptions; }
         }
+
+        public SolutionSettings SolutionSettings { get; set; }
 
         private IOutput _output;
         public IOutput Output

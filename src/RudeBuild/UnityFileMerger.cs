@@ -45,7 +45,7 @@ namespace RudeBuild
 
         private void WritePrefix(ProjectInfo projectInfo, StringBuilder text)
         {
-            if (!_settings.BuildOptions.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
+            if (!_settings.SolutionSettings.DisablePrecompiledHeaders && !string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
             {
                 text.AppendLine("#include \"" + projectInfo.PrecompiledHeaderFileName + "\"");
                 text.AppendLine();
@@ -107,6 +107,8 @@ namespace RudeBuild
 
                 FileInfo fileInfo = new FileInfo(cppFilePath);
                 if (_settings.GlobalSettings.ExcludeWritableFilesFromUnityMerge && !fileInfo.IsReadOnly)
+                    continue;
+                if (_settings.SolutionSettings.IsExcludedCppFileNameForProject(projectInfo, cppFileName))
                     continue;
 
                 currentUnityFileSize += fileInfo.Length;

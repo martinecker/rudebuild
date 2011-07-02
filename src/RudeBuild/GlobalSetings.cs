@@ -82,18 +82,7 @@ namespace RudeBuild
 
         public GlobalSettings()
         {
-            SetToDefaults();
-        }
-
-        public void SetToDefaults()
-        {
-            foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(this))
-            {
-                DefaultValueAttribute attribute = property.Attributes[typeof(DefaultValueAttribute)] as DefaultValueAttribute;
-                if (null == attribute)
-                    continue;
-                property.SetValue(this, attribute.Value);
-            }
+            this.SetToDefaults();
         }
 
         public static GlobalSettings Load()

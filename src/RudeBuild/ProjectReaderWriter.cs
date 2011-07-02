@@ -149,7 +149,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
 
-            if (_settings.BuildOptions.DisablePrecompiledHeaders)
+            if (_settings.SolutionSettings.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
@@ -223,6 +223,7 @@ namespace RudeBuild
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
+            _settings.SolutionSettings.UpdateForProject(projectInfo);
 
             UnityFileMerger merger = new UnityFileMerger(_settings);
             merger.Process(projectInfo);
@@ -234,7 +235,7 @@ namespace RudeBuild
                 from unityFileName in merger.UnityFilePaths
                 select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
 
-            if (_settings.BuildOptions.DisablePrecompiledHeaders)
+            if (_settings.SolutionSettings.DisablePrecompiledHeaders)
             {
                 DisablePrecompiledHeaders(projectDocument, ns);
             }
