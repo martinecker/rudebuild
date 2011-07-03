@@ -103,6 +103,7 @@ namespace RudeBuildAddIn
                 settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo);
                 ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                 projectReaderWriter.ReadWrite(solutionInfo);
+                settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
 
                 exitCode = _processLauncher.Run(solutionInfo);
             }

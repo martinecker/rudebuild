@@ -17,7 +17,7 @@ namespace RudeBuildAddIn
 
         public override bool IsEnabled(CommandManager commandManager)
         {
-            return !_builder.IsBuilding;
+            return IsSolutionOpen(commandManager) && !_builder.IsBuilding;
         }
     }
 }

@@ -99,6 +99,7 @@ namespace RudeBuildConsole
                     settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo); 
                     ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
                     projectReaderWriter.ReadWrite(solutionInfo);
+                    settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
 
                     ProcessLauncher processLauncher = new ProcessLauncher(settings);
                     Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)

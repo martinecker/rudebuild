@@ -27,9 +27,88 @@ namespace RudeBuild
             return configFilePath;
         }
 
-        public void Update(SolutionInfo solutionInfo)
+        public bool Update(SolutionInfo solutionInfo)
         {
+            bool changed = false;
 
+            var projectNames = ProjectNameToExcludedCppFileNameMap.Keys;
+            foreach (string projectName in projectNames)
+            {
+                // Ensure the project we have stored settings for still exists.
+                if (!solutionInfo.ProjectNames.Contains(projectName))
+                {
+                    ProjectNameToExcludedCppFileNameMap.Remove(projectName);
+                    changed = true;
+                }
+                else
+                {
+                    ProjectInfo projectInfo = null;
+                    solutionInfo.Projects.TryGetValue(projectName, out projectInfo);
+                    if (null == projectInfo)
+                        throw new InvalidDataException("SolutionInfo does not contain ProjectInfo object for project called " + projectName);
+
+                    List<string> cppFileNames = null;
+                    ProjectNameToExcludedCppFileNameMap.TryGetValue(projectName, out cppFileNames);
+                    if (null != cppFileNames)
+                    {
+                        for (int i = 0; i < cppFileNames.Count; ++i)
+                        {
+                            if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
+                            {
+                                cppFileNames.RemoveAt(i);
+                                --i;
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return changed;
+        }
+
+        public bool UpdateAndSave(Settings settings, SolutionInfo solutionInfo)
+        {
+            bool changed = Update(solutionInfo);
+            if (changed)
+            {
+                try
+                {
+                    Save(settings, solutionInfo);
+                }
+                catch (System.Exception ex)
+                {
+                    settings.Output.WriteLine("Couldn't save solution settings file: " + GetConfigFilePath(settings, solutionInfo));
+                    settings.Output.WriteLine("because of exception: " + ex.Message);
+                }
+            }
+            return changed;
+        }
+
+        public void ExcludeCppFileNameForProject(ProjectInfo projectInfo, string cppFileName)
+        {
+            if (null == ProjectNameToExcludedCppFileNameMap)
+            {
+                ProjectNameToExcludedCppFileNameMap = new SerializableDictionary<string, List<string>>();
+            }
+            if (!projectInfo.CppFileNames.Contains(cppFileName))
+            {
+                throw new ArgumentException("The project " + projectInfo.Name + " does not contain the file '" + cppFileName + "' and so cannot be excluded.");
+            }
+
+            List<string> cppFileNames = null;
+            ProjectNameToExcludedCppFileNameMap.TryGetValue(projectInfo.Name, out cppFileNames);
+            if (null == cppFileNames)
+            {
+                cppFileNames = new List<string>();
+                cppFileNames.Add(cppFileName);
+                ProjectNameToExcludedCppFileNameMap.Add(projectInfo.Name, cppFileNames);
+            }
+            else
+            {
+                if (!cppFileNames.Contains(cppFileName))
+                    cppFileNames.Add(cppFileName);
+            }
         }
 
         public bool IsExcludedCppFileNameForProject(ProjectInfo projectInfo, string cppFileName)
