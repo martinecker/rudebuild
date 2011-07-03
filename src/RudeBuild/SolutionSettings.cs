@@ -22,12 +22,12 @@ namespace RudeBuild
 
         public static string GetConfigFilePath(Settings settings, SolutionInfo solutionInfo)
         {
-            string solutionFileName = settings.ModifyFileName(Path.GetFileName(solutionInfo.FilePath));
+            string solutionFileName = Path.GetFileNameWithoutExtension(solutionInfo.FilePath);
             string configFilePath = Path.Combine(Path.GetDirectoryName(solutionInfo.FilePath), solutionFileName + ConfigFileNameSuffix);
             return configFilePath;
         }
 
-        public void UpdateForProject(ProjectInfo projectInfo)
+        public void Update(SolutionInfo solutionInfo)
         {
 
         }

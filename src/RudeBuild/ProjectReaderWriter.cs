@@ -15,7 +15,7 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        public abstract void ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns);
+        public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
     }
 
     internal class SingleProjectReaderWriterVS2010 : SingleProjectReaderWriterBase
@@ -124,8 +124,9 @@ namespace RudeBuild
             }
         }
 
-        public override void ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns)
+        public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
+            XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectDocument);
 
             var cppFileNameElements = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
@@ -137,24 +138,29 @@ namespace RudeBuild
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
 
-            UnityFileMerger merger = new UnityFileMerger(_settings);
-            merger.Process(projectInfo);
-
-            foreach (XElement cppFileNameElement in cppFileNameElements)
+            if (!performReadOnly)
             {
-                AddExcludedFromBuild(ns, cppFileNameElement);
+                UnityFileMerger merger = new UnityFileMerger(_settings);
+                merger.Process(projectInfo);
+
+                foreach (XElement cppFileNameElement in cppFileNameElements)
+                {
+                    AddExcludedFromBuild(ns, cppFileNameElement);
+                }
+
+                compileItemGroupElement.Add(
+                    from unityFileName in merger.UnityFilePaths
+                    select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+
+                if (_settings.SolutionSettings.DisablePrecompiledHeaders)
+                {
+                    DisablePrecompiledHeaders(projectDocument, ns);
+                }
+
+                ReadWriteFilters(projectFileName, merger);
             }
 
-            compileItemGroupElement.Add(
-                from unityFileName in merger.UnityFilePaths
-                select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
-
-            if (_settings.SolutionSettings.DisablePrecompiledHeaders)
-            {
-                DisablePrecompiledHeaders(projectDocument, ns);
-            }
-
-            ReadWriteFilters(projectFileName, merger);
+            return projectInfo;
         }
     }
 
@@ -211,8 +217,10 @@ namespace RudeBuild
             }
         }
 
-        public override void ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, XNamespace ns)
+        public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
+            XNamespace ns = projectDocument.Root.Name.Namespace;
+
             var cppFileNameElements =
                 from cppFileElement in projectDocument.Descendants(ns + "File")
                 where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && !cppFileElement.HasElements     // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
@@ -223,22 +231,26 @@ namespace RudeBuild
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
-            _settings.SolutionSettings.UpdateForProject(projectInfo);
 
-            UnityFileMerger merger = new UnityFileMerger(_settings);
-            merger.Process(projectInfo);
-
-            cppFileNameElements.Remove();
-
-            XElement filesElement = projectDocument.Descendants(ns + "Files").Single();
-            filesElement.Add(
-                from unityFileName in merger.UnityFilePaths
-                select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
-
-            if (_settings.SolutionSettings.DisablePrecompiledHeaders)
+            if (!performReadOnly)
             {
-                DisablePrecompiledHeaders(projectDocument, ns);
+                UnityFileMerger merger = new UnityFileMerger(_settings);
+                merger.Process(projectInfo);
+
+                cppFileNameElements.Remove();
+
+                XElement filesElement = projectDocument.Descendants(ns + "Files").Single();
+                filesElement.Add(
+                    from unityFileName in merger.UnityFilePaths
+                    select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
+
+                if (_settings.SolutionSettings.DisablePrecompiledHeaders)
+                {
+                    DisablePrecompiledHeaders(projectDocument, ns);
+                }
             }
+
+            return projectInfo;
         }
     }
 
@@ -251,21 +263,33 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        public void ReadWrite(SolutionInfo solutionInfo)
+        private SingleProjectReaderWriterBase CreateSingleProjectReaderWriter(SolutionInfo solutionInfo)
         {
-            SingleProjectReaderWriterBase singleProjectReaderWriter = null;
             if (solutionInfo.Version == VisualStudioVersion.VS2010)
-                singleProjectReaderWriter = new SingleProjectReaderWriterVS2010(_settings);
+                return new SingleProjectReaderWriterVS2010(_settings);
             else
-                singleProjectReaderWriter = new SingleProjectReaderWriterPreVS2010(_settings);
-            
+                return new SingleProjectReaderWriterPreVS2010(_settings);
+        }
+
+        public void Read(SolutionInfo solutionInfo)
+        {
+            SingleProjectReaderWriterBase singleProjectReaderWriter = CreateSingleProjectReaderWriter(solutionInfo);
             foreach (string projectFileName in solutionInfo.ProjectFileNames)
             {
-                ReadWrite(projectFileName, solutionInfo, singleProjectReaderWriter);
+                ReadWrite(projectFileName, solutionInfo, singleProjectReaderWriter, performReadOnly: true);
             }
         }
 
-        private void ReadWrite(string projectFileName, SolutionInfo solutionInfo, SingleProjectReaderWriterBase singleProjectReaderWriter)
+        public void ReadWrite(SolutionInfo solutionInfo)
+        {
+            SingleProjectReaderWriterBase singleProjectReaderWriter = CreateSingleProjectReaderWriter(solutionInfo);
+            foreach (string projectFileName in solutionInfo.ProjectFileNames)
+            {
+                ReadWrite(projectFileName, solutionInfo, singleProjectReaderWriter, performReadOnly: false);
+            }
+        }
+
+        private void ReadWrite(string projectFileName, SolutionInfo solutionInfo, SingleProjectReaderWriterBase singleProjectReaderWriter, bool performReadOnly)
         {
             XDocument projectDocument = XDocument.Load(projectFileName);
             if (null == projectDocument)
@@ -273,14 +297,17 @@ namespace RudeBuild
                 throw new InvalidDataException("Couldn't load project file '" + projectFileName + "'.");
             }
 
-            XNamespace ns = projectDocument.Root.Name.Namespace;
-            singleProjectReaderWriter.ReadWrite(projectFileName, solutionInfo, projectDocument, ns);
+            ProjectInfo projectInfo = singleProjectReaderWriter.ReadWrite(projectFileName, solutionInfo, projectDocument, performReadOnly);
+            solutionInfo.AddProject(projectInfo);
 
-            string destProjectFileName = _settings.ModifyFileName(projectFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
-            if (writer.Write(projectDocument.ToString()))
+            if (!performReadOnly)
             {
-                _settings.Output.WriteLine("Creating project file " + destProjectFileName);
+                string destProjectFileName = _settings.ModifyFileName(projectFileName);
+                ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
+                if (writer.Write(projectDocument.ToString()))
+                {
+                    _settings.Output.WriteLine("Creating project file " + destProjectFileName);
+                }
             }
         }
     }
