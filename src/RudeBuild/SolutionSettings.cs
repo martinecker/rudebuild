@@ -27,13 +27,10 @@ namespace RudeBuild
             return configFilePath;
         }
 
-        public bool Update(SolutionInfo solutionInfo)
+        private bool RemoveNoLongerExistingProjects(SolutionInfo solutionInfo)
         {
-            if (null == ProjectNameToExcludedCppFileNameMap)
-                return false;
-
             bool changed = false;
-            var projectNames = ProjectNameToExcludedCppFileNameMap.Keys;
+            IList<string> projectNames = new List<string>(ProjectNameToExcludedCppFileNameMap.Keys);
             foreach (string projectName in projectNames)
             {
                 // Check if the projects we have stored settings for still exists. If they don't, remove them.
@@ -41,29 +38,65 @@ namespace RudeBuild
                 {
                     ProjectNameToExcludedCppFileNameMap.Remove(projectName);
                     changed = true;
-                    continue;
                 }
+            }
 
+            return changed;
+        }
+
+        private bool AddNewProjects(SolutionInfo solutionInfo)
+        {
+            bool changed = false;
+            foreach (string projectName in solutionInfo.ProjectNames)
+            {
+                if (!ProjectNameToExcludedCppFileNameMap.ContainsKey(projectName))
+                {
+                    ProjectNameToExcludedCppFileNameMap.Add(projectName, new List<string>());
+                    changed = true;
+                }
+            }
+            return changed;
+        }
+
+        private bool RemoveNoLongerExistingCppFileNames(ProjectInfo projectInfo)
+        {
+            // Check if all the file names we have stored settings for still exist. If they don't, remove them.
+            bool changed = false;
+            List<string> cppFileNames = null;
+            ProjectNameToExcludedCppFileNameMap.TryGetValue(projectInfo.Name, out cppFileNames);
+            if (null != cppFileNames)
+            {
+                for (int i = 0; i < cppFileNames.Count; ++i)
+                {
+                    if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
+                    {
+                        cppFileNames.RemoveAt(i);
+                        --i;
+                        changed = true;
+                    }
+                }
+            }
+            return changed;
+        }
+
+        public bool Update(SolutionInfo solutionInfo)
+        {
+            if (null == ProjectNameToExcludedCppFileNameMap)
+            {
+                ProjectNameToExcludedCppFileNameMap = new SerializableDictionary<string, List<string>>();
+            }
+
+            bool changed = RemoveNoLongerExistingProjects(solutionInfo);
+            changed = AddNewProjects(solutionInfo) || changed;
+
+            foreach (string projectName in solutionInfo.ProjectNames)
+            {
                 ProjectInfo projectInfo = null;
                 solutionInfo.Projects.TryGetValue(projectName, out projectInfo);
                 if (null == projectInfo)
                     throw new InvalidDataException("SolutionInfo does not contain ProjectInfo object for project called " + projectName);
 
-                // Check if all the file names we have stored settings for still exist. If they don't, remove them.
-                List<string> cppFileNames = null;
-                ProjectNameToExcludedCppFileNameMap.TryGetValue(projectName, out cppFileNames);
-                if (null != cppFileNames)
-                {
-                    for (int i = 0; i < cppFileNames.Count; ++i)
-                    {
-                        if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
-                        {
-                            cppFileNames.RemoveAt(i);
-                            --i;
-                            changed = true;
-                        }
-                    }
-                }
+                changed = RemoveNoLongerExistingCppFileNames(projectInfo) || changed;
             }
 
             return changed;

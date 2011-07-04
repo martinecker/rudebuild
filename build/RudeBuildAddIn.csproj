@@ -119,6 +119,9 @@
     <Compile Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml.cs">
       <DependentUpon>GlobalSettingsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml.cs">
+      <DependentUpon>SolutionSettingsDialog.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -213,6 +216,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
