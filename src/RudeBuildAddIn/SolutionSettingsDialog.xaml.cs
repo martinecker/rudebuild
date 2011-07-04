@@ -39,5 +39,42 @@ namespace RudeBuildAddIn
         {
             DialogResult = false;
         }
+
+        private void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TreeViewItem treeViewItem = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
+            if (null != treeViewItem)
+            {
+                treeViewItem.Focus();
+                e.Handled = true;
+            }
+        }
+
+        private static DependencyObject VisualUpwardSearch<T>(DependencyObject source)
+        {
+            while (source != null && source.GetType() != typeof(T))
+                source = VisualTreeHelper.GetParent(source);
+            return source;
+        }
+
+        private ProjectInfo GetSelectedProjectInfo()
+        {
+            if (null == _treeViewExcludedFileNames.SelectedValue)
+                return null;
+            string projectName = _treeViewExcludedFileNames.SelectedValue as string;
+            if (string.IsNullOrEmpty(projectName))
+                return null;
+            ProjectInfo projectInfo = _solutionInfo.GetProjectInfo(projectName);
+            return projectInfo;
+        }
+
+        private void OnAddExcludedCppFileNameFromProject(object sender, RoutedEventArgs e)
+        {
+            ProjectInfo projectInfo = GetSelectedProjectInfo();
+            if (null == projectInfo)
+                return;
+
+            _settings.SolutionSettings.ExcludeCppFileNameForProject(projectInfo, "hugo.cpp");
+        }
     }
 }

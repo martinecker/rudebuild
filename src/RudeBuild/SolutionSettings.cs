@@ -91,8 +91,7 @@ namespace RudeBuild
 
             foreach (string projectName in solutionInfo.ProjectNames)
             {
-                ProjectInfo projectInfo = null;
-                solutionInfo.Projects.TryGetValue(projectName, out projectInfo);
+                ProjectInfo projectInfo = solutionInfo.GetProjectInfo(projectName);
                 if (null == projectInfo)
                     throw new InvalidDataException("SolutionInfo does not contain ProjectInfo object for project called " + projectName);
 

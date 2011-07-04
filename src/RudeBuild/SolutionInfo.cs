@@ -46,5 +46,12 @@ namespace RudeBuild
 
             Projects.Add(projectInfo.Name, projectInfo);
         }
+
+        public ProjectInfo GetProjectInfo(string projectName)
+        {
+            ProjectInfo projectInfo = null;
+            Projects.TryGetValue(projectName, out projectInfo);
+            return projectInfo;
+        }
     }
 }
