@@ -6,7 +6,7 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
              xmlns:RudeBuildAddIn="clr-namespace:RudeBuildAddIn"
-             Title="RudeBuild Solution Settings" Width="500" Height="260">
+             Title="RudeBuild Solution Settings" Width="500" Height="533">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="26" />
@@ -22,7 +22,7 @@
                     <TextBlock FontWeight="Bold" Text="{Binding Path=Key}">
                         <TextBlock.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="_Add Excluded C/C++ File..." Click="OnAddExcludedCppFileNameFromProject" />
+                                <MenuItem Header="_Add Excluded C/C++ File..." Click="OnAddExcludedCppFileNameForProject" />
                             </ContextMenu>
                         </TextBlock.ContextMenu>
                     </TextBlock>
@@ -33,12 +33,17 @@
                     </HierarchicalDataTemplate.ItemTemplate>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="true" />
+                </Style>
+            </TreeView.ItemContainerStyle>
         </TreeView>
         <CheckBox Content="Disable Precompiled Headers" Margin="8,6,6,0" Grid.Row="2"
                   IsChecked="{Binding Path=DisablePrecompiledHeaders}" />
         <StackPanel Orientation="Horizontal" Grid.Row="3">
-            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Name="okButton" Width="75" Click="OnOK" />
-            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Name="cancelButton" Width="75" Click="OnCancel" />
+            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Width="75" Click="OnOK" />
+            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Width="75" Click="OnCancel" />
         </StackPanel>
     </Grid>
 </Window>

@@ -122,6 +122,9 @@
     <Compile Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml.cs">
       <DependentUpon>SolutionSettingsDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\src\RudeBuildAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml.cs">
+      <DependentUpon>SolutionSettingsAddExcludedCppFileNameDialog.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE">
@@ -222,6 +225,12 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\src\RudeBuildAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

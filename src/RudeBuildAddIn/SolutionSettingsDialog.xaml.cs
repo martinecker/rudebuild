@@ -19,19 +19,22 @@ namespace RudeBuildAddIn
     {
         private Settings _settings;
         private SolutionInfo _solutionInfo;
+        private SolutionSettings _solutionSettings;
 
         public SolutionSettingsDialog(Settings settings, SolutionInfo solutionInfo)
         {
             _settings = settings;
             _solutionInfo = solutionInfo;
+            _solutionSettings = SolutionSettings.Load(settings, solutionInfo);
 
             InitializeComponent();
-            _window.DataContext = _settings.SolutionSettings;
+            _window.DataContext = _solutionSettings;
         }
 
         private void OnOK(object sender, RoutedEventArgs e)
         {
-            _settings.SolutionSettings.Save(_settings, _solutionInfo);
+            _settings.SolutionSettings = _solutionSettings;
+            _solutionSettings.Save(_settings, _solutionInfo);
             DialogResult = true;
         }
 
@@ -68,13 +71,29 @@ namespace RudeBuildAddIn
             return projectInfo;
         }
 
-        private void OnAddExcludedCppFileNameFromProject(object sender, RoutedEventArgs e)
+        private void OnAddExcludedCppFileNameForProject(object sender, RoutedEventArgs e)
         {
             ProjectInfo projectInfo = GetSelectedProjectInfo();
             if (null == projectInfo)
                 return;
 
-            _settings.SolutionSettings.ExcludeCppFileNameForProject(projectInfo, "hugo.cpp");
+            SolutionSettingsAddExcludedCppFileNameDialog dialog = new SolutionSettingsAddExcludedCppFileNameDialog(projectInfo, _solutionSettings);
+            try
+            {
+                dialog.ShowDialog();
+
+                if (dialog.DialogResult == true)
+                {
+                    foreach (string fileName in dialog.FileNamesToExclude)
+                    {
+                        _solutionSettings.ExcludeCppFileNameForProject(projectInfo, fileName);
+                    }
+                }
+            }
+            finally
+            {
+                dialog.Close();
+            }
         }
     }
 }

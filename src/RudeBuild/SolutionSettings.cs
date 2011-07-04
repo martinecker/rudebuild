@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -154,6 +155,18 @@ namespace RudeBuild
             if (null == cppFileNames)
                 return false;
             return cppFileNames.Contains(cppFileName);
+        }
+
+        public ReadOnlyCollection<string> GetExcludedCppFileNamesForProject(string projectName)
+        {
+            if (null == ProjectNameToExcludedCppFileNameMap)
+                return null;
+
+            List<string> cppFileNames = null;
+            ProjectNameToExcludedCppFileNameMap.TryGetValue(projectName, out cppFileNames);
+            if (null == cppFileNames)
+                return null;
+            return new ReadOnlyCollection<string>(cppFileNames);
         }
 
         public static SolutionSettings Load(Settings settings, SolutionInfo solutionInfo)

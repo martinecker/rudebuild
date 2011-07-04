@@ -38,8 +38,8 @@
         <CheckBox Content="Randomize Order of Unity Merged Files per Build" Margin="8,6,6,0" Grid.Row="5"
                   IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
         <StackPanel Orientation="Horizontal" Grid.Row="6">
-            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Name="okButton" Width="75" Click="OnOK" />
-            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Name="cancelButton" Width="75" Click="OnCancel" />
+            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Width="75" Click="OnOK" />
+            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Width="75" Click="OnCancel" />
         </StackPanel>
     </Grid>
 </Window>
