@@ -29,36 +29,38 @@ namespace RudeBuild
 
         public bool Update(SolutionInfo solutionInfo)
         {
-            bool changed = false;
+            if (null == ProjectNameToExcludedCppFileNameMap)
+                return false;
 
+            bool changed = false;
             var projectNames = ProjectNameToExcludedCppFileNameMap.Keys;
             foreach (string projectName in projectNames)
             {
-                // Ensure the project we have stored settings for still exists.
+                // Check if the projects we have stored settings for still exists. If they don't, remove them.
                 if (!solutionInfo.ProjectNames.Contains(projectName))
                 {
                     ProjectNameToExcludedCppFileNameMap.Remove(projectName);
                     changed = true;
+                    continue;
                 }
-                else
-                {
-                    ProjectInfo projectInfo = null;
-                    solutionInfo.Projects.TryGetValue(projectName, out projectInfo);
-                    if (null == projectInfo)
-                        throw new InvalidDataException("SolutionInfo does not contain ProjectInfo object for project called " + projectName);
 
-                    List<string> cppFileNames = null;
-                    ProjectNameToExcludedCppFileNameMap.TryGetValue(projectName, out cppFileNames);
-                    if (null != cppFileNames)
+                ProjectInfo projectInfo = null;
+                solutionInfo.Projects.TryGetValue(projectName, out projectInfo);
+                if (null == projectInfo)
+                    throw new InvalidDataException("SolutionInfo does not contain ProjectInfo object for project called " + projectName);
+
+                // Check if all the file names we have stored settings for still exist. If they don't, remove them.
+                List<string> cppFileNames = null;
+                ProjectNameToExcludedCppFileNameMap.TryGetValue(projectName, out cppFileNames);
+                if (null != cppFileNames)
+                {
+                    for (int i = 0; i < cppFileNames.Count; ++i)
                     {
-                        for (int i = 0; i < cppFileNames.Count; ++i)
+                        if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
                         {
-                            if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
-                            {
-                                cppFileNames.RemoveAt(i);
-                                --i;
-                                changed = true;
-                            }
+                            cppFileNames.RemoveAt(i);
+                            --i;
+                            changed = true;
                         }
                     }
                 }
