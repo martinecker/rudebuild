@@ -145,7 +145,9 @@ namespace RudeBuild
 
                 foreach (XElement cppFileNameElement in cppFileNameElements)
                 {
-                    AddExcludedFromBuild(ns, cppFileNameElement);
+                    string cppFileName = cppFileNameElement.Attribute("Include").Value;
+                    if (merger.MergedCppFileNames.Contains(cppFileName))
+                        AddExcludedFromBuild(ns, cppFileNameElement);
                 }
 
                 compileItemGroupElement.Add(
@@ -237,7 +239,12 @@ namespace RudeBuild
                 UnityFileMerger merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                cppFileNameElements.Remove();
+                foreach (XElement cppFileNameElement in cppFileNameElements)
+                {
+                    string cppFileName = cppFileNameElement.Attribute("RelativePath").Value;
+                    if (merger.MergedCppFileNames.Contains(cppFileName))
+                        cppFileNameElement.Remove();
+                }
 
                 XElement filesElement = projectDocument.Descendants(ns + "Files").Single();
                 filesElement.Add(

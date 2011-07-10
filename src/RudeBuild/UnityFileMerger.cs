@@ -26,11 +26,9 @@ namespace RudeBuild
     {
         private Settings _settings;
         private string _cachePath;
-        private IList<string> _unityFilePaths;
-        public IList<string> UnityFilePaths
-        {
-            get { return _unityFilePaths; }
-        }
+
+        public IList<string> UnityFilePaths { get; private set; }
+        public IList<string> MergedCppFileNames { get; private set; }
 
         public UnityFileMerger(Settings settings)
         {
@@ -75,14 +73,15 @@ namespace RudeBuild
                 _settings.Output.WriteLine("Creating unity file " + projectInfo.Name + fileIndex);
             }
 
-            _unityFilePaths.Add(destFileName);
+            UnityFilePaths.Add(destFileName);
         }
 
         public void Process(ProjectInfo projectInfo)
         {
             CreateCachePath(projectInfo.Solution);
 
-            _unityFilePaths = new List<string>();
+            UnityFilePaths = new List<string>();
+            MergedCppFileNames = new List<string>();
 
             StringBuilder currentUnityFileContents = new StringBuilder();
             WritePrefix(projectInfo, currentUnityFileContents);
@@ -126,6 +125,8 @@ namespace RudeBuild
                 currentUnityFileContents.AppendLine("#pragma message(\"" + Path.GetFileName(cppFileName) + "\")");
                 currentUnityFileContents.AppendLine("#endif");
                 currentUnityFileContents.AppendLine("#include \"" + cppFilePath + "\"");
+
+                MergedCppFileNames.Add(cppFileName);
             }
 
             if (currentUnityFileSize > 0)
