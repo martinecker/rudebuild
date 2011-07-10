@@ -20,6 +20,7 @@ namespace RudeBuildAddIn
         private Settings _settings;
         private SolutionInfo _solutionInfo;
         private SolutionSettings _solutionSettings;
+        private TreeViewItem _selectedTreeViewItem;
 
         public SolutionSettingsDialog(Settings settings, SolutionInfo solutionInfo)
         {
@@ -43,37 +44,57 @@ namespace RudeBuildAddIn
             DialogResult = false;
         }
 
+        private void OnTreeViewItemSelected(object sender, RoutedEventArgs e)
+        {
+            _selectedTreeViewItem = e.OriginalSource as TreeViewItem;
+        }
+
+        private void OnTreeViewItemUnselected(object sender, RoutedEventArgs e)
+        {
+            _selectedTreeViewItem = null;
+        }
+
         private void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            TreeViewItem treeViewItem = VisualUpwardSearch<TreeViewItem>(e.OriginalSource as DependencyObject) as TreeViewItem;
-            if (null != treeViewItem)
+            DependencyObject clickedControl = e.OriginalSource as DependencyObject;
+            if (null != clickedControl)
             {
-                treeViewItem.Focus();
-                e.Handled = true;
+                TreeViewItem treeViewItem = clickedControl.VisualUpwardSearch<TreeViewItem>();
+                if (null != treeViewItem)
+                {
+                    treeViewItem.Focus();
+                    e.Handled = true;
+                }
             }
         }
 
-        private static DependencyObject VisualUpwardSearch<T>(DependencyObject source)
+        private string GetSelectedFileName()
         {
-            while (source != null && source.GetType() != typeof(T))
-                source = VisualTreeHelper.GetParent(source);
-            return source;
+            if (null == _treeViewExcludedFileNames.SelectedItem)
+                return null;
+            string fileName = _treeViewExcludedFileNames.SelectedItem as string;
+            if (string.IsNullOrEmpty(fileName))
+                return null;
+            return fileName;
         }
 
-        private ProjectInfo GetSelectedProjectInfo()
+        private ProjectInfo GetProjectInfoFromTreeViewItem(TreeViewItem projectTreeViewItem)
         {
-            if (null == _treeViewExcludedFileNames.SelectedValue)
+            TextBlock textBlock = projectTreeViewItem.VisualDownwardSearch<TextBlock>();
+            if (null == textBlock)
                 return null;
-            string projectName = _treeViewExcludedFileNames.SelectedValue as string;
-            if (string.IsNullOrEmpty(projectName))
-                return null;
+            string projectName = textBlock.Text;
             ProjectInfo projectInfo = _solutionInfo.GetProjectInfo(projectName);
+            if (null == projectInfo)
+                return null;
             return projectInfo;
         }
 
         private void OnAddExcludedCppFileNameForProject(object sender, RoutedEventArgs e)
         {
-            ProjectInfo projectInfo = GetSelectedProjectInfo();
+            if (null == _selectedTreeViewItem)
+                return;
+            ProjectInfo projectInfo = GetProjectInfoFromTreeViewItem(_selectedTreeViewItem);
             if (null == projectInfo)
                 return;
 
@@ -94,6 +115,28 @@ namespace RudeBuildAddIn
             {
                 dialog.Close();
             }
+        }
+
+        private void OnRemoveExcludedCppFileNameForProject(object sender, RoutedEventArgs e)
+        {
+            if (null == _selectedTreeViewItem)
+                return;
+
+            string fileName = GetSelectedFileName();
+            if (null == fileName)
+                return;
+
+            DependencyObject parentControl = VisualTreeHelper.GetParent(_selectedTreeViewItem);
+            if (null == parentControl)
+                return;
+            TreeViewItem projectTreeViewItem = parentControl.VisualUpwardSearch<TreeViewItem>();
+            if (null == projectTreeViewItem)
+                return;
+            ProjectInfo projectInfo = GetProjectInfoFromTreeViewItem(projectTreeViewItem);
+            if (null == projectInfo)
+                return;
+
+            _solutionSettings.RemoveExcludedCppFileNameForProject(projectInfo, fileName);
         }
     }
 }

@@ -146,6 +146,17 @@ namespace RudeBuild
             }
         }
 
+        public void RemoveExcludedCppFileNameForProject(ProjectInfo projectInfo, string cppFileName)
+        {
+            if (null == ProjectNameToExcludedCppFileNameMap)
+                return;
+            List<string> cppFileNames = null;
+            ProjectNameToExcludedCppFileNameMap.TryGetValue(projectInfo.Name, out cppFileNames);
+            if (null == cppFileNames)
+                return;
+            cppFileNames.Remove(cppFileName);
+        }
+
         public bool IsExcludedCppFileNameForProject(ProjectInfo projectInfo, string cppFileName)
         {
             if (null == ProjectNameToExcludedCppFileNameMap)

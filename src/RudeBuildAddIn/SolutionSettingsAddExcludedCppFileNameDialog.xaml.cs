@@ -53,5 +53,30 @@ namespace RudeBuildAddIn
         {
             DialogResult = false;
         }
+
+        private void OnFileNameMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (_listBoxFileNames.SelectedItems.Count == 1)
+            {
+                FileNamesToExclude = new List<string>() { (string)_listBoxFileNames.SelectedItems[0] };
+                DialogResult = true;
+                Close();
+            }
+        }
+
+        private void OnFileNamePreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject clickedControl = e.OriginalSource as DependencyObject;
+            if (null != clickedControl)
+            {
+                ListBox listBox = clickedControl.VisualUpwardSearch<ListBox>();
+                if (_listBoxFileNames == listBox)
+                {
+                    ListBoxItem clickedListBoxItem = clickedControl.VisualUpwardSearch<ListBoxItem>();
+                    listBox.UnselectAll();
+                    clickedListBoxItem.IsSelected = true;
+                }
+            }
+        }
     }
 }
