@@ -90,6 +90,12 @@ namespace RudeBuildAddIn
             return projectInfo;
         }
 
+        private void RefreshTreeViewBinding()
+        {
+            BindingOperations.ClearBinding(_treeViewExcludedFileNames, TreeView.ItemsSourceProperty);
+            _treeViewExcludedFileNames.SetBinding(TreeView.ItemsSourceProperty, new Binding("ProjectNameToExcludedCppFileNameMap"));
+        }
+
         private void OnAddExcludedCppFileNameForProject(object sender, RoutedEventArgs e)
         {
             if (null == _selectedTreeViewItem)
@@ -109,6 +115,7 @@ namespace RudeBuildAddIn
                     {
                         _solutionSettings.ExcludeCppFileNameForProject(projectInfo, fileName);
                     }
+                    RefreshTreeViewBinding();
                 }
             }
             finally
@@ -137,6 +144,7 @@ namespace RudeBuildAddIn
                 return;
 
             _solutionSettings.RemoveExcludedCppFileNameForProject(projectInfo, fileName);
+            RefreshTreeViewBinding();
         }
     }
 }
