@@ -38,11 +38,10 @@ namespace RudeBuildAddIn
                 return;
 
             Command vsCommand = GetVSCommand(name);
-            if (null != vsCommand)
+            if (null == vsCommand)
             {
-                vsCommand.Delete();
+                vsCommand = _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
             }
-            vsCommand = _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
             command.Initialize(name, caption, toolTip, icon, vsCommand);
             _commandRegistry.Register(command);
         }

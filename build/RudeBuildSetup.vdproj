@@ -975,7 +975,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
         "ProductCode" = "8:{B4576A90-0AB0-4511-90A2-6BBC94722DB7}"
-        "PackageCode" = "8:{6BB0EB91-A782-4F3F-862B-80A1B88A3623}"
+        "PackageCode" = "8:{B4E93D66-513F-47DC-8EAB-BD5B42D91276}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
