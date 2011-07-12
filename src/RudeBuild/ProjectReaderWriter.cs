@@ -143,7 +143,7 @@ namespace RudeBuild
                 UnityFileMerger merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                foreach (XElement cppFileNameElement in cppFileNameElements)
+                foreach (XElement cppFileNameElement in cppFileNameElements.ToList())
                 {
                     string cppFileName = cppFileNameElement.Attribute("Include").Value;
                     if (merger.MergedCppFileNames.Contains(cppFileName))
@@ -239,7 +239,7 @@ namespace RudeBuild
                 UnityFileMerger merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                foreach (XElement cppFileNameElement in cppFileNameElements)
+                foreach (XElement cppFileNameElement in cppFileNameElements.ToList())
                 {
                     string cppFileName = cppFileNameElement.Attribute("RelativePath").Value;
                     if (merger.MergedCppFileNames.Contains(cppFileName))

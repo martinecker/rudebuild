@@ -214,6 +214,18 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_1CF250535FCC3E9B5FE34C57BAF984D7"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_E6C7439674989241413E383D17D4959B"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -256,19 +268,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1CF250535FCC3E9B5FE34C57BAF984D7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_64A05845583C4AC09E077767C8E8894C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -975,7 +975,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
         "ProductCode" = "8:{B4576A90-0AB0-4511-90A2-6BBC94722DB7}"
-        "PackageCode" = "8:{B4E93D66-513F-47DC-8EAB-BD5B42D91276}"
+        "PackageCode" = "8:{EF379C5D-E147-4A68-91B7-716C807BAEA2}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
