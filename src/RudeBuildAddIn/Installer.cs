@@ -15,6 +15,7 @@ namespace RudeBuildAddIn
     public partial class Installer : System.Configuration.Install.Installer
     {
         private const string _addInFileName = "RudeBuild.AddIn";
+        private const string _globalSettingsFileName = "RudeBuild.GlobalSettings.config";
 
         public Installer()
         {
@@ -67,6 +68,11 @@ namespace RudeBuildAddIn
             }
         }
 
+        private string GetInstallationPath()
+        {
+            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
+
         public override void Install(IDictionary savedState)
         {
             // Uncomment the following line, recompile, and run the built setup if you want to debug this installer.
@@ -76,7 +82,7 @@ namespace RudeBuildAddIn
 
             try
             {
-                string installationPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                string installationPath = GetInstallationPath();
                 string addInFilePath = Path.Combine(installationPath, _addInFileName);
                 PatchAddInFile(addInFilePath, installationPath);
                 InstallAddInFile(savedState, addInFilePath, "2008");
@@ -95,6 +101,13 @@ namespace RudeBuildAddIn
             {
                 UninstallAddInFile(savedState, "2008");
                 UninstallAddInFile(savedState, "2010");
+
+                string installationPath = GetInstallationPath();
+                string globalSettingsPath = Path.Combine(installationPath, _globalSettingsFileName);
+                if (File.Exists(globalSettingsPath))
+                {
+                    File.Delete(globalSettingsPath);
+                }
             }
             catch (Exception ex)
             {
