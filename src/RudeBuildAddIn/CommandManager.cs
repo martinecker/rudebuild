@@ -124,22 +124,6 @@ namespace RudeBuildAddIn
             return FindCommandBarControlByCaption(FindCommandBar(commandBarName), caption);
         }
 
-        public CommandBarControl FindCommandBarControlByTag(CommandBar commandBar, string tag)
-        {
-            if (null == commandBar)
-                return null;
-
-            var commandBarControl = from CommandBarControl control in commandBar.Controls
-                                    where control.Tag == tag
-                                    select control;
-            return commandBarControl.SingleOrDefault();
-        }
-
-        public CommandBarControl FindCommandBarControlByTag(string commandBarName, string tag)
-        {
-            return FindCommandBarControlByTag(FindCommandBar(commandBarName), tag);
-        }
-
         #endregion
 
         #region Add command control/bar functions
@@ -168,7 +152,6 @@ namespace RudeBuildAddIn
                 if (null == commandBarPopup)
                     return null;
                 commandBarPopup.Visible = true;
-                commandBarPopup.Tag = popupCommandBarName;
                 commandBarPopup.Caption = caption;
                 commandBarPopup.BeginGroup = beginGroup;
                 commandBar = commandBarPopup.CommandBar;
@@ -194,13 +177,12 @@ namespace RudeBuildAddIn
             if (null == command)
                 return;
 
-            CommandBarControl existingControl = FindCommandBarControlByTag(commandBar, commandName);
+            CommandBarControl existingControl = FindCommandBarControlByCaption(commandBar, command.Caption);
             if (null != existingControl)
             {
                 existingControl.Delete();
             }
             CommandBarButton commandBarButton = (CommandBarButton)command.VSCommand.AddControl(commandBar, insertIndex);
-            commandBarButton.Tag = commandName;
             commandBarButton.BeginGroup = beginGroup;
             commandBarButton.Style = style;
         }
