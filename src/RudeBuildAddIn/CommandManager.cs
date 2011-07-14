@@ -178,11 +178,11 @@ namespace RudeBuildAddIn
                 return;
 
             CommandBarControl existingControl = FindCommandBarControlByCaption(commandBar, command.Caption);
+            CommandBarButton commandBarButton;
             if (null != existingControl)
-            {
-                existingControl.Delete();
-            }
-            CommandBarButton commandBarButton = (CommandBarButton)command.VSCommand.AddControl(commandBar, insertIndex);
+                commandBarButton = (CommandBarButton)existingControl;
+            else
+                commandBarButton = (CommandBarButton)command.VSCommand.AddControl(commandBar, insertIndex);
             commandBarButton.BeginGroup = beginGroup;
             commandBarButton.Style = style;
         }

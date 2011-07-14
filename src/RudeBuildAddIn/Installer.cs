@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml;
+using RudeBuild;
 
 namespace RudeBuildAddIn
 {
@@ -121,10 +122,35 @@ namespace RudeBuildAddIn
             UninstallOrRollback(savedState);
         }
 
+        private void ResetAddIn(VisualStudioVersion version)
+        {
+            try
+            {
+                Process process = new Process();
+                ProcessStartInfo info = process.StartInfo;
+                info.CreateNoWindow = true;
+                info.UseShellExecute = false;
+                info.WindowStyle = ProcessWindowStyle.Hidden; 
+                info.ErrorDialog = false;
+                info.FileName = ProcessLauncher.GetDevEnvPath(version);
+                info.Arguments = " /ResetAddIn RudeBuildAddIn.Connect /Command File.Exit";
+                if (process.Start())
+                {
+                    process.WaitForExit();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
         public override void Uninstall(IDictionary savedState)
         {
             base.Rollback(savedState);
             UninstallOrRollback(savedState);
+            ResetAddIn(VisualStudioVersion.VS2008);
+            ResetAddIn(VisualStudioVersion.VS2010);
         }
     }
 }

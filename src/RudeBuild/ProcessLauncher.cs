@@ -16,10 +16,10 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        private string GetDevEnvPath(SolutionInfo solutionInfo)
+        public static string GetDevEnvPath(VisualStudioVersion version)
         {
             string registryPath = null;
-            switch (solutionInfo.Version)
+            switch (version)
             {
                 case VisualStudioVersion.VS2005: registryPath = @"SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS"; break;
                 case VisualStudioVersion.VS2008: registryPath = @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"; break;
@@ -35,7 +35,7 @@ namespace RudeBuild
 
         private void SetupDevEnvProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
         {
-            info.FileName = GetDevEnvPath(solutionInfo);
+            info.FileName = GetDevEnvPath(solutionInfo.Version);
 
             string buildCommand = "Build";
             if (_settings.BuildOptions.Clean)
