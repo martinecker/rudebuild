@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml;
+using System.Windows;
+using EnvDTE80;
 using RudeBuild;
 
 namespace RudeBuildAddIn
@@ -69,9 +71,27 @@ namespace RudeBuildAddIn
             }
         }
 
-        private string GetInstallationPath()
+        private static string GetInstallationPath()
         {
             return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        }
+
+        public static object CreateComObjectFromProgId(string progId)
+        {
+            try
+            {
+                Type type = Type.GetTypeFromProgID(progId);
+                if (type != null)
+                {
+                    return Activator.CreateInstance(type);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+
+            return null;
         }
 
         public override void Install(IDictionary savedState)
@@ -92,7 +112,46 @@ namespace RudeBuildAddIn
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                MessageBox.Show("RudeBuild install error!\n" + ex.Message, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private static string GetDevEnvProgId(VisualStudioVersion version)
+        {
+            switch (version)
+            {
+            case VisualStudioVersion.VS2005: return "VisualStudio.DTE.8.0";
+            case VisualStudioVersion.VS2008: return "VisualStudio.DTE.9.0";
+            case VisualStudioVersion.VS2010: return "VisualStudio.DTE.10.0";
+            default: return null;
+            }
+        }
+
+        private void RemoveCommands(VisualStudioVersion version)
+        {
+            DTE2 application = null;
+            try
+            {
+                string devEnvProgId = GetDevEnvProgId(version);
+                if (string.IsNullOrEmpty(devEnvProgId))
+                    return;
+                application = CreateComObjectFromProgId(devEnvProgId) as DTE2;
+                if (null == application)
+                    return;
+
+                Connect connect = new Connect();
+                connect.OnUninstall(application);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("RudeBuild error while removing commands from Visual Studio!\n" + ex.Message, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (null != application)
+                {
+                    application.Quit();
+                }
             }
         }
 
@@ -100,6 +159,9 @@ namespace RudeBuildAddIn
         {
             try
             {
+                RemoveCommands(VisualStudioVersion.VS2008);
+                RemoveCommands(VisualStudioVersion.VS2010);
+
                 UninstallAddInFile(savedState, "2008");
                 UninstallAddInFile(savedState, "2010");
 
@@ -112,7 +174,7 @@ namespace RudeBuildAddIn
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                MessageBox.Show("RudeBuild uninstall error!\n" + ex.Message, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -141,7 +203,7 @@ namespace RudeBuildAddIn
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                MessageBox.Show("RudeBuild uninstall error!\n" + ex.Message, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -149,8 +211,9 @@ namespace RudeBuildAddIn
         {
             base.Rollback(savedState);
             UninstallOrRollback(savedState);
-            ResetAddIn(VisualStudioVersion.VS2008);
-            ResetAddIn(VisualStudioVersion.VS2010);
+
+//             ResetAddIn(VisualStudioVersion.VS2008);
+//             ResetAddIn(VisualStudioVersion.VS2010);
         }
     }
 }

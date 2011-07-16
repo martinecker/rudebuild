@@ -14,6 +14,11 @@ namespace RudeBuildAddIn
             _commands.Add(command.Name, command);
         }
 
+        public void Unregister(string commandName)
+        {
+            _commands.Remove(commandName);
+        }
+
         public ICommand Get(string commandName)
         {
             ICommand result = null;

@@ -8,6 +8,8 @@ namespace RudeBuildAddIn
 {
     public class CommandManager
     {
+        public const string CommandPrefix = "RudeBuildAddIn.Connect.";
+
         public DTE2 Application { get; private set; }
         public AddIn AddInInstance { get; private set; }
         
@@ -27,7 +29,7 @@ namespace RudeBuildAddIn
         private Command GetVSCommand(string name)
         {
             var vsCommand = from Command command in _vsCommands
-                            where command.Name == "RudeBuildAddIn.Connect." + name
+                            where command.Name == CommandPrefix + name
                             select command;
             return vsCommand.SingleOrDefault();
         }
@@ -44,6 +46,16 @@ namespace RudeBuildAddIn
             }
             command.Initialize(name, caption, toolTip, icon, vsCommand);
             _commandRegistry.Register(command);
+        }
+
+        public void UnregisterCommand(string name)
+        {
+            _commandRegistry.Unregister(name);
+            Command vsCommand = GetVSCommand(name);
+            if (null != vsCommand)
+            {
+                vsCommand.Delete();
+            }
         }
 
         public ICommand GetCommand(string name)
