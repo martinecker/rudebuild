@@ -60,7 +60,7 @@ namespace RudeBuild
         }
 
         private long _maxUnityFileSizeInBytes;
-        [DefaultValue(50 * 1024)]
+        [DefaultValue(300 * 1024)]
         public long MaxUnityFileSizeInBytes
         {
             get { return _maxUnityFileSizeInBytes; }
