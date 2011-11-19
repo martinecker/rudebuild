@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -203,13 +204,38 @@ namespace RudeBuild
             return new SolutionSettings();
         }
 
-        public void Save(Settings settings, SolutionInfo solutionInfo)
+        private void SaveInternal(Settings settings, SolutionInfo solutionInfo)
         {
             string configFilePath = GetConfigFilePath(settings, solutionInfo);
             using (TextWriter textWriter = new StreamWriter(configFilePath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(SolutionSettings));
                 serializer.Serialize(textWriter, this);
+            }
+        }
+
+        public void Save(Settings settings, SolutionInfo solutionInfo)
+        {
+            // Since multiple instances of RudeBuild could try to save the solution
+            // settings at the same time, retry a few times if it fails because we
+            // couldn't get exclusive access to the file.
+            int retryCount = 3;
+            while (retryCount > 0)
+            {
+                try
+                {
+                    SaveInternal(settings, solutionInfo);
+                    retryCount = 0;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(300);
+                    --retryCount;
+                    if (retryCount == 0)
+                    {
+                        throw e;
+                    }
+                }
             }
         }
     }

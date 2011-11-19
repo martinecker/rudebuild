@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -37,7 +38,7 @@ namespace RudeBuild
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("You must specify a valid cache path.");
                 if (-1 != value.IndexOfAny(invalidChars))
-                    throw new ArgumentException("The cache path contains not valid characters for a path.");
+                    throw new ArgumentException("The cache path contains invalid characters for a path.");
                 _cachePath = value;
             }
         }
@@ -53,7 +54,7 @@ namespace RudeBuild
                 if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("You must specify a valid file name prefix.");
                 if (-1 != value.IndexOfAny(invalidChars))
-                    throw new ArgumentException("The file name prefix contains not valid characters for file names.");
+                    throw new ArgumentException("The file name prefix contains invalid characters for file names.");
                 _fileNamePrefix = value;
             }
         }
@@ -100,12 +101,37 @@ namespace RudeBuild
             }
         }
 
-        public void Save()
+        private void SaveInternal()
         {
             using (TextWriter textWriter = new StreamWriter(ConfigFilePath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(GlobalSettings));
                 serializer.Serialize(textWriter, this);
+            }
+        }
+
+        public void Save()
+        {
+            // Since multiple instances of RudeBuild could try to save the global
+            // settings at the same time, retry a few times if it fails because we
+            // couldn't get exclusive access to the file.
+            int retryCount = 3;
+            while (retryCount > 0)
+            {
+                try
+                {
+                    SaveInternal();
+                    retryCount = 0;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(300);
+                    --retryCount;
+                    if (retryCount == 0)
+                    {
+                        throw e;
+                    }
+                }
             }
         }
     }
