@@ -37,7 +37,7 @@ namespace RudeBuildConsole
 
         private BuildOptions ParseBuildOptions(string[] args)
         {
-            _output.WriteLine("RudeBuild, Version 1.0");
+            _output.WriteLine("RudeBuild, Version 1.1");
             _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker.");
             _output.WriteLine("This is free, open source software under the zlib license.");
             _output.WriteLine();
@@ -76,10 +76,10 @@ namespace RudeBuildConsole
             try
             {
                 BuildOptions options = ParseBuildOptions(args);
-                if (options == null)
+                if (options == null || options.Solution == null)
                     return 1;
 
-                GlobalSettings globalSettings = GlobalSettings.Load();
+                GlobalSettings globalSettings = GlobalSettings.Load(_output);
                 globalSettings.Save();
                 Settings settings = new Settings(globalSettings, options, _output);
 

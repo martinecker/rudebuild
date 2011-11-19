@@ -1,4 +1,4 @@
-RudeBuild, Version 1.0
+RudeBuild, Version 1.1
 ----------------------
 
 A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.

@@ -41,7 +41,27 @@ namespace RudeBuild
             _fileName = fileName;
             _cppFileNames = cppFileNames;
             _name = Path.GetFileNameWithoutExtension(fileName);
-            _precompiledHeaderFileName = precompiledHeaderFileName;
+            _precompiledHeaderFileName = ExpandMacros(precompiledHeaderFileName);
+        }
+
+        public string ExpandMacros(string value)
+        {
+            string solutionPath = _solution.FilePath;
+            string projectPath = Path.GetFullPath(_fileName);
+
+            value = value.Replace("$(SolutionName)", _solution.Name);
+            value = value.Replace("$(SolutionPath)", solutionPath);
+            value = value.Replace("$(SolutionFileName)", Path.GetFileName(solutionPath));
+            value = value.Replace("$(SolutionDir)", Path.GetDirectoryName(solutionPath) + Path.DirectorySeparatorChar);
+            value = value.Replace("$(SolutionExt)", Path.GetExtension(solutionPath));
+            
+            value = value.Replace("$(ProjectName)", _name);
+            value = value.Replace("$(ProjectPath)", projectPath);
+            value = value.Replace("$(ProjectFileName)", Path.GetFileName(projectPath));
+            value = value.Replace("$(ProjectDir)", Path.GetDirectoryName(projectPath) + Path.DirectorySeparatorChar);
+            value = value.Replace("$(ProjectExt)", Path.GetExtension(projectPath));
+
+            return value;
         }
     }
 }

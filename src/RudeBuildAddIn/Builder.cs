@@ -12,7 +12,13 @@ namespace RudeBuildAddIn
         private GlobalSettings _globalSettings;
 
         private EnvDTE80.DTE2 _application;
+        
         private IOutput _output;
+        public IOutput Output
+        {
+            get { return _output; }
+        }
+
         private Stopwatch _stopwatch;
 
         private object _lock = new object();
@@ -50,7 +56,7 @@ namespace RudeBuildAddIn
 
             try
             {
-                _globalSettings = GlobalSettings.Load();
+                _globalSettings = GlobalSettings.Load(_output);
                 _globalSettings.Save();
             }
             catch (System.Exception ex)
@@ -64,7 +70,7 @@ namespace RudeBuildAddIn
             if (IsBuilding)
                 return;
 
-            _globalSettings = GlobalSettings.Load();
+            _globalSettings = GlobalSettings.Load(_output);
             Settings settings = new Settings(_globalSettings, options, _output);
 
             if (options.CleanCache)

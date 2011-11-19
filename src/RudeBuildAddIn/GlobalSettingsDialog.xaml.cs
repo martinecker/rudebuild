@@ -19,10 +19,10 @@ namespace RudeBuildAddIn
     {
         private GlobalSettings _globalSettings;
 
-        public GlobalSettingsDialog()
+        public GlobalSettingsDialog(IOutput output)
         {
             InitializeComponent();
-            _globalSettings = GlobalSettings.Load();
+            _globalSettings = GlobalSettings.Load(output);
             _window.DataContext = _globalSettings;
         }
 

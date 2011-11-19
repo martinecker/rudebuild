@@ -15,7 +15,7 @@ namespace RudeBuildAddIn
 
         public override void Execute(CommandManager commandManager)
         {
-            GlobalSettings globalSettings = GlobalSettings.Load();
+            GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
             BuildOptions buildOptions = new BuildOptions();
             buildOptions.Solution = GetSolutionFileInfo(commandManager);
             Settings settings = new Settings(globalSettings, buildOptions, _outputPane);

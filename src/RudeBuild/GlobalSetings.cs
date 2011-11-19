@@ -86,18 +86,28 @@ namespace RudeBuild
             this.SetToDefaults();
         }
 
-        public static GlobalSettings Load()
+        public static GlobalSettings Load(IOutput output)
         {
             if (!File.Exists(ConfigFilePath))
             {
                 return new GlobalSettings();
             }
 
-            using (TextReader textReader = new StreamReader(ConfigFilePath))
+            try
             {
-                XmlSerializer deserializer = new XmlSerializer(typeof(GlobalSettings));
-                GlobalSettings globalSettings = (GlobalSettings)deserializer.Deserialize(textReader);
-                return globalSettings;
+                using (TextReader textReader = new StreamReader(ConfigFilePath))
+                {
+                    XmlSerializer deserializer = new XmlSerializer(typeof(GlobalSettings));
+                    GlobalSettings globalSettings = (GlobalSettings)deserializer.Deserialize(textReader);
+                    return globalSettings;
+                }
+            }
+            catch (Exception e)
+            {
+                output.WriteLine("An exception occurred trying to read global settings file '" + ConfigFilePath + "':");
+                output.WriteLine(e.Message);
+                output.WriteLine("Using default global settings!");
+                return new GlobalSettings();
             }
         }
 

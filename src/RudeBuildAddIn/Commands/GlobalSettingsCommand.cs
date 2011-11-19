@@ -13,7 +13,7 @@ namespace RudeBuildAddIn
 
         public override void Execute(CommandManager commandManager)
         {
-            GlobalSettingsDialog dialog = new GlobalSettingsDialog();
+            GlobalSettingsDialog dialog = new GlobalSettingsDialog(_builder.Output);
             try
             {
                 dialog.ShowDialog();
