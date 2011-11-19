@@ -428,7 +428,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.1.4340.21187, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.1.4340.24041, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_0140A19120767998C562B0E006E4D61C"
@@ -975,7 +975,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
         "ProductCode" = "8:{D46FCE2E-6862-441A-B026-A3A4E5BCDC58}"
-        "PackageCode" = "8:{DEE202D3-3180-4034-A14F-C0E4C6770CFE}"
+        "PackageCode" = "8:{9680C0A8-9ECC-423F-8CBC-1E079CD6597F}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
