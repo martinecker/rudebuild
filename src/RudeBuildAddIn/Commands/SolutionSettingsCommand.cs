@@ -1,3 +1,4 @@
+using System.IO;
 using RudeBuild;
 
 namespace RudeBuildAddIn
@@ -40,7 +41,16 @@ namespace RudeBuildAddIn
 
         public override bool IsEnabled(CommandManager commandManager)
         {
-            return IsSolutionOpen(commandManager) && !_builder.IsBuilding;
+            if (IsSolutionOpen(commandManager) && !_builder.IsBuilding)
+            {
+                string solutionPath = commandManager.Application.Solution.FullName;
+                if (!File.Exists(solutionPath))
+                {
+                    return false;
+                }
+                return true;
+            }
+            return false;
         }
     }
 }
