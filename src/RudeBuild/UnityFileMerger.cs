@@ -50,8 +50,14 @@ namespace RudeBuild
                 text.AppendLine("#include \"" + projectInfo.PrecompiledHeaderFileName + "\"");
                 text.AppendLine();
             }
+            text.AppendLine("#define RUDE_BUILD_UNITY_BUILD");
+            text.AppendLine("#ifdef __GNUC__");
+            text.AppendLine("  #if __GNUC__ >= 4 && __GNUC_MINOR__ >= 4");
+            text.AppendLine("  #define RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
+            text.AppendLine("  #endif");
+            text.AppendLine("#endif");
             text.AppendLine("#ifdef _MSC_VER");
-            text.AppendLine("#define RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
+            text.AppendLine("  #define RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
             text.AppendLine("#endif");
             text.AppendLine();
         }
