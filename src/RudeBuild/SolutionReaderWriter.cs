@@ -13,7 +13,7 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        private bool ParseVisualStudioVersion(string line, string solutionFormatVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
+        private static bool ParseVisualStudioVersion(string line, string solutionFormatVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
         {
             if (line.StartsWith("Microsoft Visual Studio Solution File, Format Version " + solutionFormatVersionString))
             {
@@ -56,20 +56,20 @@ namespace RudeBuild
             return projectFileName;
         }
 
-        public SolutionInfo Read(string srcFileName)
+        public SolutionInfo Read(string fileName)
         {
             VisualStudioVersion version = VisualStudioVersion.VSUnknown;
             List<string> projectFileNames = new List<string>();
             StringBuilder destSolutionText = new StringBuilder();
-            string solutionDirectory = Path.GetDirectoryName(srcFileName);
+            string solutionDirectory = Path.GetDirectoryName(fileName);
 
-            using (StreamReader reader = new StreamReader(srcFileName))
+            using (StreamReader reader = new StreamReader(fileName))
             {
                 string line;
                 bool isInSourceControlSection = false;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line == string.Empty)
+                    if (string.IsNullOrEmpty(line))
                     {
                         line = null;
                     }
@@ -114,10 +114,10 @@ namespace RudeBuild
 
             if (version == VisualStudioVersion.VSUnknown)
             {
-                throw new InvalidDataException("Solution file '" + srcFileName + "' is corrupt. It does not contain a Visual Studio version.");
+                throw new InvalidDataException("Solution file '" + fileName + "' is corrupt. It does not contain a Visual Studio version.");
             }
 
-            return new SolutionInfo(srcFileName, version, projectFileNames, destSolutionText.ToString());
+            return new SolutionInfo(fileName, version, projectFileNames, destSolutionText.ToString());
         }
 
         public void Write(SolutionInfo solutionInfo)
@@ -130,9 +130,9 @@ namespace RudeBuild
             }
         }
 
-        public SolutionInfo ReadWrite(string srcFileName)
+        public SolutionInfo ReadWrite(string fileName)
         {
-            SolutionInfo solutionInfo = Read(srcFileName);
+            SolutionInfo solutionInfo = Read(fileName);
             Write(solutionInfo);
             return solutionInfo;
         }

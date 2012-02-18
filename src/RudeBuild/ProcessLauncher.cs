@@ -24,7 +24,7 @@ namespace RudeBuild
                 case VisualStudioVersion.VS2005: registryPath = @"SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS"; break;
                 case VisualStudioVersion.VS2008: registryPath = @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"; break;
                 case VisualStudioVersion.VS2010: registryPath = @"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"; break;
-                default: throw new System.Exception("Couldn't find Visual Studio registry key. Your version of Visual Studio is either not properly installed, or it is unsupported by this tool.");
+                default: throw new System.ArgumentException("Couldn't find Visual Studio registry key. Your version of Visual Studio is either not properly installed, or it is unsupported by this tool.");
             }
 
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
@@ -53,7 +53,7 @@ namespace RudeBuild
             }
         }
 
-        private string GetIncrediBuildPath()
+        private static string GetIncrediBuildPath()
         {
             string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
@@ -179,16 +179,18 @@ namespace RudeBuild
 
                 _stopped = false;
 
-                Process killProcess = new System.Diagnostics.Process();
-                ProcessStartInfo info = killProcess.StartInfo;
-                info.UseShellExecute = false;
-                info.CreateNoWindow = true;
-                info.FileName = "taskkill";
-                info.Arguments = "/pid " + _process.Id + " /f /t";
-                if (killProcess.Start())
+                using (Process killProcess = new System.Diagnostics.Process())
                 {
-                    killProcess.WaitForExit();
-                    _stopped = true;
+                    ProcessStartInfo info = killProcess.StartInfo;
+                    info.UseShellExecute = false;
+                    info.CreateNoWindow = true;
+                    info.FileName = "taskkill";
+                    info.Arguments = "/pid " + _process.Id + " /f /t";
+                    if (killProcess.Start())
+                    {
+                        killProcess.WaitForExit();
+                        _stopped = true;
+                    }
                 }
             }
         }

@@ -59,16 +59,17 @@ namespace RudeBuild
 
         private static string GetMD5Hash(string input)
         {
-            MD5 md5Hasher = MD5.Create();
-
-            // Convert the input string to a byte array and compute the hash.
-            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-
-            // Convert to a 32 character hexadecimal output string.
             StringBuilder result = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
+            using (MD5 md5Hasher = MD5.Create())
             {
-                result.Append(data[i].ToString("x2"));
+                // Convert the input string to a byte array and compute the hash.
+                byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+
+                // Convert to a 32 character hexadecimal output string.
+                for (int i = 0; i < data.Length; i++)
+                {
+                    result.Append(data[i].ToString("x2"));
+                }
             }
             return result.ToString();
         }

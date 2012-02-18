@@ -22,7 +22,7 @@ namespace RudeBuild
             this.SetToDefaults();
         }
 
-        public static string GetConfigFilePath(Settings settings, SolutionInfo solutionInfo)
+        public static string GetConfigFilePath(SolutionInfo solutionInfo)
         {
             string solutionFileName = Path.GetFileNameWithoutExtension(solutionInfo.FilePath);
             string configFilePath = Path.Combine(Path.GetDirectoryName(solutionInfo.FilePath), solutionFileName + ConfigFileNameSuffix);
@@ -114,7 +114,7 @@ namespace RudeBuild
                 }
                 catch (System.Exception ex)
                 {
-                    settings.Output.WriteLine("Couldn't save solution settings file: " + GetConfigFilePath(settings, solutionInfo));
+                    settings.Output.WriteLine("Couldn't save solution settings file: " + GetConfigFilePath(solutionInfo));
                     settings.Output.WriteLine("because of exception: " + ex.Message);
                 }
             }
@@ -183,7 +183,7 @@ namespace RudeBuild
 
         public static SolutionSettings Load(Settings settings, SolutionInfo solutionInfo)
         {
-            string configFilePath = GetConfigFilePath(settings, solutionInfo);
+            string configFilePath = GetConfigFilePath(solutionInfo);
             if (File.Exists(configFilePath))
             {
                 using (TextReader textReader = new StreamReader(configFilePath))
@@ -206,7 +206,7 @@ namespace RudeBuild
 
         private void SaveInternal(Settings settings, SolutionInfo solutionInfo)
         {
-            string configFilePath = GetConfigFilePath(settings, solutionInfo);
+            string configFilePath = GetConfigFilePath(solutionInfo);
             using (TextWriter textWriter = new StreamWriter(configFilePath))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(SolutionSettings));

@@ -75,8 +75,7 @@ namespace RudeBuildAddIn
 
             if (options.CleanCache)
             {
-                CacheCleaner cacheCleaner = new CacheCleaner();
-                cacheCleaner.Run(settings);
+                CacheCleaner.Run(settings);
                 return;
             }
 

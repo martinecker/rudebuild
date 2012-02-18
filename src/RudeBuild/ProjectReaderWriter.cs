@@ -55,7 +55,7 @@ namespace RudeBuild
             return string.Empty;
         }
 
-        private void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
+        private static void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
         {
             var pchElements =
                 from pchElement in projectDocument.Descendants(ns + "PrecompiledHeader")
@@ -66,7 +66,7 @@ namespace RudeBuild
             }
         }
 
-        private XElement GetCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
+        private static XElement GetCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
         {
             XElement projectElement = projectDocument.Element(ns + "Project");
             if (null == projectElement)
@@ -208,7 +208,7 @@ namespace RudeBuild
                 return "StdAfx.h";
         }
 
-        private void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
+        private static void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
         {
             var pchAttributes =
                 from pchAttribute in projectDocument.Descendants().Attributes(ns + "UsePrecompiledHeader")

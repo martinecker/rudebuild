@@ -11,7 +11,7 @@ using System.Security.Permissions;
 namespace RudeBuild
 {
     [Serializable()]
-    public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable
+    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable, ISerializable
     {
         private const string DictionaryNodeName = "Dictionary";
         private const string ItemNodeName = "Item";
@@ -24,7 +24,7 @@ namespace RudeBuild
             get
             {
                 if (valueSerializer == null)
-                    valueSerializer = new XmlSerializer(typeof(TVal));
+                    valueSerializer = new XmlSerializer(typeof(TValue));
                 return valueSerializer;
             }
         }
@@ -46,7 +46,7 @@ namespace RudeBuild
         {
         }
 
-        public SerializableDictionary(IDictionary<TKey,TVal> dictionary)
+        public SerializableDictionary(IDictionary<TKey,TValue> dictionary)
             : base(dictionary)
         {
         }
@@ -61,7 +61,7 @@ namespace RudeBuild
         {
         }
 
-        public SerializableDictionary(IDictionary<TKey,TVal> dictionary, IEqualityComparer<TKey> comparer)
+        public SerializableDictionary(IDictionary<TKey,TValue> dictionary, IEqualityComparer<TKey> comparer)
             : base(dictionary, comparer)
         {
         }
@@ -80,7 +80,7 @@ namespace RudeBuild
             int itemCount = info.GetInt32("ItemCount");
             for (int i = 0; i < itemCount; i++)
             {
-                KeyValuePair<TKey, TVal> kvp = (KeyValuePair<TKey, TVal>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TVal>));
+                KeyValuePair<TKey, TValue> kvp = (KeyValuePair<TKey, TValue>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TValue>));
                 this.Add(kvp.Key, kvp.Value);
             }
         }
@@ -90,9 +90,9 @@ namespace RudeBuild
         {
             info.AddValue("ItemCount", this.Count);
             int itemIdx = 0;
-            foreach (KeyValuePair<TKey, TVal> kvp in this)
+            foreach (KeyValuePair<TKey, TValue> kvp in this)
             {
-                info.AddValue(String.Format("Item{0}", itemIdx), kvp, typeof(KeyValuePair<TKey, TVal>));
+                info.AddValue(String.Format("Item{0}", itemIdx), kvp, typeof(KeyValuePair<TKey, TValue>));
                 itemIdx++;
             }
         }
@@ -104,7 +104,7 @@ namespace RudeBuild
         void IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
         {
             //writer.WriteStartElement(DictionaryNodeName);
-            foreach (KeyValuePair<TKey, TVal> kvp in this)
+            foreach (KeyValuePair<TKey, TValue> kvp in this)
             {
                 writer.WriteStartElement(ItemNodeName);
                 writer.WriteStartElement(KeyNodeName);
@@ -138,7 +138,7 @@ namespace RudeBuild
                 TKey key = (TKey)KeySerializer.Deserialize(reader);
                 reader.ReadEndElement();
                 reader.ReadStartElement(ValueNodeName);
-                TVal value = (TVal)ValueSerializer.Deserialize(reader);
+                TValue value = (TValue)ValueSerializer.Deserialize(reader);
                 reader.ReadEndElement();
                 reader.ReadEndElement();
                 this.Add(key, value);

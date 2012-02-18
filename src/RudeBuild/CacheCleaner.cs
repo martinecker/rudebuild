@@ -5,7 +5,7 @@ namespace RudeBuild
 {
     public class CacheCleaner
     {
-        private void SafeDeleteDirectory(string path)
+        private static void SafeDeleteDirectory(string path)
         {
             try
             {
@@ -17,7 +17,7 @@ namespace RudeBuild
             }
         }
 
-        private void SafeDeleteFile(string path)
+        private static void SafeDeleteFile(string path)
         {
             try
             {
@@ -29,7 +29,7 @@ namespace RudeBuild
             }
         }
 
-        private void SafeDeleteFileWithWildcards(string path)
+        private static void SafeDeleteFileWithWildcards(string path)
         {
             string fileNameWithWildcards = Path.GetFileName(path);
             if (fileNameWithWildcards.IndexOf("*") == -1 && fileNameWithWildcards.IndexOf("?") == -1)
@@ -46,7 +46,7 @@ namespace RudeBuild
             }
         }
 
-        private void DeleteCachedUnityFiles(Settings settings, SolutionInfo solutionInfo)
+        private static void DeleteCachedUnityFiles(Settings settings, SolutionInfo solutionInfo)
         {
             string cachePath = settings.GetCachePath(solutionInfo);
             if (Directory.Exists(cachePath))
@@ -55,7 +55,7 @@ namespace RudeBuild
             }
         }
 
-        private void DeleteCachedProjectFiles(Settings settings, SolutionInfo solutionInfo)
+        private static void DeleteCachedProjectFiles(Settings settings, SolutionInfo solutionInfo)
         {
             IList<string> filesToDelete = new List<string>();
 
@@ -82,7 +82,7 @@ namespace RudeBuild
             }
         }
 
-        public void Run(Settings settings)
+        public static void Run(Settings settings)
         {
             SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
             SolutionInfo solutionInfo = solutionReaderWriter.Read(settings.BuildOptions.Solution.FullName);

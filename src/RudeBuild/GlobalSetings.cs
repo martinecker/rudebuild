@@ -133,13 +133,13 @@ namespace RudeBuild
                     SaveInternal();
                     retryCount = 0;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Thread.Sleep(300);
                     --retryCount;
                     if (retryCount == 0)
                     {
-                        throw e;
+                        throw;
                     }
                 }
             }

@@ -89,8 +89,7 @@ namespace RudeBuildConsole
                 int exitCode = 0;
                 if (options.CleanCache)
                 {
-                    CacheCleaner cacheCleaner = new CacheCleaner();
-                    cacheCleaner.Run(settings);
+                    CacheCleaner.Run(settings);
                 }
                 else
                 {
