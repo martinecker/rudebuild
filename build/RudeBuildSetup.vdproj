@@ -428,7 +428,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_0140A19120767998C562B0E006E4D61C"
@@ -974,15 +974,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
-        "ProductCode" = "8:{A5AE28BD-4FF7-4006-8CF5-262C49A93C48}"
-        "PackageCode" = "8:{1A34E12D-BFA5-4FEC-841D-927CD1AC2082}"
+        "ProductCode" = "8:{83FC0BB3-20B0-44B9-A195-B6F610CC8109}"
+        "PackageCode" = "8:{5D6DF627-D630-4C4B-ADBE-F8A8F05FE425}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.1"
+        "ProductVersion" = "8:1.2"
         "Manufacturer" = "8:PlayGroovy"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -38,7 +38,7 @@ namespace RudeBuild
                 throw new InvalidDataException("Solution file is corrupt. Found C++ project section before solution file format information.");
             }
 
-            string extension = version == VisualStudioVersion.VS2010 ? ".vcxproj" : ".vcproj";
+            string extension = version >= VisualStudioVersion.VS2010 ? ".vcxproj" : ".vcproj";
             int extensionIndex = line.IndexOf(extension);
             if (extensionIndex <= 0)
             {
@@ -75,7 +75,8 @@ namespace RudeBuild
                     }
                     else if (!ParseVisualStudioVersion(line, "9.00", VisualStudioVersion.VS2005, ref version) &&
                              !ParseVisualStudioVersion(line, "10.00", VisualStudioVersion.VS2008, ref version) &&
-                             !ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version))
+                             !ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version) &&
+                             !ParseVisualStudioVersion(line, "12.00", VisualStudioVersion.VS2011, ref version))
                     {
                         string projectFileName = ParseCppProject(ref line, version);
                         if (null != projectFileName)

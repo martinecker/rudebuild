@@ -24,6 +24,7 @@ namespace RudeBuild
                 case VisualStudioVersion.VS2005: registryPath = @"SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS"; break;
                 case VisualStudioVersion.VS2008: registryPath = @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"; break;
                 case VisualStudioVersion.VS2010: registryPath = @"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"; break;
+                case VisualStudioVersion.VS2011: registryPath = @"SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS"; break;
                 default: throw new System.ArgumentException("Couldn't find Visual Studio registry key. Your version of Visual Studio is either not properly installed, or it is unsupported by this tool.");
             }
 
@@ -47,7 +48,7 @@ namespace RudeBuild
             if (_settings.BuildOptions.Project != null)
             {
                 string projectName = _settings.BuildOptions.Project;
-                if (solutionInfo.Version == VisualStudioVersion.VS2010)     // VS2010 expects the project file name instead of the actual project name on the command line.
+                if (solutionInfo.Version >= VisualStudioVersion.VS2010)     // VS2010 and higher expects the project file name instead of the actual project name on the command line.
                     projectName = _settings.GlobalSettings.FileNamePrefix + projectName;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
             }

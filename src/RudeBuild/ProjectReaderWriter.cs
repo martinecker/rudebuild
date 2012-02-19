@@ -18,9 +18,9 @@ namespace RudeBuild
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
     }
 
-    internal class SingleProjectReaderWriterVS2010 : SingleProjectReaderWriterBase
+    internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
     {
-        public SingleProjectReaderWriterVS2010(Settings settings)
+        public SingleProjectReaderWriterPostVS2010(Settings settings)
             : base(settings)
         {
         }
@@ -124,13 +124,19 @@ namespace RudeBuild
             }
         }
 
+        private static bool IsValidCompileElement(XElement compileElement)
+        {
+            // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
+            return !compileElement.HasElements;
+        }
+        
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectDocument);
 
             var cppFileNameElements = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-                                      where !compileElement.HasElements        // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
+                                      where IsValidCompileElement(compileElement)
                                       select compileElement;
             var cppFileNames = from compileElement in cppFileNameElements
                                select compileElement.Attribute("Include").Value;
@@ -179,6 +185,12 @@ namespace RudeBuild
             return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
         }
 
+        private static bool IsValidCppFileElement(XElement cppFileElement)
+        {
+            // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
+            return !cppFileElement.HasElements;
+        }
+
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
         {
             var configElements =
@@ -225,7 +237,7 @@ namespace RudeBuild
 
             var cppFileNameElements =
                 from cppFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && !cppFileElement.HasElements     // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
+                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && IsValidCppFileElement(cppFileElement)
                 select cppFileElement;
             var cppFileNames =
                 from cppFileElement in cppFileNameElements
@@ -272,8 +284,8 @@ namespace RudeBuild
 
         private SingleProjectReaderWriterBase CreateSingleProjectReaderWriter(SolutionInfo solutionInfo)
         {
-            if (solutionInfo.Version == VisualStudioVersion.VS2010)
-                return new SingleProjectReaderWriterVS2010(_settings);
+            if (solutionInfo.Version >= VisualStudioVersion.VS2010)
+                return new SingleProjectReaderWriterPostVS2010(_settings);
             else
                 return new SingleProjectReaderWriterPreVS2010(_settings);
         }

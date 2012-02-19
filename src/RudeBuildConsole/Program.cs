@@ -37,7 +37,7 @@ namespace RudeBuildConsole
 
         private BuildOptions ParseBuildOptions(string[] args)
         {
-            _output.WriteLine("RudeBuild, Version 1.1");
+            _output.WriteLine("RudeBuild, Version 1.2");
             _output.WriteLine("A unity C++ build tool for Visual Studio developed by Martin Ecker.");
             _output.WriteLine("This is free, open source software under the zlib license.");
             _output.WriteLine();

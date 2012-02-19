@@ -9,7 +9,8 @@ namespace RudeBuild
         VSUnknown,
         VS2005,
         VS2008,
-        VS2010
+        VS2010,
+        VS2011
     }
 
     public class SolutionInfo
