@@ -9,7 +9,7 @@ http://rudebuild.sourceforge.net
 
 ----------------------
 
-RudeBuild is a non-intrusive bulk/unity C++ build tool that seamlessly integrates into Visual Studio 2008 and 2010 as an add-in.  It can speed up build times of large C++ projects by a factor of 5 or more.  RudeBuild also supports the use of IncrediBuild to speed up your build times even more.
+RudeBuild is a non-intrusive bulk/unity C++ build tool that seamlessly integrates into Visual Studio 2008 and 2010 and Visual Studio 11 as an add-in.  It can speed up build times of large C++ projects by a factor of 5 or more.  RudeBuild also supports the use of IncrediBuild to speed up your build times even more.
 
 RudeBuild comes in two flavors, as a command-line tool that works on Visual Studio solution files and as a Visual Studio add-in complete with toolbar and menus.
 
