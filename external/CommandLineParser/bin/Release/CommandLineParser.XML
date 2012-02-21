@@ -1,0 +1,2199 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CommandLineParser</name>
+    </assembly>
+    <members>
+        <member name="T:CommandLineParser.Exceptions.CommandLineException">
+            <summary>
+            General command line exception
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.CommandLineException.#ctor(System.String)">
+            <summary>
+            Creates new instance of CommandLineException.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.CommandLineException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates new instance of CommandLineException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="innerException">The exception that is the cause of the 
+            current exception, or a null reference (Nothing in Visual Basic) if no 
+            inner exception is specified. </param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.CommandLineFormatException">
+            <summary>
+            Thrown when command line arguments does not followgeneral rules for 
+            command line arguments or rules specific for the particular argument type. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.CommandLineFormatException.#ctor(System.String)">
+            <summary>
+            Creates new instance of CommandLineFormatException.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.CommandLineArgumentException">
+            <summary>
+            Thrown when an argument is used in a wrong way
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.CommandLineArgumentException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of CommandLineArgumentException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="P:CommandLineParser.Exceptions.CommandLineArgumentException.Argument">
+            <summary>
+            Argument used in a wrong way.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.MandatoryArgumentNotSetException">
+            <summary>
+            Thrown when an <see cref="T:CommandLineParser.Arguments.Argument"/> with <see cref="P:CommandLineParser.Arguments.Argument.Optional"/> field 
+            set to false is not used on the parsed command line. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.MandatoryArgumentNotSetException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of MandatoryArgumentNotSetException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.MissingArgumentValueException">
+            <summary>
+            Thrown when <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/> value is not set on the parsed command line.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.MissingArgumentValueException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of MissingArgumentValueException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.UnknownArgumentException">
+            <summary>
+            Thrown when uknown argument is found on the command line
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.UnknownArgumentException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of UnknownArgumentException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.InvalidConversionException">
+            <summary>
+            Thrown when parser failed to converse string to arguments value
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.InvalidConversionException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of InvalidConversionException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.CommandLineArgumentOutOfRangeException">
+            <summary>
+            Thrown when arguments value does not follow limitations defined by the argument.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.CommandLineArgumentOutOfRangeException.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of CommandLineArgumentOutOfRangeException.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="argument">Name of the argument</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.InvalidArgumentGroupException">
+            <summary>
+            Thrown when argument defined group is not valid.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.InvalidArgumentGroupException.#ctor(System.String)">
+            <summary>
+            Creates new instance of InvalidArgumentGroupException.
+            </summary>
+            <param name="message">reason of the exception</param>
+        </member>
+        <member name="T:CommandLineParser.Exceptions.MissingAdditionalArgumentsException">
+            <summary>
+            Thrown when there are not all requested additional arguments found on the 
+            command line
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Exceptions.MissingAdditionalArgumentsException.#ctor(System.String)">
+            <summary>
+            Creates new instance of CommandLineException.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="T:CommandLineParser.Arguments.CertifiedValueArgument`1">
+            <summary>
+            CertifiedValueArgument is a base class for all arguments that have other limitations and restrictions (defined
+            int <see cref="M:CommandLineParser.Arguments.CertifiedValueArgument`1.Certify(`0)"/> function) on their values apart from the value 
+            being of a certain type (<typeparamref name="TValue"/>).
+            </summary>
+            <typeparam name="TValue">Type of the value</typeparam>
+            <seealso cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>
+            <seealso cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>
+            <remarks>
+
+      </remarks><example>
+        <code source="Examples\CertifiedValueExample.cs" lang="cs" title="Example of CertifiedValueArgument"/>
+      </example>
+        </member>
+        <member name="T:CommandLineParser.Arguments.ValueArgument`1">
+            <summary>
+            Use value argument for an argument followed by value on the command line. (e. g. --version 1.2)
+            </summary>
+            <typeparam name="TValue">type of the value of the argument. 
+            Can be either builtin type or any user type (for which specific
+            conversion routine is provided - <see cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/></typeparam>
+            <remarks>
+
+      </remarks><example>
+        <code source="Examples\ValueExample.cs" lang="cs" title="Example of ValueArgument"/>
+      </example>
+        </member>
+        <member name="T:CommandLineParser.Arguments.Argument">
+            <summary>
+            Abstract command line argument that can have name, description, aliases and can be marked
+            optional/mandatory. 
+            </summary>
+            <seealso cref="T:CommandLineParser.Arguments.ValueArgument`1"/>
+            <seealso cref="T:CommandLineParser.Arguments.SwitchArgument"/>
+            <seealso cref="T:CommandLineParser.Arguments.CertifiedValueArgument`1"/>
+            <seealso cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>
+            <seealso cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>
+            <remarks>
+        <p>
+          Argument class is a base class for all the argument types.
+        </p>
+        <p>
+          To use the argument parser, you can either create your own
+          argument types by deriving from Argument class or you can
+          use some of the argument types provided out of the box that
+          cover the usual user scenarios. 
+        </p>
+        <p>
+          See:
+          <ul>
+            <li><see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>
+            </li>
+            <li>
+              <see cref="T:CommandLineParser.Arguments.SwitchArgument"/>
+            </li>
+            <li>
+              <see cref="T:CommandLineParser.Arguments.CertifiedValueArgument`1"/>
+            </li>
+            <li>
+              <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>
+            </li>
+            <li>
+              <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>
+            </li>
+          </ul>
+        </p>
+      </remarks>
+        </member>
+        <member name="F:CommandLineParser.Arguments.Argument.shortAliases">
+            <summary>
+            List of short aliases.
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Arguments.Argument.longAliases">
+            <summary>
+            List of long aliases.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.#ctor(System.Char)">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.#ctor(System.Char,System.String,System.String)">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">Description of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.AddAlias(System.Char)">
+            <summary>
+            Creates a short name alias for the parameter. The parameter is processed identically when the alias appears on the command line.
+            <param name="alias">Short alias of the argument</param>
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.AddAlias(System.String)">
+            <summary>
+            Creates a long name alias for the parameter. The parameter is processed identically when the alias appears on the command line.
+            <param name="alias">Long alias of the argument</param>
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.Parse(System.Collections.Generic.IList{System.String},System.Int32@)">
+            <summary>
+            Parse argument. This method should read the input arguments and set the argument fields.  
+            </summary>
+            <param name="args">command line arguments</param>
+            <param name="i">index to the args array, where this argument occured. 
+            Parse method should move the index to the next argument after the argument is processed. </param>
+            <remarks>It is up to the argument class how many words it will consume from the command line. 
+            At the end, it should just point the <paramref name="i"/> index to the correct place where the
+            argument class passes the control back to the <see cref="T:CommandLineParser.CommandLineParser"/></remarks>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.PrintValueInfo">
+            <summary>
+            Prints information about the argument value to the console.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.Init">
+            <summary>
+            Initializes the argument. Sets <see cref="P:CommandLineParser.Arguments.Argument.Parsed"/> to false. Override in inherited classes 
+            if any further initialization is needed. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.Argument.UpdateBoundObject">
+            <summary>
+            If <see cref="P:CommandLineParser.Arguments.Argument.Bind"/> is specified, the bound field of the bound object should be updated. 
+            according to the value of the argument. Should be called after Parse is called.  
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Optional">
+            <summary>
+            Mark argument optional. 
+            <see cref="P:CommandLineParser.CommandLineParser.CheckMandatoryArguments"/>
+            <remarks>Default is true</remarks>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.AllowMultiple">
+            <summary>
+            Specifies whether argument can appear multiple times on the command line. 
+            Default is false; 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Parsed">
+            <summary>
+            Tests whether argument was already parsed on the command line. 
+            See <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> and <see cref="M:CommandLineParser.Arguments.Argument.Init"/>. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.FullDescription">
+            <summary>
+            Long, full description of the argument. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Description">
+            <summary>
+            Description of the argument 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.LongName">
+            <summary>
+            Long name of the argument. Can apear on the command line in --<i>longName</i> format.
+            Must be one word. 
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Name is invalid</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.ShortName">
+            <summary>
+            Long name of the argument. Can apear on the command line in -<i>shortName</i> format.
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Name is invalid</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Example">
+            <summary>
+            Example usage of the attribute. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Name">
+            <summary>
+            Name of the argument. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.ShortAliases">
+            <summary>
+            Defined short aliases of the parameter. Can appear on the command line in  -<i>shortAlias</i> format.
+            <see cref="M:CommandLineParser.Arguments.Argument.AddAlias(System.Char)"/>
+            </summary>
+            <seealso cref="P:CommandLineParser.Arguments.Argument.LongAliases"/>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.LongAliases">
+            <summary>
+            Defined long aliases of the parameter. Can appear on the command line in  --<i>longAlias</i> format.
+            <see cref="M:CommandLineParser.Arguments.Argument.AddAlias(System.String)"/>
+            </summary>
+            <seealso cref="P:CommandLineParser.Arguments.Argument.ShortAliases"/>
+        </member>
+        <member name="P:CommandLineParser.Arguments.Argument.Bind">
+            <summary>
+            Defines mapping of the value of the argument to a field of another object.
+            Bound field is updated after the value of the argument is parsed by <see cref="T:CommandLineParser.CommandLineParser"/>.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.IValueArgument">
+            <summary>
+            Interface for non-generic access to <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/> fields.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.IValueArgument.AddToValues(System.Object)">
+            <summary>
+            Adds an item to underlying <see cref="P:CommandLineParser.Arguments.IValueArgument.Values"/> collection.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.IValueArgument.Convert_obj(System.String)">
+            <summary>
+            Non-generic access to <see cref="M:CommandLineParser.Arguments.ValueArgument`1.Convert(System.String)"/>
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>parsed value</returns>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IValueArgument.StringValue">
+            <summary>
+            String read from command line as arguments <see cref="P:CommandLineParser.Arguments.IValueArgument.Value"/>. 
+            Available after <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>.<see cref="M:CommandLineParser.Arguments.ValueArgument`1.Parse(System.Collections.Generic.IList{System.String},System.Int32@)"/> is called. 
+            </summary>
+            <exception cref="T:System.InvalidOperationException">String value was read before ParseCommandLine was called or when</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IValueArgument.AllowMultiple">
+            <summary>
+            Specifies whether argument can appear multiple times on the command line. 
+            Default is false; 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IValueArgument.Optional">
+            <summary>
+            Mark argument optional.
+            <see cref="P:CommandLineParser.CommandLineParser.CheckMandatoryArguments"/>
+            <remarks>Default is true</remarks>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IValueArgument.Value">
+            <summary>
+            Value of the ValueArgument, for arguments with single value.
+            Can be used only if <see cref="P:CommandLineParser.Arguments.IValueArgument.AllowMultiple"/> is set to false.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IValueArgument.Values">
+            <summary>
+            Values of the ValueArgument - for arguments with multiple values allowed. 
+            Can be used only if <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> is set to true.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.IArgumentWithDefaultValue">
+            <summary>
+            Implemented by arguments with default value, e.g.
+            <see cref="T:CommandLineParser.Arguments.SwitchArgument"/> and <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>.
+            These arguments updates the value of bound object (<see cref="M:CommandLineParser.Arguments.Argument.UpdateBoundObject"/>)
+            with the value of <see cref="P:CommandLineParser.Arguments.IArgumentWithDefaultValue.DefaultValue"/> 
+            event when they do not appear on the command line. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.IArgumentWithDefaultValue.DefaultValue">
+            <summary>
+             Default value of the argument.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.#ctor(System.Char)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.#ctor(System.Char,System.String,System.String)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">description of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.AddToValues(System.Object)">
+            <summary>
+            Adds an item to underlying <see cref="P:CommandLineParser.Arguments.ValueArgument`1.Values"/> collection.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.Parse(System.Collections.Generic.IList{System.String},System.Int32@)">
+            <summary>
+            This method reads the argument and the following string representing the value of the argument. 
+            This string is then converted to <typeparamref name="TValue"/> (using built-in <typeparamref name="TValue"/>.Parse
+            method for built-in types or using <see cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/> for user types).
+            </summary>
+            <param name="args">command line arguments</param>
+            <param name="i">index to the args array, where this argument occured. 
+            The index to the next argument after the argument is processed. </param>
+            <seealso cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineArgumentException">Incorrect format of the command line
+            or multiple useage of an argument that is not <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> found.</exception>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.UpdateBoundObject">
+            <summary>
+            If <see cref="P:CommandLineParser.Arguments.Argument.Bind"/> is specified, the bound field of the bound object should is updated
+            according to the value of the argument. Should be called after Parse is called. If 
+            <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> is set to false, the binding fills a collection or an array with the 
+            values. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.Convert(System.String)">
+            <summary>
+            Converts <paramref name="stringValue"/> to <typeparamref name="TValue"/>.
+            <see cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/> is called if specified, otherwise
+            <see cref="M:CommandLineParser.Arguments.ValueArgument`1.DefaultConvert(System.String)"/> is called.
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>value as <typeparamref name="TValue"/></returns>
+            <exception cref="T:CommandLineParser.Exceptions.InvalidConversionException">String cannot be converted to <typeparamref name="TValue"/>.</exception>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.Convert_obj(System.String)">
+            <summary>
+            Non-generic access to <see cref="M:CommandLineParser.Arguments.ValueArgument`1.Convert(System.String)"/>
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>parsed value</returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.DefaultConvert(System.String)">
+            <summary>
+            Converts <paramref name="stringValue"/> to <typeparamref name="TValue"/>.
+            Works only for built-in types. 
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>value as <typeparamref name="TValue"/></returns>
+            <exception cref="T:CommandLineParser.Exceptions.InvalidConversionException">String cannot be converted to <typeparamref name="TValue"/>.</exception>
+            
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.Init">
+            <summary>
+            Initializes the argument.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgument`1.PrintValueInfo">
+            <summary>
+            Prints information about the argument value to the console.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.StringValue">
+            <summary>
+            String read from command line as arguments <see cref="P:CommandLineParser.Arguments.ValueArgument`1.Value"/>. Available after <see cref="M:CommandLineParser.Arguments.ValueArgument`1.Parse(System.Collections.Generic.IList{System.String},System.Int32@)"/> is called. 
+            </summary>
+            <exception cref="T:System.InvalidOperationException">String value was read before ParseCommandLine was called or when</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.Value">
+            <summary>
+            Value of the ValueArgument, for arguments with single value.
+            Can be used only if <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> is set to false.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.DefaultValue">
+            <summary>
+            Default value of the argument. Restored each time <see cref="M:CommandLineParser.Arguments.ValueArgument`1.Init"/> is called.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.Values">
+            <summary>
+            Values of the ValueArgument - for arguments with multiple values allowed. 
+            Can be used only if <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> is set to true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.CommandLineParser#Arguments#IValueArgument#Value">
+            <summary>
+            Value of the ValueArgument, for arguments with single value.
+            Can be used only if <see cref="P:CommandLineParser.Arguments.Argument.AllowMultiple"/> is set to false.
+            </summary>
+            <value></value>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler">
+            <summary>
+            Function that converts string to <typeparamref name="TValue"/> type.
+            Necessary when non-builtin type is used as <typeparamref name="TValue"/>.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgument`1.CultureInfo">
+            <summary>
+            Culture used for conversions of built-in types. InvariantCulture is used when 
+            no other culture is specified. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.CertifiedValueArgument`1.#ctor(System.Char)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.CertifiedValueArgument`1.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.CertifiedValueArgument`1.#ctor(System.Char,System.String,System.String)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">description of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.CertifiedValueArgument`1.Parse(System.Collections.Generic.IList{System.String},System.Int32@)">
+            <summary>
+            This method reads the argument and the following string representing the value of the argument. 
+            This string is then converted to <typeparamref name="TValue"/> (using built-in <typeparamref name="TValue"/>.Parse
+            method for built-in types or using <see cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/> for user types).
+            After successful conversion, validation <see cref="M:CommandLineParser.Arguments.CertifiedValueArgument`1.Certify(`0)"/> method is called
+            </summary>
+            <param name="args">command line arguments</param>
+            <param name="i">index to the args array, where this argument occured. The index to the next argument 
+            after the argument is processed. </param>
+            <seealso cref="P:CommandLineParser.Arguments.ValueArgument`1.ConvertValueHandler"/>
+        </member>
+        <member name="M:CommandLineParser.Arguments.CertifiedValueArgument`1.Certify(`0)">
+            <summary>
+            Checks for argument specific 
+            restriction and limitations. Exceptions are thrown when these are not met.
+            </summary>
+            <param name="value">value to certify</param>
+        </member>
+        <member name="T:CommandLineParser.CommandLineParser">
+            <summary>
+            CommandLineParser allows user to define command line arguments and then parse
+            the arguments from the command line.
+            </summary>
+            <remarks>
+      <p>
+        CommandLineParser is the fundamental class of the whole library. It main purpose is
+        to find the defined arguments on the command line and for each such argument call
+        the <see cref="M:CommandLineParser.Arguments.Argument.Parse(System.Collections.Generic.IList{System.String},System.Int32@)">Parse</see> method that reads the value of the argument. 
+      </p>
+      <p>
+        CommandLineParser keeps the argument definitions in its 
+        <see cref="P:CommandLineParser.CommandLineParser.Arguments">Arguments</see> collection. This collection can 
+        be filled explicitly by creating proper <see cref="T:CommandLineParser.Arguments.Argument"/> objects and adding them
+        to the collection. The other way is declaring <see cref="T:CommandLineParser.Arguments.ArgumentAttribute">argument 
+        attributes</see> in some of your classes and then letting the CommandLineParser 
+        extract the argument from instances of these classes and bind the 
+        class' instances fields to the extracted
+        arguments (this is done in <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/>.
+      </p>
+      <p>
+        For an example of using argument attributes, see <see cre="ArgumentAttribute"/>.
+      </p>
+      <p>
+        This is an example of using the CommandLineParser
+      </p>
+      <ul>
+        <li>creating an instance of the parser</li>
+        <li>defining the explicit arguments</li>
+        <li>adding the arguments to the parser</li>
+        <li>calling <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> method to process the arguments</li>
+        <li>working with arguments' values</li>
+      </ul>
+    </remarks><example>
+      <code source="Examples\Parser.cs" lang="cs" title="Using the command line parser"/>
+      
+    </example>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.InitializeArgumentLookupDictionaries">
+            <summary>
+            Fills lookup dictionaries with arguments names and aliases 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])">
+            <summary>
+            Resolves arguments from the command line and calls <see cref="M:CommandLineParser.Arguments.Argument.Parse(System.Collections.Generic.IList{System.String},System.Int32@)"/> on each argument. 
+            Additional arguments are stored in AdditionalArgumentsSettings.AdditionalArguments 
+            if AdditionalArgumentsSettings.AcceptAdditionalArguments is set to true. 
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Command line arguments are not in correct format</exception>
+            <param name="args">Command line arguments</param>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)">
+            <summary>
+            Searches <paramref name="parsingTarget"/> for fields with 
+            <see cref="T:CommandLineParser.Arguments.ArgumentAttribute">ArgumentAttributes</see> or some of its descendats. Adds new argument
+            for each such a field and defines binding of the argument to the field. 
+            Also adds <see cref="T:CommandLineParser.Validation.ArgumentCertification"/> object to <see cref="P:CommandLineParser.CommandLineParser.Certifications"/> collection 
+            for each <see cref="T:CommandLineParser.Validation.ArgumentCertificationAttribute"/> of <paramref name="parsingTarget"/>.
+            </summary>
+            <seealso cref="P:CommandLineParser.Arguments.Argument.Bind"/>
+            <param name="parsingTarget">object where you with some ArgumentAttributes</param>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ParseArgument(System.String)">
+            <summary>
+            Parses one argument on the command line, lookups argument in <see cref="P:CommandLineParser.CommandLineParser.Arguments"/> using 
+            lookup dictionaries.
+            </summary>
+            <param name="curArg">argument string (including '-' or '--' prefixes)</param>
+            <returns>Look-uped Argument class</returns>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Command line is in the wrong format</exception>
+            <exception cref="T:CommandLineParser.Exceptions.UnknownArgumentException">Unknown argument found.</exception>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.PerformMandatoryArgumentsCheck">
+            <summary>
+            Checks whether or non-optional arguments were defined on the command line. 
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.MandatoryArgumentNotSetException"><see cref="P:CommandLineParser.Arguments.Argument.Optional">Non-optional</see> argument not defined.</exception>
+            <seealso cref="P:CommandLineParser.CommandLineParser.CheckMandatoryArguments"/>, <seealso cref="P:CommandLineParser.Arguments.Argument.Optional"/>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.PerformCertificationCheck">
+            <summary>
+            Performs certifications
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ParseAdditionalArguments(System.Collections.Generic.List{System.String},System.Int32)">
+            <summary>
+            Parses the rest of the command line for additional arguments
+            </summary>
+            <param name="argsList">list of thearguments</param>
+            <param name="i">index of the first additional argument in <paramref name="argsList"/></param>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Additional arguments found, but they are 
+            not accepted</exception>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ExpandShortSwitches(System.Collections.Generic.IList{System.String})">
+            <summary>
+            If <see cref="P:CommandLineParser.CommandLineParser.AllowShortSwitchGrouping"/> is set to true,  each group of switch arguments (e. g. -abcd) 
+            is expanded into full format (-a -b -c -d) in the list.
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Argument of type differnt from SwitchArgument found in one of the groups. </exception>
+            <param name="argsList">List of arguments</param>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Arguments that are not <see cref="T:CommandLineParser.Arguments.SwitchArgument">switches</see> found 
+            in a group.</exception>
+            <seealso cref="P:CommandLineParser.CommandLineParser.AllowShortSwitchGrouping"/>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.LookupArgument(System.String)">
+            <summary>
+            Returns argument of given name
+            </summary>
+            <param name="argName">Name of the argument (<see cref="P:CommandLineParser.Arguments.Argument.ShortName"/>, <see cref="P:CommandLineParser.Arguments.Argument.LongName"/>, or alias)</param>
+            <returns>Found argument or null when argument is not present</returns>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.PrintUsage(System.IO.TextWriter)">
+            <summary>
+            Prints arguments information and usage information to
+            the <paramref name="outputStream"/>. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ShowUsage">
+            <summary>
+            Prints arguments information and usage information to the console. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.ShowParsedArguments">
+            <summary>
+            Prints values of parsed arguments. Can be used for debugging. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.CommandLineParser.FillDescFromResource(CommandLineParser.IResource)">
+            <summary>
+            <para>
+            Fills FullDescription of all the difined arguments from a resource file. 
+            For each argument selects a string from a resource that has the same resource key
+            as is the currrent value of the argument's FullDescription. 
+            </para>
+            <para>
+            This way the value of FullDescription's can be set to keys and these keys are replaced by 
+            the resource values when the method is called. 
+            </para>
+            </summary>
+            <param name="resource">The resource.</param>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.Arguments">
+            <summary>
+            Defined command line arguments
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.Certifications">
+            <summary>
+            Set of <see cref="T:CommandLineParser.Validation.ArgumentCertification">certifications</see> - certifications can be used to define 
+            which argument combinations are allowed and such type of validations. 
+            </summary>
+            <seealso cref="P:CommandLineParser.CommandLineParser.CheckArgumentCertifications"/>
+            <seealso cref="T:CommandLineParser.Validation.ArgumentCertification"/>
+            <seealso cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/>
+            <seealso cref="T:CommandLineParser.Validation.DistinctGroupsCertification"/>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.AdditionalArgumentsSettings">
+            <summary>
+            Allows more specific definition of additional arguments 
+            (arguments after those with - and -- prefix).
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.ShowUsageHeader">
+            <summary>
+            Text printed in the beginning of 'show usage'
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.ShowUsageFooter">
+            <summary>
+            Text printed in the end of 'show usage'
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.ShowUsageCommands">
+            <summary>
+            Arguments that directly invoke <see cref="M:CommandLineParser.CommandLineParser.ShowUsage"/>. By default this is --help and /?.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.ShowUsageOnEmptyCommandline">
+            <summary>
+            When set to true, usage help is printed on the console when command line is without arguments.
+            Default is false. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.CheckMandatoryArguments">
+            <summary>
+            When set to true, <see cref="T:CommandLineParser.Exceptions.MandatoryArgumentNotSetException"/> is thrown when some of the non-optional argument
+            is not found on the command line. Default is true.
+            See: <see cref="P:CommandLineParser.Arguments.Argument.Optional"/>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.CheckArgumentCertifications">
+            <summary>
+            When set to true, arguments are certified (using set of <see cref="P:CommandLineParser.CommandLineParser.Certifications"/>) after parsing. 
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.AllowShortSwitchGrouping">
+            <summary>
+            When set to true (default) <see cref="T:CommandLineParser.Arguments.SwitchArgument">switch arguments</see> can be grouped on the command line. 
+            (e.g. -a -b -c can be written as -abc). When set to false and such a group is found, <see cref="T:CommandLineParser.Exceptions.CommandLineFormatException"/> is thrown.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.AcceptSlash">
+            <summary>
+            Allows arguments in /a and /arg format
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.AcceptHyphen">
+            <summary>
+            Allows arguments in -a and --arg format
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.IgnoreCase">
+            <summary>
+            Argument names case insensitive (--OUTPUT or --output are treated equally)
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.CommandLineParser.AcceptEqualSignSyntaxForValueArguments">
+            <summary>
+            When set to true, values of <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/> are separeted by space, 
+            otherwise, they are separeted by equal sign and enclosed in quotation marks
+            </summary>
+            <example>
+            --output="somefile.txt"
+            </example>
+        </member>
+        <member name="T:CommandLineParser.Validation.DistinctGroupsCertification">
+            <summary>
+            Allows to define which two groups of arguments that can not be used together.
+            </summary>
+            <remarks>
+        <p>
+          You can use certifications to define which arguments combinations are allowed and forbidden in your application. 
+          Use <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/> and <see cref="T:CommandLineParser.Validation.DistinctGroupsCertification"/> for this purpose.
+        </p>
+        <p>
+          You can also create your own certification classes to test other conditions.
+        </p>
+      </remarks><example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="T:CommandLineParser.Validation.ArgumentCertification">
+            <summary>
+            Certification object can be used to define more complex conditions for 
+            arguments. Certifications are checked after command line is parsed and 
+            the Certify method is supposed to throw an exception when the arguments
+            and their values do not meet the do condition.
+            </summary>
+            <remarks>
+        <p>
+          You can use certifications to define which arguments combinations are allowed and forbidden in your application. 
+          Use <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/> and <see cref="T:CommandLineParser.Validation.DistinctGroupsCertification"/> for this purpose.
+        </p>
+        <p>
+          You can also create your own certification classes to test other conditions.
+        </p>
+      </remarks><example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentCertification.Certify(CommandLineParser.CommandLineParser)">
+            <summary>
+            Test the parser for the certification. This method should throw an exception if the condition
+            is not met. 
+            </summary>
+            <param name="parser">parser object gives access to the defined arguments, their values and 
+            parameters of the parser</param>
+        </member>
+        <member name="P:CommandLineParser.Validation.ArgumentCertification.GetDescription">
+            <summary>
+            Returns description of the certification.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Validation.DistinctGroupsCertification.#ctor(CommandLineParser.Arguments.Argument[],CommandLineParser.Arguments.Argument[])">
+            <summary>
+            Creates new instance of DistinctGroupsCertification - this certification specifies two groups of arguments, that 
+            can not be used together. 
+            </summary>
+            <param name="argumentGroup1">first group of arguments</param>
+            <param name="argumentGroup2">second group of arguments</param>
+        </member>
+        <member name="M:CommandLineParser.Validation.DistinctGroupsCertification.#ctor(System.String,System.String)">
+            <summary>
+            Creates new instance of DistinctGroupsCertification - this certification specifies two groups of arguments, that 
+            can not be used together. 
+            </summary>
+            <param name="argumentGroup1">first group of arguments - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+            <param name="argumentGroup2">second group of arguments - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+        </member>
+        <member name="M:CommandLineParser.Validation.DistinctGroupsCertification.Certify(CommandLineParser.CommandLineParser)">
+            <summary>
+            Tests, whether some arguments from both groups are not used. If so, ArgumentConflictException is thrown.
+            </summary>
+            <param name="parser">parser object gives access to the defined arguments, their values and 
+            parameters of the parser</param>
+            <exception cref="T:CommandLineParser.Validation.ArgumentConflictException">Thrown when arguments from both groups are used</exception>
+            <exception cref="T:CommandLineParser.Exceptions.InvalidArgumentGroupException">Thrown when one of the groups is empty</exception>
+        </member>
+        <member name="M:CommandLineParser.Validation.DistinctGroupsCertification.ToString">
+            <summary>
+            Returns a <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
+            </summary>
+            
+            <returns>
+            A <see cref="T:System.String"></see> that represents the current <see cref="T:System.Object"></see>.
+            </returns>
+            <filterpriority>2</filterpriority>
+        </member>
+        <member name="T:CommandLineParser.Validation.DistinctGroupsCertificationAttribute">
+            <summary>
+            Use DistinctGroupsCertificationAttribute to define <see cref="T:CommandLineParser.Validation.DistinctGroupsCertification"/>s declaratively. 
+            </summary>
+            <example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="T:CommandLineParser.Validation.ArgumentCertificationAttribute">
+            <summary>
+            Use ArgumentCertificationAttribute to define <see cref="T:CommandLineParser.Validation.ArgumentCertification"/>s declaratively. 
+            </summary>
+            <example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentCertificationAttribute.#ctor(System.Type,System.Object[])">
+            <summary>
+            Creates new instance of ArgumentCertificationAttribute. 
+            </summary>
+            <param name="underlyingCertificationType">type of the certification</param>
+            <param name="constructorParams">parameters of the 
+            <paramref name="underlyingCertificationType">certification</paramref>constructor</param>
+        </member>
+        <member name="P:CommandLineParser.Validation.ArgumentCertificationAttribute.Certification">
+            <summary>
+            Underlying <see cref="T:CommandLineParser.Validation.ArgumentCertification"/> object.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Validation.DistinctGroupsCertificationAttribute.#ctor(System.String,System.String)">
+            <summary>
+            Adds ArgumentGroupCertification condition for the arguments. 
+            </summary>
+            <param name="argumentGroup1">arguments in the first group - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+            <param name="argumentGroup2">arguments in the first group - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+        </member>
+        <member name="T:CommandLineParser.Validation.EArgumentGroupCondition">
+            <summary>
+            Condition for the argument group.
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Validation.EArgumentGroupCondition.AtLeastOneUsed">
+            <summary>
+            At least one of the arguments in the group must be used
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Validation.EArgumentGroupCondition.ExactlyOneUsed">
+            <summary>
+            Exactly one of the arguments in the group must be used
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Validation.EArgumentGroupCondition.OneOreNoneUsed">
+            <summary>
+            Only one of the arguments in the group can be used
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Validation.EArgumentGroupCondition.AllOrNoneUsed">
+            <summary>
+            All or none of the arguments in the group can be used
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Validation.EArgumentGroupCondition.AllUsed">
+            <summary>
+            All of the arguments in the group must be used
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Validation.ArgumentGroupCertification">
+            <summary>
+            Allows to define which arguments can be used together and which combinations
+            are forbidden for the application.
+            </summary>
+            <remarks>
+        <p>
+          You can use certifications to define which arguments combinations are allowed and forbidden in your application. 
+          Use <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/> and <see cref="T:CommandLineParser.Validation.DistinctGroupsCertification"/> for this purpose.
+        </p>
+        <p>
+          You can also create your own certification classes to test other conditions.
+        </p>
+      </remarks><example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertification.#ctor(CommandLineParser.Arguments.Argument[],CommandLineParser.Validation.EArgumentGroupCondition)">
+            <summary>
+            Creates new instance of <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/>. 
+            </summary>
+            <param name="arguments">arguments in the group</param>
+            <param name="condition">condition for the group</param>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertification.#ctor(System.String,CommandLineParser.Validation.EArgumentGroupCondition)">
+            <summary>
+            Creates new instance of <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/>. 
+            </summary>
+            <param name="arguments">arguments in the group - separated by one of these characters: ',' ';' '|'</param>
+            <param name="condition">condition for the group</param>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertification.GetArgumentsFromGroupString(CommandLineParser.CommandLineParser,System.String)">
+            <summary>
+            Finds Argument objects specified in groupString
+            </summary>
+            <param name="parser">parser where the arguments are defined</param>
+            <param name="groupString">string containing argument names</param>
+            <returns></returns>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertification.GetGroupStringFromArguments(CommandLineParser.Arguments.Argument[])">
+            <summary>
+            Creates a string of argument names
+            </summary>
+            <param name="argumentGroup">arguments</param>
+            <returns>string of names of the arguments, separated by '|' character</returns>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertification.Certify(CommandLineParser.CommandLineParser)">
+            <summary>
+            Test the arguments parsed by the parser for the <see cref="P:CommandLineParser.Validation.ArgumentGroupCertification.Condition"/>.
+            </summary>
+            <param name="parser">parser object gives access to the defined arguments, their values and 
+            parameters of the parser</param>
+            <exception cref="T:CommandLineParser.Exceptions.InvalidArgumentGroupException">thrown when group contains no arguments</exception>
+            <exception cref="T:CommandLineParser.Validation.ArgumentConflictException">thrown when the parsed arguments does not meet the condition</exception>
+        </member>
+        <member name="P:CommandLineParser.Validation.ArgumentGroupCertification.Condition">
+            <summary>
+            Condition of for the argument group.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Validation.ArgumentGroupCertification.GetDescription">
+            <summary>
+            Returns description of the certification.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Validation.ArgumentConflictException">
+            <summary>
+            Thrown when there is some conflict among the used arguments. 
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentConflictException.#ctor(System.String)">
+            <summary>
+            Creates new instance of <see cref="T:CommandLineParser.Validation.ArgumentConflictException"/>
+            </summary>
+            <param name="message">cause of the exception</param>
+        </member>
+        <member name="T:CommandLineParser.Validation.ArgumentGroupCertificationAttribute">
+            <summary>
+            Use ArgumentGroupCertificationAttribute to define <see cref="T:CommandLineParser.Validation.ArgumentGroupCertification"/>s declaratively. 
+            </summary>
+            <example>
+        <code source="Examples\CertificationExample.cs" lang="cs" title="Defining conditions for the attributes."/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Validation.ArgumentGroupCertificationAttribute.#ctor(System.String,CommandLineParser.Validation.EArgumentGroupCondition)">
+            <summary>
+            Adds ArgumentGroupCertification condition for the arguments. 
+            </summary>
+            <param name="arguments">arguments in the group - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+            <param name="condition">condition for the group - names of the 
+            arguments separated by commas, semicolons or '|' character</param>
+        </member>
+        <member name="T:CommandLineParser.Arguments.FileArgument">
+            <summary>
+            Value of the argument is an existing file (input file) or 
+            a file that can be created (output file).
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.#ctor(System.Char)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CommandLineParser.Arguments.FileArgument"/> class.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.#ctor(System.Char,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CommandLineParser.Arguments.FileArgument"/> class.
+            </summary>
+            <param name="shortName">The short name.</param>
+            <param name="longName">The long name.</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.#ctor(System.Char,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CommandLineParser.Arguments.FileArgument"/> class.
+            </summary>
+            <param name="shortName">The short name.</param>
+            <param name="longName">The long name.</param>
+            <param name="description">The description.</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.OpenFileRead">
+            <summary>
+            Returns stream of the input file ready for reading. Available only 
+            when <see cref="P:CommandLineParser.Arguments.FileArgument.FileMustExist"/> is set to true.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.OpenFileWrite">
+            <summary>
+            Returns stream of the output file ready for writing. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.Convert(System.String)">
+            <summary>
+            Converts <paramref name="stringValue"/> to <see cref="P:CommandLineParser.Arguments.FileArgument.FileInfo"/>
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>value as <see cref="P:CommandLineParser.Arguments.FileArgument.FileInfo"/></returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgument.Certify(System.IO.FileInfo)">
+            <summary>
+            Checks whether file exists in the file system
+            </summary>
+            <param name="value">value to certify - file path</param>
+        </member>
+        <member name="P:CommandLineParser.Arguments.FileArgument.FileMustExist">
+            <summary>
+            Gets or sets a value indicating whether the file must
+            already exists in the file system (input file) or not (output file).
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.FileArgument.FileInfo">
+            <summary>
+            FileInfo for the file passed as argument.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.FileArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.FileArgumentAttribute"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Appliable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="T:CommandLineParser.Arguments.ArgumentAttribute">
+            <summary>
+            <para>
+            Base class for argument attributes. Each subclass of Argument has corresponding 
+            subclass of ArgumentAttribute that can be used to define the Argument declaratively. 
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.
+            </remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ArgumentAttribute.#ctor(System.Type,System.Object[])">
+            <summary>
+            Creates new instance of ArgumentAttribute.
+            </summary>
+            <param name="underlyingArgumentType">Type of the underlying argument.</param>
+            <param name="constructorParams">Parameters of the constructor of underlying argument</param>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.Argument">
+            <summary>
+            The underlying Argument type
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.Description">
+            <summary>
+            Description of the argument 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.FullDescription">
+            <summary>
+            Long, full description of the argument. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.LongName">
+            <summary>
+            Long name of the argument. Can apear on the command line in --<i>longName</i> format.
+            Must be one word. 
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Name is invalid</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.Optional">
+            <summary>
+            Mark argument optional. Arguments with Optional = false can be checked in <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> method.
+            <see cref="P:CommandLineParser.CommandLineParser.CheckMandatoryArguments"/>
+            <remarks>Default is true</remarks>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.AllowMultiple">
+            <summary>
+            Allows argument to appear multiple times on the command line. Default is false.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.ShortName">
+            <summary>
+            Long name of the argument. Can apear on the command line in -<i>shortName</i> format.
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineFormatException">Name is invalid</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ArgumentAttribute.Example">
+            <summary>
+            Example usage of the attribute.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgumentAttribute.#ctor(System.Char)">
+            <summary>
+            Creates new instance of FileArgumentAttribute. FileArgumentAttribute
+            uses underlaying <see cref="T:CommandLineParser.Arguments.FileArgument"/>.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FileArgumentAttribute.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new instance of FileArgumentAttribute. FileArgumentAttribute
+            uses underlaying <see cref="T:CommandLineParser.Arguments.FileArgument"/>.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+        </member>
+        <member name="P:CommandLineParser.Arguments.FileArgumentAttribute.FileMustExist">
+            <summary>
+            Gets or sets a value indicating whether the file must
+            already exists in the file system (input file) or not (output file).
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.FileArgumentAttribute.DefaultValue">
+            <summary>
+            Default value
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.FieldArgumentBind">
+            <summary>
+            Defines bind to the certain field of the certain object. See <see cref="P:CommandLineParser.Arguments.Argument.Bind"/>. 
+            Bind between object ensures that value of the argument from the command line is copied
+            to the bound field or property.
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Arguments.FieldArgumentBind.Object">
+            <summary>
+            Bound object
+            </summary>
+        </member>
+        <member name="F:CommandLineParser.Arguments.FieldArgumentBind.Field">
+            <summary>
+            Bound field
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.FieldArgumentBind.#ctor(System.Object,System.String)">
+            <summary>
+            Creates new instance of <see cref="T:CommandLineParser.Arguments.FieldArgumentBind"/>.
+            </summary>
+            <param name="boundObject">any object whose field should be bound</param>
+            <param name="boundField">ield of <paramref name="boundObject"/> that will be bound to the argument</param>
+        </member>
+        <member name="T:CommandLineParser.IResource">
+            <summary>
+            Interface for resources. Give your resource classes this interface so that 
+            they can be used for <see cref="M:CommandLineParser.CommandLineParser.FillDescFromResource(CommandLineParser.IResource)"/> call. 
+            That way you can assign the <see cref="P:CommandLineParser.Arguments.Argument.FullDescription"/> property of 
+            your arguments defined using declarative syntax to strings in resource class. 
+            In argument declarations, use the resource key as a value of FullDescription property
+            and then call <see cref="M:CommandLineParser.CommandLineParser.FillDescFromResource(CommandLineParser.IResource)"/> after the parser
+            is initialized. It will replace the key with the string from resource in the 
+            arguments. See help file for an example
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.IResource.ResourceManager">
+            <summary>
+            Gets the resource manager.
+            </summary>
+            <value>The resource manager.</value>
+        </member>
+        <member name="T:CommandLineParser.Arguments.SwitchArgument">
+            <summary>
+            Switch argument can be used to represent options with <c>true</c>/<c>false</c> logic. It is initialized with default value and
+            when the argument appears on the command line, the value is flipped. 
+            </summary>
+            <remarks>
+      
+      </remarks><example>
+        <code source="Examples\SwitchExample.cs" lang="cs" title="Example of SwitchArgument"/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.#ctor(System.Char,System.Boolean)">
+            <summary>
+            Creates new switch argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="defaultValue">default value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.#ctor(System.Char,System.String,System.Boolean)">
+            <summary>
+            Creates new switch argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="defaultValue">default value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.#ctor(System.Char,System.String,System.String,System.Boolean)">
+            <summary>
+            Creates new switch argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">description of the argument</param>
+            <param name="defaultValue">default value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.Parse(System.Collections.Generic.IList{System.String},System.Int32@)">
+            <summary>
+            Parse argument. This method reads the argument from the input field and moves the 
+            index to the next argument.
+            </summary>
+            <param name="args">command line arguments</param>
+            <param name="i">index to the args array, where this argument occurred. </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.UpdateBoundObject">
+            <summary>
+            If <see cref="P:CommandLineParser.Arguments.Argument.Bind"/> is specified, the bound field of the bound object should is updated
+            according to the value of the argument. Should be called after Parse is called.  
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.PrintValueInfo">
+            <summary>
+            Prints information about the argument value to the console.
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgument.Init">
+            <summary>
+            Initializes the argument and restores the <see cref="P:CommandLineParser.Arguments.SwitchArgument.DefaultValue"/>.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.SwitchArgument.Value">
+            <summary>
+            Value of the switch argument
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.SwitchArgument.DefaultValue">
+            <summary>
+            Default value of the switch argument. Restored each time <see cref="M:CommandLineParser.Arguments.SwitchArgument.Init"/> is called.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.SwitchArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.SwitchArgument"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Applicable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have declared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgumentAttribute.#ctor(System.Char,System.Boolean)">
+            <summary>
+            Creates new instance of SwitchArgumentAttribute.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="defaultValue"><see cref="P:CommandLineParser.Arguments.SwitchArgument.DefaultValue">default value</see> of the underlying argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.SwitchArgumentAttribute.#ctor(System.Char,System.String,System.Boolean)">
+            <summary>
+            Creates new instance of SwitchArgumentAttribute.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+            <param name="defaultValue"><see cref="P:CommandLineParser.Arguments.SwitchArgument.DefaultValue">default value</see> of the underlying argument</param>
+        </member>
+        <member name="T:CommandLineParser.Arguments.DirectoryArgument">
+            <summary>
+            Value of the argument is a directory in the directory system
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgument.#ctor(System.Char)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgument.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgument.#ctor(System.Char,System.String,System.String)">
+            <summary>
+            Creates new certified value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">description of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgument.Convert(System.String)">
+            <summary>
+            Converts <paramref name="stringValue"/> to <see cref="P:CommandLineParser.Arguments.DirectoryArgument.DirectoryInfo"/>
+            </summary>
+            <param name="stringValue">string representing the value</param>
+            <returns>value as <see cref="P:CommandLineParser.Arguments.DirectoryArgument.DirectoryInfo"/></returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgument.Certify(System.IO.DirectoryInfo)">
+            <summary>
+            Checks whether directory exists in the file system
+            </summary>
+            <param name="value">value to certify - directory path</param>
+        </member>
+        <member name="P:CommandLineParser.Arguments.DirectoryArgument.DirectoryMustExist">
+            <summary>
+            Gets or sets a value indicating whether the directory must
+            already exists in the file system or not .
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.DirectoryArgument.DirectoryInfo">
+            <summary>
+            DirectoryInfo for the directory passed as argument.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.DirectoryArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.DirectoryArgumentAttribute"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Appliable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgumentAttribute.#ctor(System.Char)">
+            <summary>
+            Creates new instance of DirectoryArgumentAttribute. DirectoryArgumentAttribute
+            uses underlaying <see cref="T:CommandLineParser.Arguments.DirectoryArgument"/>.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.DirectoryArgumentAttribute.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new instance of DirectoryArgumentAttribute. DirectoryArgumentAttribute
+            uses underlaying <see cref="T:CommandLineParser.Arguments.DirectoryArgument"/>.
+            </summary>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+        </member>
+        <member name="P:CommandLineParser.Arguments.DirectoryArgumentAttribute.DirectoryMustExist">
+            <summary>
+            Gets or sets a value indicating whether the directory must
+            already exists in the file system (input file) or not (output file).
+            Default is true.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.DirectoryArgumentAttribute.DefaultValue">
+            <summary>
+            Default value
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.AdditionalArgumentsSettings">
+            <summary>
+            Allows more specific definition of additional arguments 
+            (arguments after those with - and -- prefix).
+            </summary>
+        </member>
+        <member name="M:CommandLineParser.AdditionalArgumentsSettings.ProcessArguments">
+            <summary>
+            Verifies the amount of arguments and fills them
+            with typed values type.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.AdditionalArgumentsSettings.AdditionalArguments">
+            <summary>
+            Collection of additional arguments that were found on the command line after <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> call.
+            </summary>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineException">Field accessed before <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> was called or 
+            when <see cref="P:CommandLineParser.AdditionalArgumentsSettings.AdditionalArguments"/> is set to false</exception>
+            <seealso cref="P:CommandLineParser.AdditionalArgumentsSettings.AcceptAdditionalArguments"/>
+        </member>
+        <member name="P:CommandLineParser.AdditionalArgumentsSettings.RequestedAdditionalArgumentsCount">
+            <summary>
+            Set RequestedAdditionalArgumentsCount to non-zero value if your application
+            requires some additional arguments. 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.AdditionalArgumentsSettings.AcceptAdditionalArguments">
+            <summary>
+            When set to true (default), additional arguments are stored in <see cref="P:CommandLineParser.AdditionalArgumentsSettings.AdditionalArguments"/> collection when found on the 
+            command line. When set to false, Exception is thrown when additional arguments are found by <see cref="M:CommandLineParser.CommandLineParser.ParseCommandLine(System.String[])"/> call.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.AdditionalArgumentsSettings.TypedAdditionalArguments">
+            <summary>
+            Allows requiring of arguments of certain type.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.ConvertValueDelegate`1">
+            <summary>
+            Delegate for a method that converts string to a specified class
+            </summary>
+            <typeparam name="TValue">type of the converted class</typeparam>
+            <param name="stringValue">string that represents the value of TValue</param>
+            <returns>TValue loaded from string</returns>
+        </member>
+        <member name="T:CommandLineParser.Arguments.ValueArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Appliable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgumentAttribute.CreateProperValueArgumentType(System.Type)">
+            <summary>
+            Creates proper generic <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/> type for <paramref name="type"/>.
+            </summary>
+            <param name="type">type of the argument value</param>
+            <returns>generic type</returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgumentAttribute.#ctor(System.Type,System.Char)">
+            <summary>
+            Creates new instance of ValueArgument. ValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>. </param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="M:CommandLineParser.Arguments.ValueArgumentAttribute.#ctor(System.Type,System.Char,System.String)">
+            <summary>
+            Creates new instance of ValueArgument. ValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.ValueArgument`1"/>.</param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="P:CommandLineParser.Arguments.ValueArgumentAttribute.DefaultValue">
+            <summary>
+            Default value
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.BoundedValueArgument`1">
+            <summary>
+            Use BoundedValueArgument for an argument whose value must belong to an interval.
+            </summary>
+            <typeparam name="TValue">Type of the value, must support comparison</typeparam>
+            <remarks>
+  
+      </remarks><example>
+        <code source="Examples\BoundedValueExample.cs" lang="cs" title="Example of BoundedValueExample"/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>. 
+            Without any value bounds.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>. Without any value bounds.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and specified maximal value.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="maxValue">Maximal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(`0,System.Char)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and specified minimal value.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="minValue">Minimal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,`0,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and specified minimal value and maximal value. 
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="minValue">Minimal value of the argument</param>
+            <param name="maxValue">Maximal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,System.String,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and specified maximal value.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="maxValue">Maximal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(`0,System.Char,System.String)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and specified minimal value.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="minValue">minimal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,System.String,`0,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and specified minimal and maximal value.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="maxValue">Maximal value of the argument</param>
+            <param name="minValue">minimal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,System.String,System.String,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see> and specified maximal value. 
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">Description of the argument</param>
+            <param name="maxValue">Maximal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(`0,System.Char,System.String,System.String)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see> and specified minimal value. 
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">Description of the argument</param>
+            <param name="minValue">Minimal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.#ctor(System.Char,System.String,System.String,`0,`0)">
+            <summary>
+            Creates new value argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see> and specified minimal and maximal value. 
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">Description of the argument</param>
+            <param name="minValue">Minimal value of the argument</param>
+            <param name="maxValue">Maximal value of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgument`1.Certify(`0)">
+            <summary>
+            Checks whether the value belongs to the [<see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.MinValue"/>, <see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.MaxValue"/>] interval
+            (when <see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.UseMinValue"/> and <see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.UseMaxValue"/> are set).
+            </summary>
+            <param name="value">value to certify</param>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineArgumentOutOfRangeException">Thrown when <paramref name="value"/> lies outside the interval. </exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgument`1.MinValue">
+            <summary>
+            Minimal allowed value (inclusive)
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgument`1.MaxValue">
+            <summary>
+            Maximal allowed value (inclusive) 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgument`1.UseMinValue">
+            <summary>
+            When set to true, value is checked for being greater than or equal to <see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.MinValue"/>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgument`1.UseMaxValue">
+            <summary>
+            When set to true, value is checked for being lesser than or equal to <see cref="P:CommandLineParser.Arguments.BoundedValueArgument`1.MaxValue"/>
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.BoundedValueArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Appliable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgumentAttribute.CreateProperValueArgumentType(System.Type)">
+            <summary>
+            Creates proper generic <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/> type for <paramref name="type"/>.
+            </summary>
+            <param name="type">type of the argument value</param>
+            <returns>generic type</returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgumentAttribute.#ctor(System.Type,System.Char)">
+            <summary>
+            Creates new instance of BoundedValueArgument. BoundedValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>.</param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="M:CommandLineParser.Arguments.BoundedValueArgumentAttribute.#ctor(System.Type,System.Char,System.String)">
+            <summary>
+            Creates new instance of BoundedValueArgument. BoundedValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/>.</param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.MaxValue">
+            <summary>
+            Maximal allowed value (inclusive) 
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.MinValue">
+            <summary>
+            Minimal allowed value (inclusive)
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.UseMaxValue">
+            <summary>
+            When set to true, value is checked for being lesser than or equal to <see cref="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.MaxValue"/>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.UseMinValue">
+            <summary>
+            When set to true, value is checked for being greater than or equal to <see cref="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.MinValue"/>
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.BoundedValueArgumentAttribute.DefaultValue">
+            <summary>
+            Default value
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Messages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.CERT_REMARKS">
+            <summary>
+              Looks up a localized string similar to Argument combinations remarks:.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ADDITIONAL_ARGS_TOO_EARLY">
+            <summary>
+              Looks up a localized string similar to AdditionalArguments cannot be accessed before ParseCommandLine is called..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ADDITIONAL_ARGUMENTS_FOUND">
+            <summary>
+              Looks up a localized string similar to Additional arguments found and parser does not accept additional arguments. Set AcceptAdditionalArguments to true if you want to accept them. .
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ADDITONAL_ARGS_FORBIDDEN">
+            <summary>
+              Looks up a localized string similar to AcceptAdditionalArguments is set to false therefore AdditionalArguments can not be read..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_BOUNDED_GREATER_THAN_MAX">
+            <summary>
+              Looks up a localized string similar to Argument value {0} is greater then maximum value {1}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_BOUNDED_LESSER_THAN_MIN">
+            <summary>
+              Looks up a localized string similar to Argument value {0} is lesser then minimum value {1}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_ENUM_OUT_OF_RANGE">
+            <summary>
+              Looks up a localized string similar to Value {0} is not allowed for argument {1}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_NOT_ONE_CHAR">
+            <summary>
+              Looks up a localized string similar to ShortName of an argument must not be whitespace character..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_NOT_ONE_WORD">
+            <summary>
+              Looks up a localized string similar to LongName of an argument must be one word..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_SWITCH_PRINT">
+            <summary>
+              Looks up a localized string similar to Argument: {0} value: {1}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_UNKNOWN">
+            <summary>
+              Looks up a localized string similar to Unknown argument found: {0}..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_MISSING">
+            <summary>
+              Looks up a localized string similar to Value argument {0} must be followed by a value, another argument ({1}) found instead.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_MISSING2">
+            <summary>
+              Looks up a localized string similar to Value argument {0} must be followed by a value..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_MULTIPLE_OCCURS">
+            <summary>
+              Looks up a localized string similar to Argument {0} can not be used multiple times..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_PRINT">
+            <summary>
+              Looks up a localized string similar to Argument: {0}, type: {3}, value: {2} (converted from: {1}).
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_PRINT_MULTIPLE">
+            <summary>
+              Looks up a localized string similar to Argument: {0}, type: {3}, occured {1}x values: {2}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_STANDARD_CONVERT_FAILED">
+            <summary>
+              Looks up a localized string similar to Failed to convert string {0} to type {1} using standard {1}.ParseCommandLine. Use strings in accepted format or define custom conversion using ConvertValueHandler..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_STRINGVALUE_ACCESS">
+            <summary>
+              Looks up a localized string similar to Arguments StringValue can be read after ParseCommandLine is called..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_ARG_VALUE_USER_CONVERT_MISSING">
+            <summary>
+              Looks up a localized string similar to Type {0} of argument {1} is not a built-in type. Set ConvertValueHandler to a conversion routine for this type or define static method Parse(string stringValue, CultureInfo cultureInfo) that can Parse your type from string. .
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_BAD_ARG_IN_GROUP">
+            <summary>
+              Looks up a localized string similar to Grouping of multiple short name arguments in one word (e.g. -a -b into -ab) is allowed only for switch arguments. Argument {0} is not a switch argument..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_BINDING">
+            <summary>
+              Looks up a localized string similar to Binding of the argument {0} to the field {1} of the object {2} failed..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_DIR_NOT_FOUND">
+            <summary>
+              Looks up a localized string similar to Directory not found : {0} and DirectoryMustExist flag is set to true..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FILE_MUST_EXIST">
+            <summary>
+              Looks up a localized string similar to OpenFile should not be called when FileMustExist flag is not set..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FILE_NOT_FOUND">
+            <summary>
+              Looks up a localized string similar to File not found : {0} and FileMustExist flag is set to true..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FORMAT_DOUBLESLASH">
+            <summary>
+              Looks up a localized string similar to Invalid sequence &quot;//&quot; in the command line. .
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FORMAT_LONGNAME_PREFIX">
+            <summary>
+              Looks up a localized string similar to Only short argument names (single character) are allowed after single &apos;-&apos; character (e.g. -v). For long names use double &apos;-&apos; format (e.g. &apos;--ver&apos;). Wrong argument is: {0}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FORMAT_SHORTNAME_PREFIX">
+            <summary>
+              Looks up a localized string similar to If short name argument is used, it must be prefixed with single &apos;-&apos; character. Wrong argument is: {0}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FORMAT_SINGLEHYPHEN">
+            <summary>
+              Looks up a localized string similar to Found character &apos;-&apos; not followed by an argument..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_FORMAT_SINGLESLASH">
+            <summary>
+              Looks up a localized string similar to Found character &apos;/&apos; not followed by an argument..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_ALL_OR_NONE_USED_NOT_ALL_USED">
+            <summary>
+              Looks up a localized string similar to All or none of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_ALL_USED_NOT_ALL_USED">
+            <summary>
+              Looks up a localized string similar to All of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_AT_LEAST_ONE">
+            <summary>
+              Looks up a localized string similar to At least one of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_DISTINCT">
+            <summary>
+              Looks up a localized string similar to None of these argumens: {0} can be used together with any of these: {1}..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_EXACTLY_ONE_MORE_USED">
+            <summary>
+              Looks up a localized string similar to Only one of these arguments: {0} can be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_EXACTLY_ONE_NONE_USED">
+            <summary>
+              Looks up a localized string similar to One of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_GROUP_ONE_OR_NONE_MORE_USED">
+            <summary>
+              Looks up a localized string similar to These arguments can not be used together: {0}..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_MISSING_MANDATORY_ARGUMENT">
+            <summary>
+              Looks up a localized string similar to Argument {0} is not marked as optional and was not found on the command line..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_NONNEGATIVE">
+            <summary>
+              Looks up a localized string similar to The value must be non negative..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.EXC_NOT_ENOUGH_ADDITIONAL_ARGUMENTS">
+            <summary>
+              Looks up a localized string similar to Not enough additional arguments. Needed {0} additional arguments..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.GROUP_ALL_OR_NONE_USED">
+            <summary>
+              Looks up a localized string similar to All or none of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.GROUP_ALL_USED">
+            <summary>
+              Looks up a localized string similar to All of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.GROUP_AT_LEAST_ONE_USED">
+            <summary>
+              Looks up a localized string similar to Only one of these arguments: {0} can be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.GROUP_EXACTLY_ONE_USED">
+            <summary>
+              Looks up a localized string similar to One (and only one) of these arguments: {0} must be used..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.GROUP_ONE_OR_NONE_USED">
+            <summary>
+              Looks up a localized string similar to These arguments can not be used together: {0}..
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_ADDITIONAL_ARGUMENTS">
+            <summary>
+              Looks up a localized string similar to Additional arguments:.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_COMMAND_LINE">
+            <summary>
+              Looks up a localized string similar to Command line:.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_EXAMPLE_FORMAT">
+            <summary>
+              Looks up a localized string similar to Example: {0}.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_OPTIONAL">
+            <summary>
+              Looks up a localized string similar to  [optional] .
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_PARSED_ARGUMENTS">
+            <summary>
+              Looks up a localized string similar to Parsed Arguments:.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_PARSING_RESULTS">
+            <summary>
+              Looks up a localized string similar to Parsing results:.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Messages.MSG_USAGE">
+            <summary>
+              Looks up a localized string similar to Usage:.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.EnumeratedValueArgument`1">
+            <summary>
+            Use EnumeratedValueArgument for an argument whose values must be from certain finite set 
+            (see <see cref="P:CommandLineParser.Arguments.EnumeratedValueArgument`1.AllowedValues"/>)
+            </summary>
+            <typeparam name="TValue">Type of the value</typeparam>
+            <remarks>
+
+      </remarks><example>
+        <code source="Examples\EnumeratedValueExample.cs" lang="cs" title="Example of EnumeratedValueArgument"/>
+      </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.InitAllowedValues(System.String)">
+            <summary>
+            Initilazes <see cref="P:CommandLineParser.Arguments.EnumeratedValueArgument`1.AllowedValues"/> by a string of values separated by commas or semicolons.
+            </summary>
+            <param name="valuesString">Allowed values (separated by comas or semicolons)</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.#ctor(System.Char)">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.#ctor(System.Char,System.String)">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.#ctor(System.Char,System.Collections.Generic.ICollection{`0})">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="allowedValues">Allowed values</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.#ctor(System.Char,System.String,System.Collections.Generic.ICollection{`0})">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>
+            and <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see>.
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="allowedValues">Allowed values</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.#ctor(System.Char,System.String,System.String,System.Collections.Generic.ICollection{`0})">
+            <summary>
+            Creates new command line argument with a <see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see>,
+            <see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> and <see cref="P:CommandLineParser.Arguments.Argument.Description">description</see>
+            </summary>
+            <param name="shortName">Short name of the argument</param>
+            <param name="longName">Long name of the argument </param>
+            <param name="description">Description of the argument</param>
+            <param name="allowedValues">Allowed values</param>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgument`1.Certify(`0)">
+            <summary>
+            Checks whether the specified value belongs to 
+            the set of <see cref="P:CommandLineParser.Arguments.EnumeratedValueArgument`1.AllowedValues">allowed values</see>. 
+            </summary>
+            <param name="value">value to certify</param>
+            <exception cref="T:CommandLineParser.Exceptions.CommandLineArgumentOutOfRangeException">thrown when <paramref name="value"/> does not belong to the set of allowed values.</exception>
+        </member>
+        <member name="P:CommandLineParser.Arguments.EnumeratedValueArgument`1.AllowedValues">
+            <summary>
+            Set of values that are allowed for the argument.
+            </summary>
+        </member>
+        <member name="T:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute">
+            <summary>
+            <para>
+            Attribute for declaring a class' field a <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/> and 
+            thus binding a field's value to a certain command line switch argument.
+            </para>
+            <para>
+            Instead of creating an argument explicitly, you can assign a class' field an argument
+            attribute and let the CommandLineParse take care of binding the attribute to the field.
+            </para>
+            </summary>
+            <remarks>Appliable to fields and properties (public).</remarks>
+            <remarks>Use <see cref="M:CommandLineParser.CommandLineParser.ExtractArgumentAttributes(System.Object)"/> for each object 
+            you where you have delcared argument attributes.</remarks>
+            <example>
+            <code source="Examples\AttributeExample.cs" lang="cs" title="Example of declaring argument attributes"/>
+            </example>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute.CreateProperValueArgumentType(System.Type)">
+            <summary>
+            Creates proper generic <see cref="T:CommandLineParser.Arguments.BoundedValueArgument`1"/> type for <paramref name="type"/>.
+            </summary>
+            <param name="type">type of the argument value</param>
+            <returns>generic type</returns>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute.#ctor(System.Type,System.Char)">
+            <summary>
+            Creates new instance of EnumeratedValueArgumentAttribute. EnumeratedValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>.</param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="M:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute.#ctor(System.Type,System.Char,System.String)">
+            <summary>
+            Creates new instance of EnumeratedValueArgument. EnumeratedValueArgument
+            uses underlaying <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>.
+            </summary>
+            <param name="type">Type of the generic parameter of <see cref="T:CommandLineParser.Arguments.EnumeratedValueArgument`1"/>.</param>
+            <param name="shortName"><see cref="P:CommandLineParser.Arguments.Argument.ShortName">short name</see> of the underlying argument</param>
+            <param name="longName"><see cref="P:CommandLineParser.Arguments.Argument.LongName">long name</see> of the underlying argument</param>
+            <remarks>
+            Parameter <paramref name="type"/> has to be either built-in 
+            type or has to define a static Parse(String, CultureInfo) 
+            method for reading the value from string.
+            </remarks>
+        </member>
+        <member name="P:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute.AllowedValues">
+            <summary>
+            Allowed values of the argument, separated by commas or semicolons.
+            </summary>
+        </member>
+        <member name="P:CommandLineParser.Arguments.EnumeratedValueArgumentAttribute.DefaultValue">
+            <summary>
+            Default value
+            </summary>
+        </member>
+    </members>
+</doc>
