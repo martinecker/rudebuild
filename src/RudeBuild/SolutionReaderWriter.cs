@@ -76,7 +76,7 @@ namespace RudeBuild
                     else if (!ParseVisualStudioVersion(line, "9.00", VisualStudioVersion.VS2005, ref version) &&
                              !ParseVisualStudioVersion(line, "10.00", VisualStudioVersion.VS2008, ref version) &&
                              !ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version) &&
-                             !ParseVisualStudioVersion(line, "12.00", VisualStudioVersion.VS2011, ref version))
+                             !ParseVisualStudioVersion(line, "12.00", VisualStudioVersion.VS2012, ref version))
                     {
                         string projectFileName = ParseCppProject(ref line, version);
                         if (null != projectFileName)

@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace RudeBuildAddIn
 {
-    public static class DependencyObjectExtension
+    public static class DependencyObjectExtensions
     {
         public static T VisualUpwardSearch<T>(this DependencyObject obj) where T : DependencyObject
         {

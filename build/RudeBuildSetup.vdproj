@@ -93,6 +93,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5B04D84028A25DF849BED92E398458D1"
+        "OwnerKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5B04D84028A25DF849BED92E398458D1"
+        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -149,18 +161,6 @@
         {
         "MsmKey" = "8:_B5025C0FF0BD8755FA5F5AC1BFF44151"
         "OwnerKey" = "8:_E6C7439674989241413E383D17D4959B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BFBA543C331DE8111478022E3E3592B5"
-        "OwnerKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BFBA543C331DE8111478022E3E3592B5"
-        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -275,6 +275,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_BFBA543C331DE8111478022E3E3592B5"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5B04D84028A25DF849BED92E398458D1"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -551,6 +557,37 @@
                     }
                 }
             "SourcePath" = "8:EnvDTE.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5B04D84028A25DF849BED92E398458D1"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_5B04D84028A25DF849BED92E398458D1"
+                    {
+                    "Name" = "8:CommandLineParser.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CommandLineParser.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
@@ -974,15 +1011,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
-        "ProductCode" = "8:{83FC0BB3-20B0-44B9-A195-B6F610CC8109}"
-        "PackageCode" = "8:{5D6DF627-D630-4C4B-ADBE-F8A8F05FE425}"
+        "ProductCode" = "8:{AA93D3EB-CA3F-48F1-8324-C4B042E25E37}"
+        "PackageCode" = "8:{4987C5BA-7424-48BF-8623-4A1CD45061D7}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.2"
+        "ProductVersion" = "8:1.3"
         "Manufacturer" = "8:PlayGroovy"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
