@@ -35,7 +35,7 @@
   <ItemGroup>
     <Reference Include="CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\External\CommandLineParser\CommandLineParser\bin\Release\CommandLineParser.dll</HintPath>
+      <HintPath>..\external\CommandLineParser\bin\Release\CommandLineParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

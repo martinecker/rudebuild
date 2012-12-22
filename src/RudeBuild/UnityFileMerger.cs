@@ -30,6 +30,13 @@ namespace RudeBuild
         public IList<string> UnityFilePaths { get; private set; }
         public IList<string> MergedCppFileNames { get; private set; }
 
+		private class UnityFile
+		{
+			public readonly StringBuilder Contents = new StringBuilder();
+			public long TotalMergedSizeInBytes = 0;
+		}
+		private Dictionary<string, UnityFile> _unityFiles;
+
         public UnityFileMerger(Settings settings)
         {
             _settings = settings;
@@ -70,11 +77,11 @@ namespace RudeBuild
             text.AppendLine("#endif");
         }
 
-        private void WriteUnityFile(ProjectInfo projectInfo, StringBuilder text, int fileIndex)
+        private void WriteUnityFile(ProjectInfo projectInfo, StringBuilder text, int fileIndex, string fileExtension)
         {
             WritePostfix(text);
 
-            string destFileName = Path.Combine(_cachePath, projectInfo.Name + fileIndex + ".cpp");
+			string destFileName = Path.Combine(_cachePath, projectInfo.Name + fileIndex + fileExtension);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(text.ToString()))
             {
@@ -87,7 +94,7 @@ namespace RudeBuild
         private void WriteEmptyPrecompiledHeader(ProjectInfo projectInfo)
         {
             // For precompiled headers to work for projects that have .cpp files in multiple
-            // folders, we need to write out an precompiled header file to include that includes the original precompiled header.
+            // folders, we need to write out a precompiled header file that includes the original precompiled header.
             if (string.IsNullOrEmpty(projectInfo.PrecompiledHeaderFileName))
                 return;
 
@@ -116,19 +123,16 @@ namespace RudeBuild
             UnityFilePaths = new List<string>();
             MergedCppFileNames = new List<string>();
 
-            StringBuilder currentUnityFileContents = new StringBuilder();
-            WritePrefix(projectInfo, currentUnityFileContents);
-
-            int currentUnityFileIndex = 1;
-            long currentUnityFileSize = 0;
-
             IList<string> cppFileNames = projectInfo.CppFileNames;
             if (_settings.GlobalSettings.RandomizeOrderOfUnityMergedFiles)
             {
                 cppFileNames.Shuffle();
             }
 
-            foreach (string cppFileName in cppFileNames)
+			_unityFiles = new Dictionary<string, UnityFile>();
+
+			int currentUnityFileIndex = 1;
+			foreach (string cppFileName in cppFileNames)
             {
                 string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
                 if (!File.Exists(cppFilePath))
@@ -143,29 +147,46 @@ namespace RudeBuild
                 if (_settings.SolutionSettings.IsExcludedCppFileNameForProject(projectInfo, cppFileName))
                     continue;
 
-                currentUnityFileSize += fileInfo.Length;
-                if (currentUnityFileSize > _settings.GlobalSettings.MaxUnityFileSizeInBytes)
-                {
-                    WriteUnityFile(projectInfo, currentUnityFileContents, currentUnityFileIndex);
+				// Get the Unity file for the file extension. We separate .c and .cpp files because this is what makes
+				// Visual Studio choose if it should do a C-only or a C++ compile. There are subtle compiler differences.
+				string fileExtension = Path.GetExtension(cppFileName);
+				UnityFile unityFile;
+				if (!_unityFiles.TryGetValue(fileExtension, out unityFile))
+				{
+					unityFile = new UnityFile();
+					_unityFiles.Add(fileExtension, unityFile);
+					WritePrefix(projectInfo, unityFile.Contents);
+				}
 
-                    currentUnityFileSize = 0;
-                    currentUnityFileContents = new StringBuilder();
-                    WritePrefix(projectInfo, currentUnityFileContents);
-                    ++currentUnityFileIndex;
+				if (unityFile.TotalMergedSizeInBytes > _settings.GlobalSettings.MaxUnityFileSizeInBytes)
+                {
+					WriteUnityFile(projectInfo, unityFile.Contents, currentUnityFileIndex, fileExtension);
+					++currentUnityFileIndex;
+
+					unityFile = new UnityFile();
+					_unityFiles[fileExtension] = unityFile;
+					WritePrefix(projectInfo, unityFile.Contents);
                 }
 
-                currentUnityFileContents.AppendLine("#ifdef RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
-                currentUnityFileContents.AppendLine("#pragma message(\"" + Path.GetFileName(cppFileName) + "\")");
-                currentUnityFileContents.AppendLine("#endif");
-                currentUnityFileContents.AppendLine("#include \"" + cppFilePath + "\"");
+				unityFile.TotalMergedSizeInBytes += fileInfo.Length;
+				unityFile.Contents.AppendLine("#ifdef RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
+				unityFile.Contents.AppendLine("#pragma message(\"" + Path.GetFileName(cppFileName) + "\")");
+				unityFile.Contents.AppendLine("#endif");
+				unityFile.Contents.AppendLine("#include \"" + cppFilePath + "\"");
 
                 MergedCppFileNames.Add(cppFileName);
             }
 
-            if (currentUnityFileSize > 0)
-            {
-                WriteUnityFile(projectInfo, currentUnityFileContents, currentUnityFileIndex);
-            }
+			foreach (var keyValue in _unityFiles)
+			{
+				string fileExtension = keyValue.Key;
+				UnityFile unityFile = keyValue.Value;
+				if (unityFile.Contents.Length > 0)
+				{
+					WriteUnityFile(projectInfo, unityFile.Contents, currentUnityFileIndex, fileExtension);
+					++currentUnityFileIndex;
+				}
+			}
 
             WriteEmptyPrecompiledHeader(projectInfo);
         }

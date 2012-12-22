@@ -4,7 +4,7 @@ using CommandLineParser.Validation;
 
 namespace RudeBuild
 {
-    [ArgumentGroupCertification("rebuild,clean", EArgumentGroupCondition.ExactlyOneUsed)]
+	[ArgumentGroupCertification("rebuild,clean", EArgumentGroupCondition.OneOreNoneUsed)]
     public class BuildOptions
     {
         [FileArgument('s', "solution", FileMustExist = true, Description = "FileName of the solution to build.", Optional = false)]

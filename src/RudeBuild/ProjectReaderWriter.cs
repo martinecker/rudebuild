@@ -16,7 +16,56 @@ namespace RudeBuild
         }
 
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
-    }
+
+		protected static bool IsValidCppFileName(string fileName)
+		{
+			string extension = Path.GetExtension(fileName);
+			return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
+		}
+
+		protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
+		{
+			// Exclude any files that have special handling, precompiled headers, except for files that are excluded from build, etc.
+			XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
+			if (pathAttribute == null || !IsValidCppFileName(pathAttribute.Value))
+				return false;
+
+			if (!cppFileElement.HasElements)
+				return true;
+
+			// Make sure the only elements we have are ExcludedFromBuild elements because those are the only ones we handle correctly.
+			// If there are other elements, don't include this file in the unity build and just build it on its own.
+			var excludedFromBuildElements = (from element in cppFileElement.Elements()
+											 where element.Name == ns + "ExcludedFromBuild"
+											 select element).ToList();
+			if (cppFileElement.Elements().Count() != excludedFromBuildElements.Count)
+				return false;
+
+			string currentConfigCondition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+			foreach (XElement excludedFromBuildElement in excludedFromBuildElements)
+			{
+				XAttribute conditionAttribute = excludedFromBuildElement.Attribute("Condition");
+				if (conditionAttribute == null)
+					return false;
+				if (conditionAttribute.Value != currentConfigCondition)
+					continue;
+				if (excludedFromBuildElement.Value == "true")
+					return false;
+			}
+
+			return true;
+		}
+
+		protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
+		{
+			foreach (XElement cppFileElement in cppFileElements)
+			{
+				if (IsValidCppFileElement(ns, cppFileElement, pathAttributeName))
+					return true;
+			}
+			return false;
+		}
+	}
 
     internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
     {
@@ -66,7 +115,7 @@ namespace RudeBuild
             }
         }
 
-        private static XElement GetCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
+        private XElement GetCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
         {
             XElement projectElement = projectDocument.Element(ns + "Project");
             if (null == projectElement)
@@ -75,14 +124,11 @@ namespace RudeBuild
             }
 
             var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-                                          where itemGroupElement.Elements(ns + "ClCompile").Count() > 0
+										  let compileElements = itemGroupElement.Elements(ns + "ClCompile")
+                                          where HasValidCppFileElements(ns, compileElements, "Include")
                                           select itemGroupElement;
             XElement result = compileItemGroupElement.SingleOrDefault();
-            if (null == result)
-            {
-                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find ItemGroup XML element with the source files to compile.");
-            }
-            return result;
+			return result;
         }
 
         private static XElement AddExcludedFromBuild(XNamespace ns, XElement element)
@@ -112,9 +158,12 @@ namespace RudeBuild
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectFiltersDocument);
 
-            compileItemGroupElement.Add(
-                from unityFileName in merger.UnityFilePaths
-                select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+			if (compileItemGroupElement != null)
+			{
+				compileItemGroupElement.Add(
+					from unityFileName in merger.UnityFilePaths
+					select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+			}
 
             string destProjectFiltersFileName = _settings.ModifyFileName(projectFiltersFileName);
             ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
@@ -124,41 +173,52 @@ namespace RudeBuild
             }
         }
 
-        private static bool IsValidCompileElement(XElement compileElement)
-        {
-            // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
-            return !compileElement.HasElements;
-        }
-        
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectDocument);
 
-            var cppFileNameElements = from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-                                      where IsValidCompileElement(compileElement)
-                                      select compileElement;
-            var cppFileNames = from compileElement in cppFileNameElements
-                               select compileElement.Attribute("Include").Value;
+			IList<string> cppFileNames = null;
+			IList<XElement> cppFileNameElements = null;
+			if (compileItemGroupElement != null)
+			{
+				cppFileNameElements = (
+					from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+					where IsValidCppFileElement(ns, compileElement, "Include")
+					select compileElement).ToList();
+				cppFileNames = (
+					from compileElement in cppFileNameElements
+					select compileElement.Attribute("Include").Value).ToList();
+			}
+			else
+			{
+				cppFileNames = new List<string>();
+			}
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
-            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
+            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, precompiledHeaderFileName);
 
             if (!performReadOnly)
             {
                 UnityFileMerger merger = new UnityFileMerger(_settings);
-                merger.Process(projectInfo);
+				merger.Process(projectInfo);
 
-                foreach (XElement cppFileNameElement in cppFileNameElements.ToList())
-                {
-                    string cppFileName = cppFileNameElement.Attribute("Include").Value;
-                    if (merger.MergedCppFileNames.Contains(cppFileName))
-                        AddExcludedFromBuild(ns, cppFileNameElement);
-                }
+				if (cppFileNameElements != null)
+				{
+					foreach (XElement cppFileNameElement in cppFileNameElements)
+					{
+						string cppFileName = cppFileNameElement.Attribute("Include").Value;
+						if (merger.MergedCppFileNames.Contains(cppFileName))
+							AddExcludedFromBuild(ns, cppFileNameElement);
+					}
+				}
 
-                compileItemGroupElement.Add(
-                    from unityFileName in merger.UnityFilePaths
-                    select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+				if (compileItemGroupElement != null)
+				{
+					compileItemGroupElement.Add(
+						from unityFileName in merger.UnityFilePaths
+						select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+				}
 
                 if (_settings.SolutionSettings.DisablePrecompiledHeaders)
                 {
@@ -177,18 +237,6 @@ namespace RudeBuild
         public SingleProjectReaderWriterPreVS2010(Settings settings)
             : base(settings)
         {
-        }
-
-        private static bool IsValidCppFileName(string fileName)
-        {
-            string extension = Path.GetExtension(fileName);
-            return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
-        }
-
-        private static bool IsValidCppFileElement(XElement cppFileElement)
-        {
-            // Exclude any files that have special handling, such as excluded from build, precompiled headers, etc.
-            return !cppFileElement.HasElements;
         }
 
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
@@ -237,7 +285,7 @@ namespace RudeBuild
 
             var cppFileNameElements =
                 from cppFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidCppFileName(cppFileElement.Attribute("RelativePath").Value) && IsValidCppFileElement(cppFileElement)
+                where IsValidCppFileElement(ns, cppFileElement, "RelativePath")
                 select cppFileElement;
             var cppFileNames =
                 from cppFileElement in cppFileNameElements
