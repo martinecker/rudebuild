@@ -6,10 +6,10 @@ namespace RudeBuild
 {
     public class ProcessLauncher
     {
-        private Settings _settings;
-        private object _processLock = new object();
-        private Process _process = null;
-        private bool _stopped = false;
+        private readonly Settings _settings;
+        private readonly object _processLock = new object();
+        private Process _process;
+        private bool _stopped;
 
         public ProcessLauncher(Settings settings)
         {
@@ -29,7 +29,7 @@ namespace RudeBuild
             }
 
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
-            string devEnvPath = (string)registryKey.GetValue("EnvironmentDirectory");
+            var devEnvPath = (string)registryKey.GetValue("EnvironmentDirectory");
             devEnvPath = Path.Combine(devEnvPath, "devenv.com");
             return devEnvPath;
         }
@@ -56,7 +56,7 @@ namespace RudeBuild
 
         private static string GetIncrediBuildPath()
         {
-            string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
+            const string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
             string incrediBuildPath = (string)registryKey.GetValue("Folder");
             incrediBuildPath = Path.Combine(incrediBuildPath, "BuildConsole.exe");
@@ -83,7 +83,7 @@ namespace RudeBuild
 
         private Process CreateProcessObject(SolutionInfo solutionInfo)
         {
-            Process process = new Process();
+            var process = new Process();
             ProcessStartInfo info = process.StartInfo;
             info.CreateNoWindow = true;
             info.UseShellExecute = false;
@@ -180,7 +180,7 @@ namespace RudeBuild
 
                 _stopped = false;
 
-                using (Process killProcess = new System.Diagnostics.Process())
+                using (var killProcess = new Process())
                 {
                     ProcessStartInfo info = killProcess.StartInfo;
                     info.UseShellExecute = false;

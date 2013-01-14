@@ -10,7 +10,7 @@ namespace RudeBuild
     {
         protected Settings _settings;
 
-        public SingleProjectReaderWriterBase(Settings settings)
+        protected SingleProjectReaderWriterBase(Settings settings)
         {
             _settings = settings;
         }
@@ -58,14 +58,9 @@ namespace RudeBuild
 
 		protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
 		{
-			foreach (XElement cppFileElement in cppFileElements)
-			{
-				if (IsValidCppFileElement(ns, cppFileElement, pathAttributeName))
-					return true;
-			}
-			return false;
+		    return cppFileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, pathAttributeName));
 		}
-	}
+    }
 
     internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
     {
@@ -131,7 +126,7 @@ namespace RudeBuild
 			return result;
         }
 
-        private static XElement AddExcludedFromBuild(XNamespace ns, XElement element)
+        private static void AddExcludedFromBuild(XNamespace ns, XElement element)
         {
             XName excludedName = ns + "ExcludedFromBuild";
             XElement existingExlude = element.Element(excludedName);
@@ -140,7 +135,6 @@ namespace RudeBuild
                 existingExlude.Remove();
             }
             element.Add(new XElement(excludedName, "true"));
-            return element;
         }
 
         private void ReadWriteFilters(string projectFileName, UnityFileMerger merger)
@@ -166,7 +160,7 @@ namespace RudeBuild
 			}
 
             string destProjectFiltersFileName = _settings.ModifyFileName(projectFiltersFileName);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
+            var writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {
                 _settings.Output.WriteLine("Creating project filters file " + destProjectFiltersFileName);
@@ -196,11 +190,11 @@ namespace RudeBuild
 			}
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
-            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, precompiledHeaderFileName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, precompiledHeaderFileName);
 
             if (!performReadOnly)
             {
-                UnityFileMerger merger = new UnityFileMerger(_settings);
+                var merger = new UnityFileMerger(_settings);
 				merger.Process(projectInfo);
 
 				if (cppFileNameElements != null)
@@ -292,11 +286,11 @@ namespace RudeBuild
                 select cppFileElement.Attribute("RelativePath").Value;
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
-            ProjectInfo projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
 
             if (!performReadOnly)
             {
-                UnityFileMerger merger = new UnityFileMerger(_settings);
+                var merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
                 foreach (XElement cppFileNameElement in cppFileNameElements.ToList())
@@ -323,7 +317,7 @@ namespace RudeBuild
 
     public class ProjectReaderWriter
     {
-        private Settings _settings;
+        private readonly Settings _settings;
 
         public ProjectReaderWriter(Settings settings)
         {
@@ -370,7 +364,7 @@ namespace RudeBuild
             if (!performReadOnly)
             {
                 string destProjectFileName = _settings.ModifyFileName(projectFileName);
-                ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
+                var writer = new ModifiedTextFileWriter(destProjectFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
                 if (writer.Write(projectDocument.ToString()))
                 {
                     _settings.Output.WriteLine("Creating project file " + destProjectFileName);

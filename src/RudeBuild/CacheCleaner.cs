@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -32,13 +33,17 @@ namespace RudeBuild
         private static void SafeDeleteFileWithWildcards(string path)
         {
             string fileNameWithWildcards = Path.GetFileName(path);
-            if (fileNameWithWildcards.IndexOf("*") == -1 && fileNameWithWildcards.IndexOf("?") == -1)
+            if (fileNameWithWildcards == null)
+                return;
+            if (fileNameWithWildcards.IndexOf("*", StringComparison.Ordinal) == -1 && fileNameWithWildcards.IndexOf("?", StringComparison.Ordinal) == -1)
             {
                 SafeDeleteFile(path);
                 return;
             }
 
             string directory = Path.GetDirectoryName(path);
+            if (directory == null)
+                return;
             string[] files = Directory.GetFiles(directory, fileNameWithWildcards);
             foreach (string file in files)
             {
@@ -84,7 +89,7 @@ namespace RudeBuild
 
         public static void Run(Settings settings)
         {
-            SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
+            var solutionReaderWriter = new SolutionReaderWriter(settings);
             SolutionInfo solutionInfo = solutionReaderWriter.Read(settings.BuildOptions.Solution.FullName);
             DeleteCachedUnityFiles(settings, solutionInfo);
             DeleteCachedProjectFiles(settings, solutionInfo);

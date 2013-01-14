@@ -97,8 +97,8 @@ namespace RudeBuild
             {
                 using (TextReader textReader = new StreamReader(ConfigFilePath))
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(GlobalSettings));
-                    GlobalSettings globalSettings = (GlobalSettings)deserializer.Deserialize(textReader);
+                    var deserializer = new XmlSerializer(typeof(GlobalSettings));
+                    var globalSettings = (GlobalSettings)deserializer.Deserialize(textReader);
                     return globalSettings;
                 }
             }
@@ -115,7 +115,7 @@ namespace RudeBuild
         {
             using (TextWriter textWriter = new StreamWriter(ConfigFilePath))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(GlobalSettings));
+                var serializer = new XmlSerializer(typeof(GlobalSettings));
                 serializer.Serialize(textWriter, this);
             }
         }

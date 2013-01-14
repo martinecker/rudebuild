@@ -5,9 +5,9 @@ namespace RudeBuildAddIn
 {
 	public class OutputPane : IOutput
 	{
-        private EnvDTE.Window _window;
-        private EnvDTE.OutputWindow _outputWindow;
-		private EnvDTE.OutputWindowPane _outputPane;
+        private readonly EnvDTE.Window _window;
+        private readonly EnvDTE.OutputWindow _outputWindow;
+		private readonly EnvDTE.OutputWindowPane _outputPane;
 
         public OutputPane(EnvDTE80.DTE2 application, string name)
 		{

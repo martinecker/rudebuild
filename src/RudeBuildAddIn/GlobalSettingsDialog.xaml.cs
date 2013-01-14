@@ -17,7 +17,7 @@ namespace RudeBuildAddIn
 {
     public partial class GlobalSettingsDialog : Window
     {
-        private GlobalSettings _globalSettings;
+        private readonly GlobalSettings _globalSettings;
 
         public GlobalSettingsDialog(IOutput output)
         {

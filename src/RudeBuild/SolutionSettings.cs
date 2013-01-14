@@ -132,7 +132,7 @@ namespace RudeBuild
                 throw new ArgumentException("The project " + projectInfo.Name + " does not contain the file '" + cppFileName + "' and so cannot be excluded.");
             }
 
-            List<string> cppFileNames = null;
+            List<string> cppFileNames;
             ProjectNameToExcludedCppFileNameMap.TryGetValue(projectInfo.Name, out cppFileNames);
             if (null == cppFileNames)
             {
@@ -188,10 +188,10 @@ namespace RudeBuild
             {
                 using (TextReader textReader = new StreamReader(configFilePath))
                 {
-                    XmlSerializer deserializer = new XmlSerializer(typeof(SolutionSettings));
+                    var deserializer = new XmlSerializer(typeof(SolutionSettings));
                     try
                     {
-                        SolutionSettings solutionSettings = (SolutionSettings)deserializer.Deserialize(textReader);
+                        var solutionSettings = (SolutionSettings)deserializer.Deserialize(textReader);
                         return solutionSettings;
                     }
                     catch
@@ -209,7 +209,7 @@ namespace RudeBuild
             string configFilePath = GetConfigFilePath(solutionInfo);
             using (TextWriter textWriter = new StreamWriter(configFilePath))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(SolutionSettings));
+                var serializer = new XmlSerializer(typeof(SolutionSettings));
                 serializer.Serialize(textWriter, this);
             }
         }

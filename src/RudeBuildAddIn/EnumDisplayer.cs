@@ -39,16 +39,17 @@ namespace RudeBuildAddIn
 
                 _resourceManager = new ResourceManager(_type);
 
-                Type enumToDisplayValuesType = typeof(Dictionary<,>).GetGenericTypeDefinition().MakeGenericType(_type, typeof(string));
+                Type genericDictionaryType = typeof(Dictionary<,>).GetGenericTypeDefinition();
+                Type enumToDisplayValuesType = genericDictionaryType.MakeGenericType(_type, typeof(string));
                 _enumToDisplayValues = (IDictionary)Activator.CreateInstance(enumToDisplayValuesType);
-                Type displayToEnumValuesType = typeof(Dictionary<,>).GetGenericTypeDefinition().MakeGenericType(typeof(string), _type);
+                Type displayToEnumValuesType = genericDictionaryType.MakeGenericType(typeof(string), _type);
                 _displayToEnumValues = (IDictionary)Activator.CreateInstance(displayToEnumValuesType);
-                List<string> displayValues = new List<string>();
+                var displayValues = new List<string>();
 
                 FieldInfo[] fields = _type.GetFields(BindingFlags.Public | BindingFlags.Static);
                 foreach (FieldInfo field in fields)
                 {
-                    DisplayValueAttribute[] attributes = field.GetCustomAttributes(typeof(DisplayValueAttribute), false) as DisplayValueAttribute[];
+                    var attributes = field.GetCustomAttributes(typeof(DisplayValueAttribute), false) as DisplayValueAttribute[];
                     object enumValue = field.GetValue(null);
                     string displayValue = GetDisplayValue(_type, enumValue, attributes);
                     if (null != displayValue)

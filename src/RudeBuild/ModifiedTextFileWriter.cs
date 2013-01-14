@@ -4,8 +4,8 @@ namespace RudeBuild
 {
     public class ModifiedTextFileWriter
     {
-        private string _fileName;
-        private bool _forceWrite;
+        private readonly string _fileName;
+        private readonly bool _forceWrite;
 
         public ModifiedTextFileWriter(string fileName, bool forceWrite)
         {
@@ -17,7 +17,7 @@ namespace RudeBuild
         {
             if (File.Exists(_fileName))
             {
-                using (StreamReader reader = new StreamReader(_fileName))
+                using (var reader = new StreamReader(_fileName))
                 {
                     string existingText = reader.ReadToEnd();
                     if (!_forceWrite && existingText == text)

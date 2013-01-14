@@ -17,8 +17,8 @@ namespace RudeBuildAddIn
     [RunInstaller(true)]
     public partial class Installer : System.Configuration.Install.Installer
     {
-        private const string _addInFileName = "RudeBuild.AddIn";
-        private const string _globalSettingsFileName = "RudeBuild.GlobalSettings.config";
+        private const string AddInFileName = "RudeBuild.AddIn";
+        private const string GlobalSettingsFileName = "RudeBuild.GlobalSettings.config";
 
         public Installer()
         {
@@ -28,7 +28,7 @@ namespace RudeBuildAddIn
         private void PatchAddInFile(string filePath, string installationPath)
         {
             XDocument document = XDocument.Load(filePath);
-            if (null == document)
+            if (null == document || null == document.Root)
             {
                 throw new InvalidDataException("Couldn't load required add-in file '" + filePath + "'.");
             }
@@ -45,13 +45,13 @@ namespace RudeBuildAddIn
             string installDirectory = Path.Combine(userPersonalFolder, "Visual Studio " + vsVersion);
             installDirectory = Path.Combine(installDirectory, "Addins");
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(installDirectory);
+            var directoryInfo = new DirectoryInfo(installDirectory);
             if (!directoryInfo.Exists)
             {
                 directoryInfo.Create();
             }
 
-            string installPath = Path.Combine(installDirectory, _addInFileName);
+            string installPath = Path.Combine(installDirectory, AddInFileName);
             File.Copy(filePath, installPath, true);
             savedState.Add("AddInInstallPath" + vsVersion, installPath);            
         }
@@ -60,7 +60,7 @@ namespace RudeBuildAddIn
         {
             if (savedState.Contains("AddInInstallPath" + vsVersion))
             {
-                string installPath = (string)savedState["AddInInstallPath" + vsVersion];
+                var installPath = (string)savedState["AddInInstallPath" + vsVersion];
                 if (!string.IsNullOrEmpty(installPath))
                 {
                     if (File.Exists(installPath))
@@ -104,7 +104,7 @@ namespace RudeBuildAddIn
             try
             {
                 string installationPath = GetInstallationPath();
-                string addInFilePath = Path.Combine(installationPath, _addInFileName);
+                string addInFilePath = Path.Combine(installationPath, AddInFileName);
                 PatchAddInFile(addInFilePath, installationPath);
                 InstallAddInFile(savedState, addInFilePath, "2008");
                 InstallAddInFile(savedState, addInFilePath, "2010");
@@ -140,7 +140,7 @@ namespace RudeBuildAddIn
                 if (null == application)
                     return;
 
-                Connect connect = new Connect();
+                var connect = new Connect();
                 connect.OnUninstall(application);
             }
             catch (Exception ex)
@@ -169,7 +169,7 @@ namespace RudeBuildAddIn
                 UninstallAddInFile(savedState, "2012");
 
                 string installationPath = GetInstallationPath();
-                string globalSettingsPath = Path.Combine(installationPath, _globalSettingsFileName);
+                string globalSettingsPath = Path.Combine(installationPath, GlobalSettingsFileName);
                 if (File.Exists(globalSettingsPath))
                 {
                     File.Delete(globalSettingsPath);
@@ -191,7 +191,7 @@ namespace RudeBuildAddIn
         {
             try
             {
-                Process process = new Process();
+                var process = new Process();
                 ProcessStartInfo info = process.StartInfo;
                 info.CreateNoWindow = true;
                 info.UseShellExecute = false;

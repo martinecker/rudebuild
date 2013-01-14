@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using RudeBuild;
 
@@ -47,11 +44,10 @@ namespace RudeBuildConsole
             _output.WriteLine("Arguments: " + string.Join(" ", args));
             _output.WriteLine();
 
-            CommandLineParser.CommandLineParser parser = new CommandLineParser.CommandLineParser();
-            parser.ShowUsageOnEmptyCommandline = true;
+            var parser = new CommandLineParser.CommandLineParser { ShowUsageOnEmptyCommandline = true };
             try
             {
-                BuildOptions options = new BuildOptions();
+                var options = new BuildOptions();
                 parser.ExtractArgumentAttributes(options);
                 parser.ParseCommandLine(args);
                 return options;
@@ -81,9 +77,9 @@ namespace RudeBuildConsole
 
                 GlobalSettings globalSettings = GlobalSettings.Load(_output);
                 globalSettings.Save();
-                Settings settings = new Settings(globalSettings, options, _output);
+                var settings = new Settings(globalSettings, options, _output);
 
-                Stopwatch stopwatch = new Stopwatch();
+                var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
                 int exitCode = 0;
@@ -93,14 +89,14 @@ namespace RudeBuildConsole
                 }
                 else
                 {
-                    SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
+                    var solutionReaderWriter = new SolutionReaderWriter(settings);
                     SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(options.Solution.FullName);
                     settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo); 
-                    ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
+                    var projectReaderWriter = new ProjectReaderWriter(settings);
                     projectReaderWriter.ReadWrite(solutionInfo);
                     settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
 
-                    ProcessLauncher processLauncher = new ProcessLauncher(settings);
+                    var processLauncher = new ProcessLauncher(settings);
                     Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
                     {
                         _output.WriteLine("Stopping build...");
@@ -127,7 +123,7 @@ namespace RudeBuildConsole
 
         static int Main(string[] args)
         {
-            Program program = new Program();
+            var program = new Program();
             return program.Run(args);
         }
     }

@@ -19,7 +19,7 @@ namespace RudeBuild
             {
                 if (property.IsReadOnly)
                     continue;
-                DefaultValueAttribute attribute = property.Attributes[typeof(DefaultValueAttribute)] as DefaultValueAttribute;
+                var attribute = property.Attributes[typeof(DefaultValueAttribute)] as DefaultValueAttribute;
                 if (null == attribute)
                     property.SetValue(obj, DefaultForType(property.PropertyType));
                 else
@@ -30,36 +30,21 @@ namespace RudeBuild
 
     public class Settings
     {
-        private GlobalSettings _globalSettings;
-        public GlobalSettings GlobalSettings
-        {
-            get { return _globalSettings; }
-        }
-
-        private BuildOptions _buildOptions;
-        public BuildOptions BuildOptions
-        {
-            get { return _buildOptions; }
-        }
-
+        public GlobalSettings GlobalSettings { get; private set; }
+        public BuildOptions BuildOptions { get; private set; }
         public SolutionSettings SolutionSettings { get; set; }
-
-        private IOutput _output;
-        public IOutput Output
-        {
-            get { return _output; }
-        }
+        public IOutput Output { get; private set; }
 
         public Settings(GlobalSettings globalSettings, BuildOptions buildOptions, IOutput output)
         {
-            _globalSettings = globalSettings;
-            _buildOptions = buildOptions;
-            _output = output;
+            GlobalSettings = globalSettings;
+            BuildOptions = buildOptions;
+            Output = output;
         }
 
         private static string GetMD5Hash(string input)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             using (MD5 md5Hasher = MD5.Create())
             {
                 // Convert the input string to a byte array and compute the hash.
@@ -86,7 +71,7 @@ namespace RudeBuild
 
         public string ModifyFileName(string fileName)
         {
-            string modifiedFileName = Path.Combine(Path.GetDirectoryName(fileName), _globalSettings.FileNamePrefix + Path.GetFileName(fileName));
+            string modifiedFileName = Path.Combine(Path.GetDirectoryName(fileName), GlobalSettings.FileNamePrefix + Path.GetFileName(fileName));
             return modifiedFileName;
         }
     }

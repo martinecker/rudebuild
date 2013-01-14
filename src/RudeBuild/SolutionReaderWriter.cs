@@ -6,7 +6,7 @@ namespace RudeBuild
 {
     public class SolutionReaderWriter
     {
-        private Settings _settings;
+        private readonly Settings _settings;
 
         public SolutionReaderWriter(Settings settings)
         {
@@ -39,7 +39,7 @@ namespace RudeBuild
             }
 
             string extension = version >= VisualStudioVersion.VS2010 ? ".vcxproj" : ".vcproj";
-            int extensionIndex = line.IndexOf(extension);
+            int extensionIndex = line.IndexOf(extension, System.StringComparison.Ordinal);
             if (extensionIndex <= 0)
             {
                 throw new InvalidDataException("Solution file is corrupt. Found C++ project without project fileName.");
@@ -58,12 +58,12 @@ namespace RudeBuild
 
         public SolutionInfo Read(string fileName)
         {
-            VisualStudioVersion version = VisualStudioVersion.VSUnknown;
-            List<string> projectFileNames = new List<string>();
-            StringBuilder destSolutionText = new StringBuilder();
+            var version = VisualStudioVersion.VSUnknown;
+            var projectFileNames = new List<string>();
+            var destSolutionText = new StringBuilder();
             string solutionDirectory = Path.GetDirectoryName(fileName);
 
-            using (StreamReader reader = new StreamReader(fileName))
+            using (var reader = new StreamReader(fileName))
             {
                 string line;
                 bool isInSourceControlSection = false;
@@ -124,7 +124,7 @@ namespace RudeBuild
         public void Write(SolutionInfo solutionInfo)
         {
             string destFileName = _settings.ModifyFileName(solutionInfo.FilePath);
-            ModifiedTextFileWriter writer = new ModifiedTextFileWriter(destFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
+            var writer = new ModifiedTextFileWriter(destFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(solutionInfo.Contents))
             {
                 _settings.Output.WriteLine("Creating solution file " + destFileName);

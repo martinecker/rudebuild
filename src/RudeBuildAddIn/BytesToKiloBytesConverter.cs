@@ -22,9 +22,12 @@ namespace RudeBuildAddIn
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+                return DependencyProperty.UnsetValue;
+
             try
             {
-                long valueInKiloBytes = Int64.Parse(value as string);
+                long valueInKiloBytes = Int64.Parse((string)value);
                 return valueInKiloBytes * 1024;
             }
             catch

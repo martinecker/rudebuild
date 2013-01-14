@@ -18,8 +18,8 @@ namespace RudeBuildAddIn
 {
     public partial class SolutionSettingsAddExcludedCppFileNameDialog : Window
     {
-        private ProjectInfo _projectInfo;
-        private SolutionSettings _solutionSettings;
+        private readonly ProjectInfo _projectInfo;
+        private readonly SolutionSettings _solutionSettings;
 
         public IList<string> FileNamesToExclude;
 
@@ -30,8 +30,8 @@ namespace RudeBuildAddIn
 
             InitializeComponent();
 
-            ReadOnlyCollection<string> existingExcludedFileNames = _solutionSettings.GetExcludedCppFileNamesForProject(_projectInfo.Name);
-            ReadOnlyCollection<string> fileNames = new ReadOnlyCollection<string>(
+            var existingExcludedFileNames = _solutionSettings.GetExcludedCppFileNamesForProject(_projectInfo.Name);
+            var fileNames = new ReadOnlyCollection<string>(
                 (from fileName in _projectInfo.CppFileNames
                  where !existingExcludedFileNames.Contains(fileName)
                  select fileName).ToList());
@@ -66,13 +66,13 @@ namespace RudeBuildAddIn
 
         private void OnFileNamePreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            DependencyObject clickedControl = e.OriginalSource as DependencyObject;
+            var clickedControl = e.OriginalSource as DependencyObject;
             if (null != clickedControl)
             {
-                ListBox listBox = clickedControl.VisualUpwardSearch<ListBox>();
+                var listBox = clickedControl.VisualUpwardSearch<ListBox>();
                 if (_listBoxFileNames == listBox)
                 {
-                    ListBoxItem clickedListBoxItem = clickedControl.VisualUpwardSearch<ListBoxItem>();
+                    var clickedListBoxItem = clickedControl.VisualUpwardSearch<ListBoxItem>();
                     listBox.UnselectAll();
                     clickedListBoxItem.IsSelected = true;
                 }

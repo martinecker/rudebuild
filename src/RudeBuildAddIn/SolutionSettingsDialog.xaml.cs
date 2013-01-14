@@ -17,9 +17,9 @@ namespace RudeBuildAddIn
 {
     public partial class SolutionSettingsDialog : Window
     {
-        private Settings _settings;
-        private SolutionInfo _solutionInfo;
-        private SolutionSettings _solutionSettings;
+        private readonly Settings _settings;
+        private readonly SolutionInfo _solutionInfo;
+        private readonly SolutionSettings _solutionSettings;
         private TreeViewItem _selectedTreeViewItem;
 
         public SolutionSettingsDialog(Settings settings, SolutionInfo solutionInfo)
@@ -56,10 +56,10 @@ namespace RudeBuildAddIn
 
         private void OnPreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            DependencyObject clickedControl = e.OriginalSource as DependencyObject;
+            var clickedControl = e.OriginalSource as DependencyObject;
             if (null != clickedControl)
             {
-                TreeViewItem treeViewItem = clickedControl.VisualUpwardSearch<TreeViewItem>();
+                var treeViewItem = clickedControl.VisualUpwardSearch<TreeViewItem>();
                 if (null != treeViewItem)
                 {
                     treeViewItem.Focus();
@@ -80,7 +80,7 @@ namespace RudeBuildAddIn
 
         private ProjectInfo GetProjectInfoFromTreeViewItem(TreeViewItem projectTreeViewItem)
         {
-            TextBlock textBlock = projectTreeViewItem.VisualDownwardSearch<TextBlock>();
+            var textBlock = projectTreeViewItem.VisualDownwardSearch<TextBlock>();
             if (null == textBlock)
                 return null;
             string projectName = textBlock.Text;
@@ -92,8 +92,8 @@ namespace RudeBuildAddIn
 
         private void RefreshTreeViewBinding()
         {
-            BindingOperations.ClearBinding(_treeViewExcludedFileNames, TreeView.ItemsSourceProperty);
-            _treeViewExcludedFileNames.SetBinding(TreeView.ItemsSourceProperty, new Binding("ProjectNameToExcludedCppFileNameMap"));
+            BindingOperations.ClearBinding(_treeViewExcludedFileNames, ItemsControl.ItemsSourceProperty);
+            _treeViewExcludedFileNames.SetBinding(ItemsControl.ItemsSourceProperty, new Binding("ProjectNameToExcludedCppFileNameMap"));
         }
 
         private void OnAddExcludedCppFileNameForProject(object sender, RoutedEventArgs e)
@@ -104,7 +104,7 @@ namespace RudeBuildAddIn
             if (null == projectInfo)
                 return;
 
-            SolutionSettingsAddExcludedCppFileNameDialog dialog = new SolutionSettingsAddExcludedCppFileNameDialog(projectInfo, _solutionSettings);
+            var dialog = new SolutionSettingsAddExcludedCppFileNameDialog(projectInfo, _solutionSettings);
             try
             {
                 dialog.ShowDialog();
@@ -136,7 +136,7 @@ namespace RudeBuildAddIn
             DependencyObject parentControl = VisualTreeHelper.GetParent(_selectedTreeViewItem);
             if (null == parentControl)
                 return;
-            TreeViewItem projectTreeViewItem = parentControl.VisualUpwardSearch<TreeViewItem>();
+            var projectTreeViewItem = parentControl.VisualUpwardSearch<TreeViewItem>();
             if (null == projectTreeViewItem)
                 return;
             ProjectInfo projectInfo = GetProjectInfoFromTreeViewItem(projectTreeViewItem);

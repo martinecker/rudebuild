@@ -13,8 +13,8 @@ namespace RudeBuildAddIn
         public DTE2 Application { get; private set; }
         public AddIn AddInInstance { get; private set; }
         
-        public CommandRegistry _commandRegistry = new CommandRegistry();
-        private Commands2 _vsCommands;
+        private readonly CommandRegistry _commandRegistry = new CommandRegistry();
+        private readonly Commands2 _vsCommands;
 
         public CommandManager(DTE2 application, AddIn addInInstance)
         {
@@ -39,11 +39,8 @@ namespace RudeBuildAddIn
             if (GetCommand(name) != null)
                 return;
 
-            Command vsCommand = GetVSCommand(name);
-            if (null == vsCommand)
-            {
-                vsCommand = _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
-            }
+            Command vsCommand = GetVSCommand(name) ??
+                                _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
             command.Initialize(name, caption, toolTip, icon, vsCommand);
             _commandRegistry.Register(command);
         }
@@ -84,7 +81,7 @@ namespace RudeBuildAddIn
 
         public CommandBar FindCommandBar(string name)
         {
-            CommandBars commandBars = (CommandBars)Application.CommandBars;
+            var commandBars = (CommandBars)Application.CommandBars;
             var result = from CommandBar commandBar in commandBars
                          where commandBar.Name == name
                          select commandBar;
@@ -93,7 +90,7 @@ namespace RudeBuildAddIn
 
         public IList<CommandBar> FindCommandBars(string name)
         {
-            CommandBars commandBars = (CommandBars)Application.CommandBars;
+            var commandBars = (CommandBars)Application.CommandBars;
             var result = from CommandBar commandBar in commandBars
                          where commandBar.Name == name
                          select commandBar;
@@ -108,7 +105,7 @@ namespace RudeBuildAddIn
             var commandBarControl = from CommandBarControl control in parentCommandBar.Controls
                                     where control.accName == popupCommandBarName
                                     select control;
-            CommandBarPopup commandBarPopup = commandBarControl.SingleOrDefault() as CommandBarPopup;
+            var commandBarPopup = commandBarControl.SingleOrDefault() as CommandBarPopup;
             if (null == commandBarPopup)
                 return null;
             return commandBarPopup.CommandBar;
@@ -145,7 +142,7 @@ namespace RudeBuildAddIn
             CommandBar commandBar = FindCommandBar(name);
             if (null == commandBar)
             {
-                CommandBars commandBars = (CommandBars)Application.CommandBars;
+                var commandBars = (CommandBars)Application.CommandBars;
                 commandBar = commandBars.Add(name, position);
                 commandBar.Visible = true;
             }
@@ -160,7 +157,7 @@ namespace RudeBuildAddIn
             CommandBar commandBar = FindPopupCommandBar(parentCommandBar, popupCommandBarName);
             if (null == commandBar)
             {
-                CommandBarPopup commandBarPopup = parentCommandBar.Controls.Add(MsoControlType.msoControlPopup, Before: insertIndex, Temporary: true) as CommandBarPopup;
+                var commandBarPopup = parentCommandBar.Controls.Add(MsoControlType.msoControlPopup, Before: insertIndex, Temporary: true) as CommandBarPopup;
                 if (null == commandBarPopup)
                     return null;
                 commandBarPopup.Visible = true;

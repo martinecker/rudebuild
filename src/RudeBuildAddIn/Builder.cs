@@ -13,15 +13,15 @@ namespace RudeBuildAddIn
 
         private EnvDTE80.DTE2 _application;
         
-        private IOutput _output;
+        private readonly IOutput _output;
         public IOutput Output
         {
             get { return _output; }
         }
 
-        private Stopwatch _stopwatch;
+        private readonly Stopwatch _stopwatch;
 
-        private object _lock = new object();
+        private readonly object _lock = new object();
         private ProcessLauncher _processLauncher;
         private Thread _buildThread;
 
@@ -71,7 +71,7 @@ namespace RudeBuildAddIn
                 return;
 
             _globalSettings = GlobalSettings.Load(_output);
-            Settings settings = new Settings(_globalSettings, options, _output);
+            var settings = new Settings(_globalSettings, options, _output);
 
             if (options.CleanCache)
             {
@@ -84,8 +84,7 @@ namespace RudeBuildAddIn
                 _processLauncher = new ProcessLauncher(settings);
                 _lastBuildWasStopped = false;
                 _isBeingStopped = false;
-                _buildThread = new Thread(delegate() { BuildThread(settings); });
-                _buildThread.IsBackground = true;
+                _buildThread = new Thread(() => BuildThread(settings)) { IsBackground = true };
                 _buildThread.Start();
             }
         }
@@ -103,10 +102,10 @@ namespace RudeBuildAddIn
             int exitCode = -1;
             try
             {
-                SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
+                var solutionReaderWriter = new SolutionReaderWriter(settings);
                 SolutionInfo solutionInfo = solutionReaderWriter.ReadWrite(settings.BuildOptions.Solution.FullName);
                 settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo);
-                ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
+                var projectReaderWriter = new ProjectReaderWriter(settings);
                 projectReaderWriter.ReadWrite(solutionInfo);
                 settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
 
@@ -125,7 +124,7 @@ namespace RudeBuildAddIn
 
             lock (_lock)
             {
-                _lastBuildWasSuccessful = _isBeingStopped ? false : exitCode == 0;
+                _lastBuildWasSuccessful = !_isBeingStopped && exitCode == 0;
                 _buildThread = null;
                 _processLauncher = null;
             }
@@ -142,7 +141,7 @@ namespace RudeBuildAddIn
 
                     _isBeingStopped = true;
                     _output.WriteLine("Stopping build...");
-                    Thread stopThread = new Thread(delegate() { StopThread(); });
+                    var stopThread = new Thread(StopThread);
                     stopThread.Start();
                 }
             }
@@ -165,7 +164,7 @@ namespace RudeBuildAddIn
                     buildThread.Join();
                     _output.WriteLine("Build stopped.");
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     _output.WriteLine("An error occurred trying to stop the build:");
                     _output.WriteLine(ex.Message);

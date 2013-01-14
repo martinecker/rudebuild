@@ -4,7 +4,7 @@ namespace RudeBuildAddIn
 {
     public class CommandRegistry
     {
-        private IDictionary<string, ICommand> _commands = new Dictionary<string, ICommand>();
+        private readonly IDictionary<string, ICommand> _commands = new Dictionary<string, ICommand>();
 
         public void Register(ICommand command)
         {

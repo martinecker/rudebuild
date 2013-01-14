@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Ecker/PlayGroovy")]
 [assembly: AssemblyProduct("RudeBuild")]
-[assembly: AssemblyCopyright("Copyright © Martin Ecker/PlayGroovy 2011")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker/PlayGroovy 2011-2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

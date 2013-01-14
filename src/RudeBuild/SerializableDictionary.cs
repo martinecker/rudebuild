@@ -18,25 +18,25 @@ namespace RudeBuild
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";
 
-        private XmlSerializer valueSerializer = null;
+        private XmlSerializer _valueSerializer;
         protected XmlSerializer ValueSerializer
         {
             get
             {
-                if (valueSerializer == null)
-                    valueSerializer = new XmlSerializer(typeof(TValue));
-                return valueSerializer;
+                if (_valueSerializer == null)
+                    _valueSerializer = new XmlSerializer(typeof(TValue));
+                return _valueSerializer;
             }
         }
 
-        private XmlSerializer keySerializer = null;
+        private XmlSerializer _keySerializer = null;
         private XmlSerializer KeySerializer
         {
             get
             {
-                if (keySerializer == null)
-                    keySerializer = new XmlSerializer(typeof(TKey));
-                return keySerializer;
+                if (_keySerializer == null)
+                    _keySerializer = new XmlSerializer(typeof(TKey));
+                return _keySerializer;
             }
         }
 
@@ -80,8 +80,8 @@ namespace RudeBuild
             int itemCount = info.GetInt32("ItemCount");
             for (int i = 0; i < itemCount; i++)
             {
-                KeyValuePair<TKey, TValue> kvp = (KeyValuePair<TKey, TValue>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TValue>));
-                this.Add(kvp.Key, kvp.Value);
+                var kvp = (KeyValuePair<TKey, TValue>)info.GetValue(String.Format("Item{0}", i), typeof(KeyValuePair<TKey, TValue>));
+                Add(kvp.Key, kvp.Value);
             }
         }
 
@@ -141,7 +141,7 @@ namespace RudeBuild
                 TValue value = (TValue)ValueSerializer.Deserialize(reader);
                 reader.ReadEndElement();
                 reader.ReadEndElement();
-                this.Add(key, value);
+                Add(key, value);
                 reader.MoveToContent();
             }
             //reader.ReadEndElement();
