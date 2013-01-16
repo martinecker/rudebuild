@@ -25,6 +25,11 @@ namespace RudeBuild
                 }
             }
 
+            // Create the directory if it doesn't exist.
+            string directory = Path.GetDirectoryName(_fileName);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             using (StreamWriter writer = File.CreateText(_fileName))
             {
                 writer.Write(text);
