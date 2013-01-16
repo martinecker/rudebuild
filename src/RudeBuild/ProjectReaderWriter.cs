@@ -17,11 +17,6 @@ namespace RudeBuild
 
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
 
-        protected string GetConfigCondition()
-        {
-            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
-        }
-
         protected static bool IsValidCppFileName(string fileName)
         {
             string extension = Path.GetExtension(fileName);
@@ -38,27 +33,10 @@ namespace RudeBuild
             if (!cppFileElement.HasElements)
                 return true;
 
-            // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
-            // so don't include the file for the unity merge.
-            var conditionalBuildElements = (from element in cppFileElement.Elements()
-                                            where element.Attribute("Condition") != null
-                                            select element).ToList();
-            if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
-                return false;
-
-            string currentConfigCondition = GetConfigCondition();
-            XName excludedFromBuildName = ns + "ExcludedFromBuild";
-            foreach (XElement conditionalBuildElement in conditionalBuildElements)
-            {
-                XAttribute conditionAttribute = conditionalBuildElement.Attribute("Condition");
-                if (conditionAttribute.Value != currentConfigCondition)
-                    continue;
-                if (conditionalBuildElement.Name == excludedFromBuildName && conditionalBuildElement.Value == "true")
-                    return false;
-            }
-
-            return true;
+            return IsValidCppFileElementInternal(ns, cppFileElement);
         }
+
+        protected abstract bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement);
 
         protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
         {
@@ -83,6 +61,35 @@ namespace RudeBuild
         public SingleProjectReaderWriterPostVS2010(Settings settings)
             : base(settings)
         {
+        }
+
+        private string GetConfigCondition()
+        {
+            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+        }
+
+        protected override bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement)
+        {
+            // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
+            // so don't include the file for the unity merge.
+            var conditionalBuildElements = (from element in cppFileElement.Elements()
+                                            where element.Attribute("Condition") != null
+                                            select element).ToList();
+            if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
+                return false;
+
+            string currentConfigCondition = GetConfigCondition();
+            XName excludedFromBuildName = ns + "ExcludedFromBuild";
+            foreach (XElement conditionalBuildElement in conditionalBuildElements)
+            {
+                XAttribute conditionAttribute = conditionalBuildElement.Attribute("Condition");
+                if (conditionAttribute.Value != currentConfigCondition)
+                    continue;
+                if (conditionalBuildElement.Name == excludedFromBuildName && conditionalBuildElement.Value == "true")
+                    return false;
+            }
+
+            return true;
         }
 
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
@@ -263,6 +270,55 @@ namespace RudeBuild
         {
         }
 
+        private bool IsValidFileConfigElement(XNamespace ns, XElement element)
+        {
+            if (element.Name != ns + "FileConfiguration")
+                return false;
+
+            if (!element.Attributes().All(attribute => attribute.Name == "Name" || attribute.Name == "ExcludedFromBuild"))
+                return false;
+
+            int childElementCount = element.Elements().Count();
+            if (childElementCount == 0)
+                return true;
+            if (childElementCount > 1)
+                return false;
+
+            XElement toolElement = element.Element(ns + "Tool");
+            if (null == toolElement)
+                return false;
+            if (toolElement.Attributes().Any(attribute => attribute.Name != "Name"))
+                return false;
+            XAttribute nameAttribute = toolElement.Attribute("Name");
+            if (null == nameAttribute || nameAttribute.Value != "VCCLCompilerTool")
+                return false;
+            return true;
+        }
+
+        protected override bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement)
+        {
+            // Get all child elements called FileConfiguration with a Name and possibly ExcludedFromBuild attribute.
+            // If others exist, we don't handle those currently, so don't include the file for the unity merge.
+            var configBuildElements = (from element in cppFileElement.Elements()
+                                       where IsValidFileConfigElement(ns, element)
+                                       select element).ToList();
+            if (cppFileElement.Elements().Count() != configBuildElements.Count)
+                return false;
+
+            string currentConfigCondition = _settings.BuildOptions.Config;
+            foreach (XElement configBuildElement in configBuildElements)
+            {
+                XAttribute nameAttribute = configBuildElement.Attribute("Name");
+                if (nameAttribute.Value != currentConfigCondition)
+                    continue;
+                XAttribute excludedFromBuildAttribute = configBuildElement.Attribute("ExcludedFromBuild");
+                if (null != excludedFromBuildAttribute && excludedFromBuildAttribute.Value == "true")
+                    return false;
+            }
+
+            return true;
+        }
+
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
         {
             var configElements =
@@ -305,9 +361,9 @@ namespace RudeBuild
             XNamespace ns = projectDocument.Root.Name.Namespace;
 
             var cppFileNameElements =
-                from cppFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidCppFileElement(ns, cppFileElement, "RelativePath")
-                select cppFileElement;
+                (from cppFileElement in projectDocument.Descendants(ns + "File")
+                 where IsValidCppFileElement(ns, cppFileElement, "RelativePath")
+                 select cppFileElement).ToList();
             var cppFileNames =
                 from cppFileElement in cppFileNameElements
                 select cppFileElement.Attribute("RelativePath").Value;
@@ -324,7 +380,7 @@ namespace RudeBuild
                 var merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                foreach (XElement cppFileNameElement in cppFileNameElements.ToList())
+                foreach (XElement cppFileNameElement in cppFileNameElements)
                 {
                     string cppFileName = cppFileNameElement.Attribute("RelativePath").Value;
                     if (merger.MergedCppFileNames.Contains(cppFileName))
