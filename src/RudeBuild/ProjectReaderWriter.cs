@@ -17,49 +17,48 @@ namespace RudeBuild
 
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
 
-		protected static bool IsValidCppFileName(string fileName)
-		{
-			string extension = Path.GetExtension(fileName);
-			return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
-		}
+        protected static bool IsValidCppFileName(string fileName)
+        {
+            string extension = Path.GetExtension(fileName);
+            return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
+        }
 
-		protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
-		{
-			// Exclude any files that have special handling, precompiled headers, except for files that are excluded from build, etc.
-			XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
-			if (pathAttribute == null || !IsValidCppFileName(pathAttribute.Value))
-				return false;
+        protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
+        {
+            XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
+            if (pathAttribute == null || !IsValidCppFileName(pathAttribute.Value))
+                return false;
 
-			if (!cppFileElement.HasElements)
-				return true;
+            // If the file element has no child elements, then we accept this file for the unity merge.
+            if (!cppFileElement.HasElements)
+                return true;
 
-			// Make sure the only elements we have are ExcludedFromBuild elements because those are the only ones we handle correctly.
-			// If there are other elements, don't include this file in the unity build and just build it on its own.
-			var excludedFromBuildElements = (from element in cppFileElement.Elements()
-											 where element.Name == ns + "ExcludedFromBuild"
-											 select element).ToList();
-			if (cppFileElement.Elements().Count() != excludedFromBuildElements.Count)
-				return false;
+            // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
+            // so don't include the file for the unity merge.
+            var conditionalBuildElements = (from element in cppFileElement.Elements()
+                                            where element.Attribute("Condition") != null
+                                            select element).ToList();
+            if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
+                return false;
 
-			string currentConfigCondition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
-			foreach (XElement excludedFromBuildElement in excludedFromBuildElements)
-			{
-				XAttribute conditionAttribute = excludedFromBuildElement.Attribute("Condition");
-				if (conditionAttribute == null)
-					return false;
-				if (conditionAttribute.Value != currentConfigCondition)
-					continue;
-				if (excludedFromBuildElement.Value == "true")
-					return false;
-			}
+            string currentConfigCondition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+            XName excludedFromBuildName = ns + "ExcludedFromBuild";
+            foreach (XElement conditionalBuildElement in conditionalBuildElements)
+            {
+                XAttribute conditionAttribute = conditionalBuildElement.Attribute("Condition");
+                if (conditionAttribute.Value != currentConfigCondition)
+                    continue;
+                if (conditionalBuildElement.Name == excludedFromBuildName && conditionalBuildElement.Value == "true")
+                    return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
-		{
-		    return cppFileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, pathAttributeName));
-		}
+        protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
+        {
+            return cppFileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, pathAttributeName));
+        }
     }
 
     internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
@@ -119,11 +118,11 @@ namespace RudeBuild
             }
 
             var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-										  let compileElements = itemGroupElement.Elements(ns + "ClCompile")
+                                          let compileElements = itemGroupElement.Elements(ns + "ClCompile")
                                           where HasValidCppFileElements(ns, compileElements, "Include")
                                           select itemGroupElement;
             XElement result = compileItemGroupElement.SingleOrDefault();
-			return result;
+            return result;
         }
 
         private static void AddExcludedFromBuild(XNamespace ns, XElement element)
@@ -152,12 +151,12 @@ namespace RudeBuild
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectFiltersDocument);
 
-			if (compileItemGroupElement != null)
-			{
-				compileItemGroupElement.Add(
-					from unityFileName in merger.UnityFilePaths
-					select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
-			}
+            if (compileItemGroupElement != null)
+            {
+                compileItemGroupElement.Add(
+                    from unityFileName in merger.UnityFilePaths
+                    select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+            }
 
             string destProjectFiltersFileName = _settings.ModifyFileName(projectFiltersFileName);
             var writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
@@ -172,22 +171,22 @@ namespace RudeBuild
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectDocument);
 
-			IList<string> cppFileNames = null;
-			IList<XElement> cppFileNameElements = null;
-			if (compileItemGroupElement != null)
-			{
-				cppFileNameElements = (
-					from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-					where IsValidCppFileElement(ns, compileElement, "Include")
-					select compileElement).ToList();
-				cppFileNames = (
-					from compileElement in cppFileNameElements
-					select compileElement.Attribute("Include").Value).ToList();
-			}
-			else
-			{
-				cppFileNames = new List<string>();
-			}
+            IList<string> cppFileNames = null;
+            IList<XElement> cppFileNameElements = null;
+            if (compileItemGroupElement != null)
+            {
+                cppFileNameElements = (
+                    from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+                    where IsValidCppFileElement(ns, compileElement, "Include")
+                    select compileElement).ToList();
+                cppFileNames = (
+                    from compileElement in cppFileNameElements
+                    select compileElement.Attribute("Include").Value).ToList();
+            }
+            else
+            {
+                cppFileNames = new List<string>();
+            }
 
             string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
             var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, precompiledHeaderFileName);
@@ -195,24 +194,24 @@ namespace RudeBuild
             if (!performReadOnly)
             {
                 var merger = new UnityFileMerger(_settings);
-				merger.Process(projectInfo);
+                merger.Process(projectInfo);
 
-				if (cppFileNameElements != null)
-				{
-					foreach (XElement cppFileNameElement in cppFileNameElements)
-					{
-						string cppFileName = cppFileNameElement.Attribute("Include").Value;
-						if (merger.MergedCppFileNames.Contains(cppFileName))
-							AddExcludedFromBuild(ns, cppFileNameElement);
-					}
-				}
+                if (cppFileNameElements != null)
+                {
+                    foreach (XElement cppFileNameElement in cppFileNameElements)
+                    {
+                        string cppFileName = cppFileNameElement.Attribute("Include").Value;
+                        if (merger.MergedCppFileNames.Contains(cppFileName))
+                            AddExcludedFromBuild(ns, cppFileNameElement);
+                    }
+                }
 
-				if (compileItemGroupElement != null)
-				{
-					compileItemGroupElement.Add(
-						from unityFileName in merger.UnityFilePaths
-						select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
-				}
+                if (compileItemGroupElement != null)
+                {
+                    compileItemGroupElement.Add(
+                        from unityFileName in merger.UnityFilePaths
+                        select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
+                }
 
                 if (_settings.SolutionSettings.DisablePrecompiledHeaders)
                 {
