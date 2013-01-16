@@ -28,6 +28,10 @@ namespace RudeBuild
             return false;
         }
 
+        private const string GuidPlaceholder = "{00000000-0000-0000-0000-000000000000}";
+        private const string GlobalSectionStart = "GlobalSection(";
+        private const string GlobalSectionEnd = "EndGlobalSection";
+
         private bool ParseCppProject(ref string line, VisualStudioVersion version, string solutionDirectory, SolutionConfigManager configManager)
         {
             if (!line.StartsWith("Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\")"))        // Guid for C++ projects
@@ -52,9 +56,8 @@ namespace RudeBuild
             }
 
             string projectFileName = line.Substring(projectFileNameIndex, extensionIndex - projectFileNameIndex) + extension;
-            const string guidPlaceholder = "{00000000-0000-0000-0000-000000000000}";
-            string projectGuid = line.Substring(extensionIndex + extension.Length + "\", \"".Length, guidPlaceholder.Length);
-            if (projectGuid.Length != guidPlaceholder.Length)
+            string projectGuid = line.Substring(extensionIndex + extension.Length + "\", \"".Length, GuidPlaceholder.Length);
+            if (projectGuid.Length != GuidPlaceholder.Length)
             {
                 throw new InvalidDataException("Solution file is corrupt. Couldn't correctly parse C++ project GUID.");
             }
@@ -67,6 +70,34 @@ namespace RudeBuild
             return true;
         }
 
+        private static bool ParseGlobalSectionStart(string line, ref string currentGlobalSection)
+        {
+            if (!line.Contains(GlobalSectionStart))
+                return false;
+
+            if (!string.IsNullOrEmpty(currentGlobalSection))
+                throw new InvalidDataException("Solution file is corrupt. Found a source code control section inside another source code control section " + currentGlobalSection);
+
+            int globalSectionNameStartIndex = line.IndexOf(GlobalSectionStart, StringComparison.Ordinal);
+            globalSectionNameStartIndex += GlobalSectionStart.Length;
+            int globalSectionNameEndIndex = line.IndexOf(')', globalSectionNameStartIndex);
+            if (globalSectionNameEndIndex <= 0)
+                throw new InvalidDataException("Solution file is corrupt. Couldn't find global section name end in line: " + line);
+            currentGlobalSection = line.Substring(globalSectionNameStartIndex, globalSectionNameEndIndex - globalSectionNameStartIndex);
+
+            return true;
+        }
+
+        private static bool ParseGlobalSectionEnd(string line, ref string currentGlobalSection)
+        {
+            if (!line.Contains(GlobalSectionEnd))
+                return false;
+            if (string.IsNullOrEmpty(currentGlobalSection))
+                throw new InvalidDataException("Solution file is corrupt. Found EndGlobalSection even though no global section has been started.");
+            currentGlobalSection = string.Empty;
+            return true;
+        }
+
         public SolutionInfo Read(string fileName)
         {
             var version = VisualStudioVersion.VSUnknown;
@@ -75,8 +106,6 @@ namespace RudeBuild
             string solutionDirectory = Path.GetDirectoryName(fileName);
             
             string currentGlobalSection = string.Empty;
-            const string globalSectionStart = "GlobalSection(";
-            const string globalSectionEnd = "EndGlobalSection";
 
             using (var reader = new StreamReader(fileName))
             {
@@ -96,24 +125,19 @@ namespace RudeBuild
                     else if (ParseCppProject(ref line, version, solutionDirectory, configManager))
                     {
                     }
-                    else if (line.Contains(globalSectionStart))
+                    else if (ParseGlobalSectionStart(line, ref currentGlobalSection))
                     {
-                        if (!string.IsNullOrEmpty(currentGlobalSection))
-                            throw new InvalidDataException("Solution file is corrupt. Found a source code control section inside another source code control section " + currentGlobalSection);
-
-                        int globalSectionNameStartIndex = line.IndexOf(globalSectionStart, StringComparison.Ordinal);
-                        globalSectionNameStartIndex += globalSectionStart.Length;
-                        int globalSectionNameEndIndex = line.IndexOf(')', globalSectionNameStartIndex);
-                        if (globalSectionNameEndIndex <= 0)
-                            throw new InvalidDataException("Solution file is corrupt. Couldn't find global section name end in line: " + line);
-                        currentGlobalSection = line.Substring(globalSectionNameStartIndex, globalSectionNameEndIndex - globalSectionNameStartIndex);
+                    }
+                    else if (ParseGlobalSectionEnd(line, ref currentGlobalSection)) 
+                    {
                     }
                     else if (!string.IsNullOrEmpty(currentGlobalSection))
                     {
-                        if (line.Contains(globalSectionEnd))
-                            currentGlobalSection = string.Empty;
-                        else if (currentGlobalSection == "SourceCodeControl")       // Remove anything inside a SourceCodeControl section in the RudeBuild-generated solution file.
+                        if (currentGlobalSection == "SourceCodeControl")
+                        {
+                            // Remove anything inside a SourceCodeControl section in the RudeBuild-generated solution file.
                             line = null;
+                        }
                         else if (currentGlobalSection == "SolutionConfigurationPlatforms")
                         {
                             string solutionConfig = line.Trim();
@@ -123,6 +147,28 @@ namespace RudeBuild
                                 solutionConfig = solutionConfig.Substring(0, index);
                                 configManager.AddSolutionConfig(solutionConfig);
                             }
+                        }
+                        else if (currentGlobalSection == "ProjectConfigurationPlatforms")
+                        {
+                            string trimmedLine = line.Trim();
+                            string projectGuid = trimmedLine.Substring(0, GuidPlaceholder.Length);
+                            if (projectGuid.Length != GuidPlaceholder.Length)
+                                throw new InvalidDataException("Solution file is corrupt. Expected project GUID at beginning of line: " + trimmedLine);
+
+                            int solutionConfigStartIndex = GuidPlaceholder.Length + 1;
+                            int solutionConfigEndIndex = trimmedLine.IndexOf('.', solutionConfigStartIndex);
+                            if (solutionConfigEndIndex <= 0)
+                                throw new InvalidDataException("Solution file is corrupt. Expected solution config after project GUID in line: " + trimmedLine);
+                            string solutionConfig = trimmedLine.Substring(solutionConfigStartIndex, solutionConfigEndIndex - solutionConfigStartIndex);
+
+                            int projectConfigStartIndex = trimmedLine.IndexOf(" = ", solutionConfigEndIndex, StringComparison.Ordinal);
+                            if (projectConfigStartIndex <= 0)
+                                throw new InvalidDataException("Solution file is corrupt. Expected project config after = in line: " + trimmedLine);
+                            string projectConfig = trimmedLine.Substring(projectConfigStartIndex + 3);
+
+                            string activeCfg = trimmedLine.Substring(solutionConfigEndIndex + 1, projectConfigStartIndex - solutionConfigEndIndex - 1);
+                            if (activeCfg == "ActiveCfg")
+                                configManager.SetProjectConfig(projectGuid, solutionConfig, projectConfig);
                         }
                     }
 
