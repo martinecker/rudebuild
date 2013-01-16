@@ -36,7 +36,7 @@ namespace RudeBuild
             foreach (string projectName in projectNames)
             {
                 // Check if the projects we have stored settings for still exists. If they don't, remove them.
-                if (!solutionInfo.ProjectNames.Contains(projectName))
+                if (solutionInfo.ConfigManager.GetProjectByName(projectName) == null)
                 {
                     ProjectNameToExcludedCppFileNameMap.Remove(projectName);
                     changed = true;
