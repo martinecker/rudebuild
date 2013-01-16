@@ -17,6 +17,11 @@ namespace RudeBuild
 
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
 
+        protected string GetConfigCondition()
+        {
+            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+        }
+
         protected static bool IsValidCppFileName(string fileName)
         {
             string extension = Path.GetExtension(fileName);
@@ -41,7 +46,7 @@ namespace RudeBuild
             if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
                 return false;
 
-            string currentConfigCondition = string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+            string currentConfigCondition = GetConfigCondition();
             XName excludedFromBuildName = ns + "ExcludedFromBuild";
             foreach (XElement conditionalBuildElement in conditionalBuildElements)
             {
@@ -59,6 +64,18 @@ namespace RudeBuild
         {
             return cppFileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, pathAttributeName));
         }
+
+        protected static bool IsValidIncludeFileName(string fileName)
+        {
+            string extension = Path.GetExtension(fileName);
+            return extension == ".h" || extension == ".hpp" || extension == ".hxx";
+        }
+
+        protected bool IsValidIncludeFileElement(XNamespace ns, XElement includeFileElement, string pathAttributeName)
+        {
+            XAttribute pathAttribute = includeFileElement.Attribute(pathAttributeName);
+            return pathAttribute != null && IsValidIncludeFileName(pathAttribute.Value);
+        }
     }
 
     internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
@@ -70,11 +87,12 @@ namespace RudeBuild
 
         private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
         {
-            string configCondition = "'$(Configuration)|$(Platform)'=='" + _settings.BuildOptions.Config + "'";
+            string configCondition = GetConfigCondition();
 
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
-                where configElement.Attribute("Condition") != null && configElement.Attribute("Condition").Value == configCondition
+                let configConditionElement = configElement.Attribute("Condition")
+                where configConditionElement != null && configConditionElement.Value == configCondition
                 select configElement;
             return configElements.SingleOrDefault();
         }
@@ -82,20 +100,15 @@ namespace RudeBuild
         private string GetPrecompiledHeader(XDocument projectDocument, XNamespace ns)
         {
             XElement configElement = GetConfigurationElement(projectDocument, ns);
-            if (null != configElement)
-            {
-                XElement precompiledHeaderElement = configElement.Descendants(ns + "PrecompiledHeader").SingleOrDefault();
-                XElement precompiledHeaderFileElement = configElement.Descendants(ns + "PrecompiledHeaderFile").SingleOrDefault();
-                if (null != precompiledHeaderElement && precompiledHeaderElement.Value == "Use")
-                {
-                    if (null != precompiledHeaderFileElement)
-                        return precompiledHeaderFileElement.Value;
-                    else
-                        return "StdAfx.h";
-                }
-            }
+            if (null == configElement)
+                return string.Empty;
 
-            return string.Empty;
+            XElement precompiledHeaderElement = configElement.Descendants(ns + "PrecompiledHeader").SingleOrDefault();
+            XElement precompiledHeaderFileElement = configElement.Descendants(ns + "PrecompiledHeaderFile").SingleOrDefault();
+            if (null == precompiledHeaderElement || precompiledHeaderElement.Value != "Use")
+                return string.Empty;
+
+            return null != precompiledHeaderFileElement ? precompiledHeaderFileElement.Value : "StdAfx.h";
         }
 
         private static void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
@@ -109,20 +122,35 @@ namespace RudeBuild
             }
         }
 
-        private XElement GetCompileItemGroupElement(string projectFileName, XNamespace ns, XDocument projectDocument)
+        private XElement GetProjectElement(string projectFileName, XNamespace ns, XDocument projectDocument)
         {
             XElement projectElement = projectDocument.Element(ns + "Project");
             if (null == projectElement)
             {
                 throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find Project XML element.");
             }
+            return projectElement;
+        }
 
+        private XElement GetCompileItemGroupElement(XNamespace ns, XElement projectElement)
+        {
             var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
                                           let compileElements = itemGroupElement.Elements(ns + "ClCompile")
                                           where HasValidCppFileElements(ns, compileElements, "Include")
                                           select itemGroupElement;
             XElement result = compileItemGroupElement.SingleOrDefault();
             return result;
+        }
+
+        private IList<string> GetIncludeFileNames(XNamespace ns, XElement projectElement)
+        {
+            var includeItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                                          let includeElements = itemGroupElement.Elements(ns + "ClInclude")
+                                          where includeElements.Any()
+                                          select itemGroupElement;
+            return (from includeElement in includeItemGroupElement.Elements(ns + "ClInclude")
+                    where IsValidIncludeFileElement(ns, includeElement, "Include")
+                    select includeElement.Attribute("Include").Value).ToList();
         }
 
         private static void AddExcludedFromBuild(XNamespace ns, XElement element)
@@ -149,7 +177,8 @@ namespace RudeBuild
             }
 
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
-            XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectFiltersDocument);
+            XElement projectElement = GetProjectElement(projectFileName, ns, projectFiltersDocument);
+            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
 
             if (compileItemGroupElement != null)
             {
@@ -169,7 +198,8 @@ namespace RudeBuild
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
             XNamespace ns = projectDocument.Root.Name.Namespace;
-            XElement compileItemGroupElement = GetCompileItemGroupElement(projectFileName, ns, projectDocument);
+            XElement projectElement = GetProjectElement(projectFileName, ns, projectDocument);
+            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
 
             IList<string> cppFileNames = null;
             IList<XElement> cppFileNameElements = null;
@@ -188,8 +218,9 @@ namespace RudeBuild
                 cppFileNames = new List<string>();
             }
 
-            string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, precompiledHeaderFileName);
+            IList<string> includeFileNames = GetIncludeFileNames(ns, projectElement);
+            string precompiledHeaderName = GetPrecompiledHeader(projectDocument, ns);
+            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, includeFileNames, precompiledHeaderName);
 
             if (!performReadOnly)
             {
@@ -255,10 +286,7 @@ namespace RudeBuild
                 return string.Empty;
 
             XAttribute precompiledHeader = precompiledHeaderElement.Attribute(ns + "PrecompiledHeaderThrough");
-            if (null != precompiledHeader)
-                return precompiledHeader.Value;
-            else
-                return "StdAfx.h";
+            return null != precompiledHeader ? precompiledHeader.Value : "StdAfx.h";
         }
 
         private static void DisablePrecompiledHeaders(XDocument projectDocument, XNamespace ns)
@@ -283,9 +311,13 @@ namespace RudeBuild
             var cppFileNames =
                 from cppFileElement in cppFileNameElements
                 select cppFileElement.Attribute("RelativePath").Value;
+            var includeFileNames =
+                from includeFileElement in projectDocument.Descendants(ns + "File")
+                where IsValidIncludeFileElement(ns, includeFileElement, "RelativePath")
+                select includeFileElement.Attribute("RelativePath").Value;
 
-            string precompiledHeaderFileName = GetPrecompiledHeader(projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), precompiledHeaderFileName);
+            string precompiledHeaderName = GetPrecompiledHeader(projectDocument, ns);
+            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), includeFileNames.ToList(), precompiledHeaderName);
 
             if (!performReadOnly)
             {

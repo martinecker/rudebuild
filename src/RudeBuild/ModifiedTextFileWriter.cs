@@ -15,12 +15,12 @@ namespace RudeBuild
 
         public bool Write(string text)
         {
-            if (File.Exists(_fileName))
+            if (!_forceWrite && File.Exists(_fileName))
             {
                 using (var reader = new StreamReader(_fileName))
                 {
                     string existingText = reader.ReadToEnd();
-                    if (!_forceWrite && existingText == text)
+                    if (existingText == text)
                         return false;
                 }
             }
