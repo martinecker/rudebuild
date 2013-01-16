@@ -17,13 +17,19 @@ namespace RudeBuild
 
         public abstract ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly);
 
+        protected string GetProjectConfigName(SolutionConfigManager.ProjectConfig projectConfig)
+        {
+            string solutionConfigName = _settings.BuildOptions.Config;
+            return projectConfig.GetProjectConfig(solutionConfigName) ?? solutionConfigName;
+        }
+
         protected static bool IsValidCppFileName(string fileName)
         {
             string extension = Path.GetExtension(fileName);
             return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
         }
 
-        protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
+        protected bool IsValidCppFileElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement, string pathAttributeName)
         {
             XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
             if (pathAttribute == null || !IsValidCppFileName(pathAttribute.Value))
@@ -33,15 +39,10 @@ namespace RudeBuild
             if (!cppFileElement.HasElements)
                 return true;
 
-            return IsValidCppFileElementInternal(ns, cppFileElement);
+            return IsValidCppFileElementInternal(projectConfig, ns, cppFileElement);
         }
 
-        protected abstract bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement);
-
-        protected bool HasValidCppFileElements(XNamespace ns, IEnumerable<XElement> cppFileElements, string pathAttributeName)
-        {
-            return cppFileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, pathAttributeName));
-        }
+        protected abstract bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement);
 
         protected static bool IsValidIncludeFileName(string fileName)
         {
@@ -63,12 +64,12 @@ namespace RudeBuild
         {
         }
 
-        private string GetConfigCondition()
+        private string GetConfigCondition(SolutionConfigManager.ProjectConfig projectConfig)
         {
-            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", _settings.BuildOptions.Config);
+            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", GetProjectConfigName(projectConfig));
         }
 
-        protected override bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement)
+        protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
             // so don't include the file for the unity merge.
@@ -78,7 +79,7 @@ namespace RudeBuild
             if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
                 return false;
 
-            string currentConfigCondition = GetConfigCondition();
+            string currentConfigCondition = GetConfigCondition(projectConfig);
             XName excludedFromBuildName = ns + "ExcludedFromBuild";
             foreach (XElement conditionalBuildElement in conditionalBuildElements)
             {
@@ -92,9 +93,9 @@ namespace RudeBuild
             return true;
         }
 
-        private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
+        private XElement GetConfigurationElement(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
-            string configCondition = GetConfigCondition();
+            string configCondition = GetConfigCondition(projectConfig);
 
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
@@ -104,9 +105,9 @@ namespace RudeBuild
             return configElements.SingleOrDefault();
         }
 
-        private string GetPrecompiledHeader(XDocument projectDocument, XNamespace ns)
+        private string GetPrecompiledHeader(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
-            XElement configElement = GetConfigurationElement(projectDocument, ns);
+            XElement configElement = GetConfigurationElement(projectConfig, projectDocument, ns);
             if (null == configElement)
                 return string.Empty;
 
@@ -139,11 +140,11 @@ namespace RudeBuild
             return projectElement;
         }
 
-        private XElement GetCompileItemGroupElement(XNamespace ns, XElement projectElement)
+        private XElement GetCompileItemGroupElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement projectElement)
         {
             var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
                                           let compileElements = itemGroupElement.Elements(ns + "ClCompile")
-                                          where HasValidCppFileElements(ns, compileElements, "Include")
+                                          where compileElements.Any(cppFileElement => IsValidCppFileElement(projectConfig, ns, cppFileElement, "Include"))
                                           select itemGroupElement;
             XElement result = compileItemGroupElement.SingleOrDefault();
             return result;
@@ -171,7 +172,7 @@ namespace RudeBuild
             element.Add(new XElement(excludedName, "true"));
         }
 
-        private void ReadWriteFilters(string projectFileName, UnityFileMerger merger)
+        private void ReadWriteFilters(string projectFileName, SolutionConfigManager.ProjectConfig projectConfig, UnityFileMerger merger)
         {
             string projectFiltersFileName = projectFileName + ".filters";
             if (!File.Exists(projectFiltersFileName))
@@ -185,7 +186,7 @@ namespace RudeBuild
 
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectFiltersDocument);
-            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
+            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
 
             if (compileItemGroupElement != null)
             {
@@ -204,9 +205,13 @@ namespace RudeBuild
 
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
+            SolutionConfigManager.ProjectConfig projectConfig = solutionInfo.ConfigManager.GetProjectByFileName(projectFileName);
+            if (null == projectConfig)
+                throw new InvalidDataException("Couldn't find project " + projectFileName + " in solution " + solutionInfo.Name);
+
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectDocument);
-            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
+            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
 
             IList<string> cppFileNames = null;
             IList<XElement> cppFileNameElements = null;
@@ -214,7 +219,7 @@ namespace RudeBuild
             {
                 cppFileNameElements = (
                     from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-                    where IsValidCppFileElement(ns, compileElement, "Include")
+                    where IsValidCppFileElement(projectConfig, ns, compileElement, "Include")
                     select compileElement).ToList();
                 cppFileNames = (
                     from compileElement in cppFileNameElements
@@ -226,7 +231,7 @@ namespace RudeBuild
             }
 
             IList<string> includeFileNames = GetIncludeFileNames(ns, projectElement);
-            string precompiledHeaderName = GetPrecompiledHeader(projectDocument, ns);
+            string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
             var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, includeFileNames, precompiledHeaderName);
 
             if (!performReadOnly)
@@ -256,7 +261,7 @@ namespace RudeBuild
                     DisablePrecompiledHeaders(projectDocument, ns);
                 }
 
-                ReadWriteFilters(projectFileName, merger);
+                ReadWriteFilters(projectFileName, projectConfig, merger);
             }
 
             return projectInfo;
@@ -295,7 +300,7 @@ namespace RudeBuild
             return true;
         }
 
-        protected override bool IsValidCppFileElementInternal(XNamespace ns, XElement cppFileElement)
+        protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all child elements called FileConfiguration with a Name and possibly ExcludedFromBuild attribute.
             // If others exist, we don't handle those currently, so don't include the file for the unity merge.
@@ -305,7 +310,7 @@ namespace RudeBuild
             if (cppFileElement.Elements().Count() != configBuildElements.Count)
                 return false;
 
-            string currentConfigCondition = _settings.BuildOptions.Config;
+            string currentConfigCondition = GetProjectConfigName(projectConfig);
             foreach (XElement configBuildElement in configBuildElements)
             {
                 XAttribute nameAttribute = configBuildElement.Attribute("Name");
@@ -319,18 +324,19 @@ namespace RudeBuild
             return true;
         }
 
-        private XElement GetConfigurationElement(XDocument projectDocument, XNamespace ns)
+        private XElement GetConfigurationElement(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
+            string projectConfigName = GetProjectConfigName(projectConfig);
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "Configuration")
-                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == _settings.BuildOptions.Config
+                where configElement.Attribute(ns + "Name") != null && configElement.Attribute(ns + "Name").Value == projectConfigName
                 select configElement;
             return configElements.SingleOrDefault();
         }
 
-        private string GetPrecompiledHeader(XDocument projectDocument, XNamespace ns)
+        private string GetPrecompiledHeader(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
-            XElement configElement = GetConfigurationElement(projectDocument, ns);
+            XElement configElement = GetConfigurationElement(projectConfig, projectDocument, ns);
             if (null == configElement)
                 return string.Empty;
 
@@ -358,11 +364,15 @@ namespace RudeBuild
 
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
+            SolutionConfigManager.ProjectConfig projectConfig = solutionInfo.ConfigManager.GetProjectByFileName(projectFileName);
+            if (null == projectConfig)
+                throw new InvalidDataException("Couldn't find project " + projectFileName + " in solution " + solutionInfo.Name);
+
             XNamespace ns = projectDocument.Root.Name.Namespace;
 
             var cppFileNameElements =
                 (from cppFileElement in projectDocument.Descendants(ns + "File")
-                 where IsValidCppFileElement(ns, cppFileElement, "RelativePath")
+                 where IsValidCppFileElement(projectConfig, ns, cppFileElement, "RelativePath")
                  select cppFileElement).ToList();
             var cppFileNames =
                 from cppFileElement in cppFileNameElements
@@ -372,7 +382,7 @@ namespace RudeBuild
                 where IsValidIncludeFileElement(ns, includeFileElement, "RelativePath")
                 select includeFileElement.Attribute("RelativePath").Value;
 
-            string precompiledHeaderName = GetPrecompiledHeader(projectDocument, ns);
+            string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
             var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), includeFileNames.ToList(), precompiledHeaderName);
 
             if (!performReadOnly)

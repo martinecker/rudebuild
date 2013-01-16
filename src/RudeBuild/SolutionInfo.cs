@@ -22,6 +22,14 @@ namespace RudeBuild
             public string ProjectFileName;
             public string ProjectName;
             public IDictionary<string, string> SolutionToProjectConfigMap;
+
+            public string GetProjectConfig(string solutionConfig)
+            {
+                string projectConfig;
+                if (SolutionToProjectConfigMap.TryGetValue(solutionConfig, out projectConfig))
+                    return projectConfig;
+                return null;
+            }
         }
 
         public IList<ProjectConfig> Projects { get; private set; } 
@@ -60,6 +68,11 @@ namespace RudeBuild
         public ProjectConfig GetProjectByName(string projectName)
         {
             return Projects.FirstOrDefault(project => project.ProjectName == projectName);
+        }
+
+        public ProjectConfig GetProjectByFileName(string projectFileName)
+        {
+            return Projects.FirstOrDefault(project => project.ProjectFileName == projectFileName);
         }
 
         public void AddSolutionConfig(string solutionConfig)
