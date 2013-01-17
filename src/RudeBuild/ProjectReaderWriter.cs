@@ -236,13 +236,17 @@ namespace RudeBuild
 
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectDocument);
+            
+            // Determine the project name and ensure the generated RudeBuild project has a ProjectName element.
+            string projectName = Path.GetFileNameWithoutExtension(projectFileName);
             XElement globalPropertyGroupElement = GetGlobalPropertyGroupElement(projectFileName, ns, projectElement);
-            if (globalPropertyGroupElement.Element(ns + "ProjectName") == null)
-            {
-                globalPropertyGroupElement.Add(new XElement(ns + "ProjectName", projectConfig.ProjectName));
-            }
-            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
+            XElement projectNameElement = globalPropertyGroupElement.Element(ns + "ProjectName");
+            if (projectNameElement == null)
+                globalPropertyGroupElement.Add(new XElement(ns + "ProjectName", projectName));
+            else
+                projectName = projectNameElement.Value;
 
+            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
             IList<string> cppFileNames = null;
             IList<XElement> cppFileNameElements = null;
             if (compileItemGroupElement != null)
@@ -262,7 +266,7 @@ namespace RudeBuild
 
             IList<string> includeFileNames = GetIncludeFileNames(ns, projectElement);
             string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames, includeFileNames, precompiledHeaderName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, cppFileNames, includeFileNames, precompiledHeaderName);
 
             if (!performReadOnly)
             {
@@ -412,8 +416,9 @@ namespace RudeBuild
                 where IsValidIncludeFileElement(ns, includeFileElement, "RelativePath")
                 select includeFileElement.Attribute("RelativePath").Value;
 
+            string projectName = Path.GetFileNameWithoutExtension(projectFileName);
             string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectFileName, cppFileNames.ToList(), includeFileNames.ToList(), precompiledHeaderName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, cppFileNames.ToList(), includeFileNames.ToList(), precompiledHeaderName);
 
             if (!performReadOnly)
             {

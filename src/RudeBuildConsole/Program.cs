@@ -117,7 +117,7 @@ namespace RudeBuildConsole
             }
             catch (Exception e)
             {
-                _output.WriteLine(e.Message);
+                _output.WriteLine("ERROR: " + e.Message);
                 return -1;
             }
         }

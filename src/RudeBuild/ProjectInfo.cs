@@ -15,13 +15,13 @@ namespace RudeBuild
         public string PrecompiledHeaderName { get; private set; }       // Name of precompiled header without path.
         public string PrecompiledHeaderFileName { get; private set; }   // Project-relative path of precompiled header as parsed out of the project file.
 
-        public ProjectInfo(SolutionInfo solution, string fileName, IList<string> cppFileNames, IList<string> includeFileNames, string precompiledHeaderName)
+        public ProjectInfo(SolutionInfo solution, string name, string fileName, IList<string> cppFileNames, IList<string> includeFileNames, string precompiledHeaderName)
         {
             Solution = solution;
             FileName = fileName;
             CppFileNames = cppFileNames;
             IncludeFileNames = includeFileNames;
-            Name = Path.GetFileNameWithoutExtension(fileName);
+            Name = name;
             PrecompiledHeaderName = ExpandMacros(precompiledHeaderName);
             PrecompiledHeaderFileName = GetPrecompiledHeaderFileName(PrecompiledHeaderName, IncludeFileNames);
         }

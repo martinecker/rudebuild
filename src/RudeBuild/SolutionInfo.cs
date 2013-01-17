@@ -20,7 +20,6 @@ namespace RudeBuild
         {
             public string ProjectGuid;
             public string ProjectFileName;
-            public string ProjectName;
             public IDictionary<string, string> SolutionToProjectConfigMap;
 
             public string GetProjectConfig(string solutionConfig)
@@ -50,14 +49,13 @@ namespace RudeBuild
                 throw new InvalidDataException(string.Format("Project {0} with GUID {1} occurs twice in the solution!", projectFileName, projectGuid));
 
             string projectName = Path.GetFileNameWithoutExtension(projectFileName);
-            if (GetProjectByName(projectName) != null)
+            if (GetProjectByFileName(projectFileName) != null)
                 throw new InvalidDataException(string.Format("Project {0} with GUID {1} occurs twice in the solution!", projectFileName, projectGuid));
 
             var config = new ProjectConfig
             {
                 ProjectGuid = projectGuid,
                 ProjectFileName = projectFileName,
-                ProjectName = projectName,
                 SolutionToProjectConfigMap = new Dictionary<string, string>()
             };
             Projects.Add(config);
@@ -66,11 +64,6 @@ namespace RudeBuild
         public ProjectConfig GetProjectByGuid(string projectGuid)
         {
             return Projects.FirstOrDefault(project => project.ProjectGuid == projectGuid);
-        }
-
-        public ProjectConfig GetProjectByName(string projectName)
-        {
-            return Projects.FirstOrDefault(project => project.ProjectName == projectName);
         }
 
         public ProjectConfig GetProjectByFileName(string projectFileName)
@@ -105,9 +98,10 @@ namespace RudeBuild
         public string Contents { get; private set; }
 
         public SolutionConfigManager ConfigManager { get; private set; }
-        public IEnumerable<string> ProjectNames { get { return from project in ConfigManager.Projects select project.ProjectName; } }
         public IEnumerable<string> ProjectFileNames { get { return from project in ConfigManager.Projects select project.ProjectFileName; } }
+
         public IDictionary<string, ProjectInfo> Projects { get; private set; }
+        public IEnumerable<string> ProjectNames { get { return from projectName in Projects.Keys select projectName; } }
 
         public SolutionInfo(string filePath, VisualStudioVersion version, SolutionConfigManager configManager, string contents)
         {
@@ -121,7 +115,7 @@ namespace RudeBuild
 
         public void AddProject(ProjectInfo projectInfo)
         {
-            if (!ProjectNames.Contains(projectInfo.Name))
+            if (!ProjectFileNames.Contains(projectInfo.FileName))
                 throw new ArgumentException("Trying to add a project of name " + projectInfo.Name + " to a solution that doesn't contain that project.");
 
             Projects.Add(projectInfo.Name, projectInfo);

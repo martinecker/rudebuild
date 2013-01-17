@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
@@ -45,7 +46,7 @@ namespace RudeBuild
                 buildCommand = "Rebuild";
 
             info.Arguments = string.Format(" \"{0}\" /{1} \"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
-            if (_settings.BuildOptions.Project != null)
+            if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
             {
                 string projectName = _settings.BuildOptions.Project;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
@@ -72,7 +73,7 @@ namespace RudeBuild
                 buildCommand = "/Rebuild";
 
             info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
-            if (_settings.BuildOptions.Project != null)
+            if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
             {
                 string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
                 info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
@@ -123,8 +124,24 @@ namespace RudeBuild
             return process;
         }
 
+        private void ValidateBuildOptions(SolutionInfo solutionInfo)
+        {
+            string solutionConfig = _settings.BuildOptions.Config;
+            if (string.IsNullOrEmpty(solutionConfig))
+                throw new ArgumentException(string.Format("A solution configuration to build is required! None specified while trying to build solution {0}.", solutionInfo.Name));
+
+            if (!solutionInfo.ConfigManager.SolutionConfigs.Contains(solutionConfig))
+                throw new ArgumentException(string.Format("The specified solution configuration {0} does not exist in solution {1}.", solutionConfig, solutionInfo.Name));
+
+            string projectName = _settings.BuildOptions.Project;
+            if (!string.IsNullOrEmpty(projectName) && null == solutionInfo.GetProjectInfo(projectName))
+                throw new ArgumentException(string.Format("Solution {0} doesn't contain a project called {1}!", solutionInfo.Name, projectName));
+        }
+
         public int Run(SolutionInfo solutionInfo)
         {
+            ValidateBuildOptions(solutionInfo);
+
             int exitCode = -1;
 
             try
