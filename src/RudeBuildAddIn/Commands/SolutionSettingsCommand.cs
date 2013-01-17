@@ -19,6 +19,7 @@ namespace RudeBuildAddIn
             GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
             BuildOptions buildOptions = new BuildOptions();
             buildOptions.Solution = GetSolutionFileInfo(commandManager);
+			buildOptions.Config = GetActiveSolutionConfig(commandManager);
             Settings settings = new Settings(globalSettings, buildOptions, _outputPane);
 
             SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
