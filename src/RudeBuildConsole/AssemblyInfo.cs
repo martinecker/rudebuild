@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RudeBuildConsole")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A unity C++ build tool for Visual Studio developed by Martin Ecker.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Ecker/PlayGroovy")]
 [assembly: AssemblyProduct("RudeBuildConsole")]
