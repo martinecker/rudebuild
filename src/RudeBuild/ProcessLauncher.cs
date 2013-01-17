@@ -48,8 +48,6 @@ namespace RudeBuild
             if (_settings.BuildOptions.Project != null)
             {
                 string projectName = _settings.BuildOptions.Project;
-                if (solutionInfo.Version >= VisualStudioVersion.VS2010)     // VS2010 and higher expects the project file name instead of the actual project name on the command line.
-                    projectName = _settings.GlobalSettings.FileNamePrefix + projectName;
                 info.Arguments += string.Format(" /project \"{0}\"", projectName);
             }
         }
