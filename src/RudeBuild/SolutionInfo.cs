@@ -25,14 +25,17 @@ namespace RudeBuild
 
             public string GetProjectConfig(string solutionConfig)
             {
-                string projectConfig;
-                if (SolutionToProjectConfigMap.TryGetValue(solutionConfig, out projectConfig))
-                    return projectConfig;
+                if (SolutionToProjectConfigMap != null)
+                {
+                    string projectConfig;
+                    if (SolutionToProjectConfigMap.TryGetValue(solutionConfig, out projectConfig))
+                        return projectConfig;
+                }
                 return null;
             }
         }
 
-        public IList<ProjectConfig> Projects { get; private set; } 
+        public IList<ProjectConfig> Projects { get; private set; }
         public IList<string> SolutionConfigs { get; private set; }
 
         public SolutionConfigManager()
@@ -104,7 +107,7 @@ namespace RudeBuild
         public SolutionConfigManager ConfigManager { get; private set; }
         public IEnumerable<string> ProjectNames { get { return from project in ConfigManager.Projects select project.ProjectName; } }
         public IEnumerable<string> ProjectFileNames { get { return from project in ConfigManager.Projects select project.ProjectFileName; } }
-        public IDictionary<string, ProjectInfo> Projects { get; private set; } 
+        public IDictionary<string, ProjectInfo> Projects { get; private set; }
 
         public SolutionInfo(string filePath, VisualStudioVersion version, SolutionConfigManager configManager, string contents)
         {

@@ -64,29 +64,43 @@ namespace RudeBuild
         {
         }
 
-        private string GetConfigCondition(SolutionConfigManager.ProjectConfig projectConfig)
+        private bool IsConfigConditionTrue(SolutionConfigManager.ProjectConfig projectConfig, string condition)
         {
-            return string.Format("'$(Configuration)|$(Platform)'=='{0}'", GetProjectConfigName(projectConfig));
+            string projectConfigName = GetProjectConfigName(projectConfig);
+    
+            if (condition == string.Format("'$(Configuration)|$(Platform)'=='{0}'", projectConfigName))
+                return true;
+
+            int platformStartIndex = projectConfigName.IndexOf('|');
+            if (platformStartIndex > 0)
+            {
+                string platformName = projectConfigName.Substring(platformStartIndex + 1);
+                if (condition == string.Format("'$(Platform)'=='{0}'", platformName))
+                    return true;
+            }
+
+            return false;
         }
 
         protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
-            // so don't include the file for the unity merge.
+            // so don't include the file in the unity merge.
             var conditionalBuildElements = (from element in cppFileElement.Elements()
                                             where element.Attribute("Condition") != null
                                             select element).ToList();
             if (cppFileElement.Elements().Count() != conditionalBuildElements.Count)
                 return false;
 
-            string currentConfigCondition = GetConfigCondition(projectConfig);
             XName excludedFromBuildName = ns + "ExcludedFromBuild";
             foreach (XElement conditionalBuildElement in conditionalBuildElements)
             {
                 XAttribute conditionAttribute = conditionalBuildElement.Attribute("Condition");
-                if (conditionAttribute.Value != currentConfigCondition)
+                if (!IsConfigConditionTrue(projectConfig, conditionAttribute.Value))
                     continue;
-                if (conditionalBuildElement.Name == excludedFromBuildName && conditionalBuildElement.Value == "true")
+                if (conditionalBuildElement.Name != excludedFromBuildName)
+                    return false;
+                if (conditionalBuildElement.Value == "true")
                     return false;
             }
 
@@ -95,12 +109,10 @@ namespace RudeBuild
 
         private XElement GetConfigurationElement(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
-            string configCondition = GetConfigCondition(projectConfig);
-
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
                 let configConditionElement = configElement.Attribute("Condition")
-                where configConditionElement != null && configConditionElement.Value == configCondition
+                where configConditionElement != null && IsConfigConditionTrue(projectConfig, configConditionElement.Value)
                 select configElement;
             return configElements.SingleOrDefault();
         }
@@ -138,6 +150,19 @@ namespace RudeBuild
                 throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find Project XML element.");
             }
             return projectElement;
+        }
+
+        private XElement GetGlobalPropertyGroupElement(string projectFileName, XNamespace ns, XElement projectElement)
+        {
+            XElement globalPropertyGroupElement = (from element in projectElement.Elements()
+                                                   let labelAttribute = element.Attribute("Label")
+                                                   where labelAttribute != null && labelAttribute.Value == "Globals"
+                                                   select element).SingleOrDefault();
+            if (null == globalPropertyGroupElement)
+            {
+                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find PropertyGroup XML element with Label=\"Globals\".");
+            }
+            return globalPropertyGroupElement;
         }
 
         private XElement GetCompileItemGroupElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement projectElement)
@@ -211,6 +236,11 @@ namespace RudeBuild
 
             XNamespace ns = projectDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectDocument);
+            XElement globalPropertyGroupElement = GetGlobalPropertyGroupElement(projectFileName, ns, projectElement);
+            if (globalPropertyGroupElement.Element(ns + "ProjectName") == null)
+            {
+                globalPropertyGroupElement.Add(new XElement(ns + "ProjectName", projectConfig.ProjectName));
+            }
             XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
 
             IList<string> cppFileNames = null;
@@ -303,7 +333,7 @@ namespace RudeBuild
         protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all child elements called FileConfiguration with a Name and possibly ExcludedFromBuild attribute.
-            // If others exist, we don't handle those currently, so don't include the file for the unity merge.
+            // If others exist, we don't handle those currently, so don't include the file in the unity merge.
             var configBuildElements = (from element in cppFileElement.Elements()
                                        where IsValidFileConfigElement(ns, element)
                                        select element).ToList();
