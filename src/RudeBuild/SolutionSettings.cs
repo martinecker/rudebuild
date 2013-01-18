@@ -14,6 +14,8 @@ namespace RudeBuild
 
         [DefaultValue(false)]
         public bool DisablePrecompiledHeaders { get; set; }
+        [DefaultValue(false)]
+        public bool SetBigObjCompilerFlag { get; set; }
 
         public SerializableDictionary<string, List<string>> ProjectNameToExcludedCppFileNameMap { get; set; }
 
@@ -112,7 +114,7 @@ namespace RudeBuild
                 {
                     Save(settings, solutionInfo);
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     settings.Output.WriteLine("Couldn't save solution settings file: " + GetConfigFilePath(solutionInfo));
                     settings.Output.WriteLine("because of exception: " + ex.Message);

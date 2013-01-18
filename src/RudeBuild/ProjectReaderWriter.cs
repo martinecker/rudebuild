@@ -142,6 +142,34 @@ namespace RudeBuild
             }
         }
 
+        private static void SetBigObjCompilerFlag(XDocument projectDocument, XNamespace ns)
+        {
+            XElement projectElement = projectDocument.Element(ns + "Project");
+            if (null == projectElement)
+                return;
+            foreach (XElement itemDefGroupElement in projectElement.Elements(ns + "ItemDefinitionGroup"))
+            {
+                if (null == itemDefGroupElement.Attribute("Condition"))
+                    continue;
+                XElement compileElement = itemDefGroupElement.Element(ns + "ClCompile");
+                if (null == compileElement)
+                    continue;
+
+                XElement additionalOptionsElement = compileElement.Element(ns + "AdditionalOptions");
+                string options = "/bigobj %(AdditionalOptions)";
+                if (null != additionalOptionsElement)
+                {
+                    options = "/bigobj " + additionalOptionsElement.Value;
+                }
+                else
+                {
+                    additionalOptionsElement = new XElement(ns + "AdditionalOptions");
+                    compileElement.Add(additionalOptionsElement);
+                }
+                additionalOptionsElement.Value = options;
+            }
+        }
+
         private XElement GetProjectElement(string projectFileName, XNamespace ns, XDocument projectDocument)
         {
             XElement projectElement = projectDocument.Element(ns + "Project");
@@ -294,6 +322,10 @@ namespace RudeBuild
                 {
                     DisablePrecompiledHeaders(projectDocument, ns);
                 }
+                if (_settings.SolutionSettings.SetBigObjCompilerFlag)
+                {
+                    SetBigObjCompilerFlag(projectDocument, ns);
+                }
 
                 ReadWriteFilters(projectFileName, projectConfig, merger);
             }
@@ -396,6 +428,31 @@ namespace RudeBuild
             }
         }
 
+        private static void SetBigObjCompilerFlag(XDocument projectDocument, XNamespace ns)
+        {
+            XElement projectElement = projectDocument.Element(ns + "VisualStudioProject");
+            if (null == projectElement)
+                return;
+            XElement configurationsElement = projectElement.Element(ns + "Configurations");
+            if (null == configurationsElement)
+                return;
+            foreach (XElement configElement in configurationsElement.Elements(ns + "Configuration"))
+            {
+                XElement compilerToolElement = (from element in configElement.Elements()
+                                                let nameAttribute = element.Attribute("Name")
+                                                where element.Name == ns + "Tool" && nameAttribute != null && nameAttribute.Value == "VCCLCompilerTool"
+                                                select element).SingleOrDefault();
+                if (null != compilerToolElement)
+                {
+                    XAttribute additionalOptionsAttribute = compilerToolElement.Attribute("AdditionalOptions");
+                    string options = "/bigobj ";
+                    if (null != additionalOptionsAttribute)
+                        options += additionalOptionsAttribute.Value;
+                    compilerToolElement.SetAttributeValue("AdditionalOptions", options);
+                }
+            }
+        }
+
         public override ProjectInfo ReadWrite(string projectFileName, SolutionInfo solutionInfo, XDocument projectDocument, bool performReadOnly)
         {
             SolutionConfigManager.ProjectConfig projectConfig = solutionInfo.ConfigManager.GetProjectByFileName(projectFileName);
@@ -440,6 +497,10 @@ namespace RudeBuild
                 if (_settings.SolutionSettings.DisablePrecompiledHeaders)
                 {
                     DisablePrecompiledHeaders(projectDocument, ns);
+                }
+                if (_settings.SolutionSettings.SetBigObjCompilerFlag)
+                {
+                    SetBigObjCompilerFlag(projectDocument, ns);
                 }
             }
 

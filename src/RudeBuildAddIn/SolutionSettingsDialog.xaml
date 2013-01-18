@@ -12,6 +12,7 @@
             <RowDefinition Height="25" />
             <RowDefinition Height="36*" />
             <RowDefinition Height="28" />
+			<RowDefinition Height="28" />
             <RowDefinition Height="36" />
         </Grid.RowDefinitions>
         <Label Height="25" Margin="6,0,6,0" Grid.Row="0" 
@@ -49,7 +50,9 @@
         </TreeView>
         <CheckBox Content="Disable Precompiled Headers" Margin="8,6,6,0" Grid.Row="2" ToolTip="If checked, precompiled headers will be turned off for all projects in the solution even if normally enabled."
                   IsChecked="{Binding Path=DisablePrecompiledHeaders}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="3">
+        <CheckBox Content="Set Big Object Compiler Flag" Margin="8,6,6,0" Grid.Row="3" ToolTip="If checked, the /bigobj compiler flag is specified for all projects. Useful if you get compiler errors about object files being too large."
+                  IsChecked="{Binding Path=SetBigObjCompilerFlag}" />
+        <StackPanel Orientation="Horizontal" Grid.Row="4">
             <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Width="75" Click="OnOK" />
             <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Width="75" Click="OnCancel" />
         </StackPanel>
