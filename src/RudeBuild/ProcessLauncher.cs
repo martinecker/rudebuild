@@ -17,22 +17,57 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        public static string GetDevEnvPath(VisualStudioVersion version)
+        public static string GetDevEvnBaseRegistryKey(VisualStudioVersion version)
         {
-            string registryPath = null;
             switch (version)
             {
-                case VisualStudioVersion.VS2005: registryPath = @"SOFTWARE\Microsoft\VisualStudio\8.0\Setup\VS"; break;
-                case VisualStudioVersion.VS2008: registryPath = @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VS"; break;
-                case VisualStudioVersion.VS2010: registryPath = @"SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VS"; break;
-                case VisualStudioVersion.VS2012: registryPath = @"SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS"; break;
-                default: throw new System.ArgumentException("Couldn't find Visual Studio registry key. Your version of Visual Studio is either not properly installed, or it is unsupported by this tool.");
+                case VisualStudioVersion.VS2005: return @"SOFTWARE\Microsoft\VisualStudio\8.0\";
+                case VisualStudioVersion.VS2008: return @"SOFTWARE\Microsoft\VisualStudio\9.0\";
+                case VisualStudioVersion.VS2010: return @"SOFTWARE\Microsoft\VisualStudio\10.0\";
+                case VisualStudioVersion.VS2012: return @"SOFTWARE\Microsoft\VisualStudio\11.0\";
+                default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
             }
+        }
 
+        public static string GetDevEnvPath(VisualStudioVersion version)
+        {
+            string registryPath = GetDevEvnBaseRegistryKey(version) + @"Setup\VS";
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
+            if (null == registryKey)
+                throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+            
             var devEnvPath = (string)registryKey.GetValue("EnvironmentDirectory");
             devEnvPath = Path.Combine(devEnvPath, "devenv.com");
             return devEnvPath;
+        }
+
+        public void RemoveSolutionFromDevEnvMRUList(SolutionInfo solutionInfo)
+        {
+            try
+            {
+                string registryPath = GetDevEvnBaseRegistryKey(solutionInfo.Version) + @"ProjectMRUList";
+                RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath, true);
+                if (null == registryKey)
+                    throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+
+                string modifiedSolutionFilePath = _settings.ModifyFileName(solutionInfo.FilePath);
+                foreach (var keyName in registryKey.GetValueNames())
+                {
+                    if (keyName.StartsWith("File"))
+                    {
+                        var keyValue = (string) registryKey.GetValue(keyName);
+                        if (keyValue.StartsWith(modifiedSolutionFilePath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            registryKey.DeleteValue(keyName);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // ignore exception
+            }
         }
 
         private void SetupDevEnvProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
@@ -182,6 +217,8 @@ namespace RudeBuild
                     _process.Close();
                     _process = null;
                 }
+
+                RemoveSolutionFromDevEnvMRUList(solutionInfo);
             }
             return exitCode;
         }
