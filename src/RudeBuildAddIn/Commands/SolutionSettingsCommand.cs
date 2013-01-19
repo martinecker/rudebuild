@@ -5,8 +5,10 @@ namespace RudeBuildAddIn
 {
     public class SolutionSettingsCommand : CommandBase
     {
-        private Builder _builder;
-        private OutputPane _outputPane;
+        private readonly Builder _builder;
+        private readonly OutputPane _outputPane;
+        private SolutionInfo _cachedSolutionInfo;
+        private Settings _cachedSettings;
 
         public SolutionSettingsCommand(Builder builder, OutputPane outputPane)
         {
@@ -14,22 +16,44 @@ namespace RudeBuildAddIn
             _outputPane = outputPane;
         }
 
+        private void CacheSolutionInfo(CommandManager commandManager)
+        {
+            string solutionPath = commandManager.Application.Solution.FullName;
+            if (_cachedSolutionInfo != null && _cachedSolutionInfo.FilePath == solutionPath)
+                return;
+            if (!File.Exists(solutionPath))
+            {
+                _cachedSolutionInfo = null;
+                _cachedSettings = null;
+                return;
+            }
+
+            FileInfo solutionFileInfo = GetSolutionFileInfo(commandManager);
+            if (null == solutionFileInfo || !solutionFileInfo.Exists)
+                return;
+
+            GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
+            var buildOptions = new BuildOptions();
+            buildOptions.Solution = solutionFileInfo;
+            buildOptions.Config = GetActiveSolutionConfig(commandManager);
+            _cachedSettings = new Settings(globalSettings, buildOptions, _outputPane);
+
+            var solutionReaderWriter = new SolutionReaderWriter(_cachedSettings);
+            _cachedSolutionInfo = solutionReaderWriter.Read(_cachedSettings.BuildOptions.Solution.FullName);
+            _cachedSettings.SolutionSettings = SolutionSettings.Load(_cachedSettings, _cachedSolutionInfo);
+            var projectReaderWriter = new ProjectReaderWriter(_cachedSettings);
+            projectReaderWriter.Read(_cachedSolutionInfo);
+
+            _cachedSettings.SolutionSettings.UpdateAndSave(_cachedSettings, _cachedSolutionInfo);
+        }
+
         public override void Execute(CommandManager commandManager)
         {
-            GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
-            BuildOptions buildOptions = new BuildOptions();
-            buildOptions.Solution = GetSolutionFileInfo(commandManager);
-			buildOptions.Config = GetActiveSolutionConfig(commandManager);
-            Settings settings = new Settings(globalSettings, buildOptions, _outputPane);
+            CacheSolutionInfo(commandManager);
+            if (null == _cachedSolutionInfo || null == _cachedSettings)
+                return;
 
-            SolutionReaderWriter solutionReaderWriter = new SolutionReaderWriter(settings);
-            SolutionInfo solutionInfo = solutionReaderWriter.Read(settings.BuildOptions.Solution.FullName);
-            settings.SolutionSettings = SolutionSettings.Load(settings, solutionInfo);
-            ProjectReaderWriter projectReaderWriter = new ProjectReaderWriter(settings);
-            projectReaderWriter.Read(solutionInfo);
-            settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
-
-            SolutionSettingsDialog dialog = new SolutionSettingsDialog(settings, solutionInfo);
+            var dialog = new SolutionSettingsDialog(_cachedSettings, _cachedSolutionInfo);
             try
             {
                 dialog.ShowDialog();
@@ -44,12 +68,8 @@ namespace RudeBuildAddIn
         {
             if (IsSolutionOpen(commandManager) && !_builder.IsBuilding)
             {
-                string solutionPath = commandManager.Application.Solution.FullName;
-                if (!File.Exists(solutionPath))
-                {
-                    return false;
-                }
-                return true;
+                CacheSolutionInfo(commandManager);
+                return null != _cachedSolutionInfo && null != _cachedSettings && _cachedSolutionInfo.Projects.Count > 0;
             }
             return false;
         }

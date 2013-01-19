@@ -10,17 +10,19 @@ namespace RudeBuild
         public SolutionInfo Solution { get; private set; }
         public string FileName { get; private set; }
         public string Name { get; private set; }
-        public IList<string> CppFileNames { get; private set; }
+        public IList<string> MergableCppFileNames { get; private set; }
+        public IList<string> AllCppFileNames { get; private set; }
         public IList<string> IncludeFileNames { get; private set; }
         public string PrecompiledHeaderName { get; private set; }       // Name of precompiled header without path.
         public string PrecompiledHeaderFileName { get; private set; }   // Project-relative path of precompiled header as parsed out of the project file.
 
-        public ProjectInfo(SolutionInfo solution, string name, string fileName, IList<string> cppFileNames, IList<string> includeFileNames, string precompiledHeaderName)
+        public ProjectInfo(SolutionInfo solution, string name, string fileName, IList<string> mergableCppFileNames, IList<string> allCppFileNames, IList<string> allIncludeFileNames, string precompiledHeaderName)
         {
             Solution = solution;
             FileName = fileName;
-            CppFileNames = cppFileNames;
-            IncludeFileNames = includeFileNames;
+            MergableCppFileNames = mergableCppFileNames;
+            AllCppFileNames = allCppFileNames;
+            IncludeFileNames = allIncludeFileNames;
             Name = name;
             PrecompiledHeaderName = ExpandMacros(precompiledHeaderName);
             PrecompiledHeaderFileName = GetPrecompiledHeaderFileName(PrecompiledHeaderName, IncludeFileNames);

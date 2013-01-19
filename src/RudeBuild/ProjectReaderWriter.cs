@@ -29,20 +29,25 @@ namespace RudeBuild
             return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
         }
 
-        protected bool IsValidCppFileElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement, string pathAttributeName)
+        protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
         {
             XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
-            if (pathAttribute == null || !IsValidCppFileName(pathAttribute.Value))
+            return pathAttribute != null && IsValidCppFileName(pathAttribute.Value);
+        }
+
+        protected bool IsMergableCppFileElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement, string pathAttributeName)
+        {
+            if (!IsValidCppFileElement(ns, cppFileElement, pathAttributeName))
                 return false;
 
             // If the file element has no child elements, then we accept this file for the unity merge.
             if (!cppFileElement.HasElements)
                 return true;
 
-            return IsValidCppFileElementInternal(projectConfig, ns, cppFileElement);
+            return IsMergableCppFileElementInternal(projectConfig, ns, cppFileElement);
         }
 
-        protected abstract bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement);
+        protected abstract bool IsMergableCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement);
 
         protected static bool IsValidIncludeFileName(string fileName)
         {
@@ -82,7 +87,7 @@ namespace RudeBuild
             return false;
         }
 
-        protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
+        protected override bool IsMergableCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all elements with a Condition attribute. If others exist, we don't handle those currently,
             // so don't include the file in the unity merge.
@@ -193,25 +198,38 @@ namespace RudeBuild
             return globalPropertyGroupElement;
         }
 
-        private XElement GetCompileItemGroupElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement projectElement)
+        private XElement GetCompileItemGroupElement(XNamespace ns, XElement projectElement)
         {
             var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
                                           let compileElements = itemGroupElement.Elements(ns + "ClCompile")
-                                          where compileElements.Any(cppFileElement => IsValidCppFileElement(projectConfig, ns, cppFileElement, "Include"))
+                                          where compileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, "Include"))
                                           select itemGroupElement;
-            XElement result = compileItemGroupElement.SingleOrDefault();
-            return result;
+            return compileItemGroupElement.SingleOrDefault();
         }
 
-        private IList<string> GetIncludeFileNames(XNamespace ns, XElement projectElement)
+        private IList<string> GetAllIncludeFileNames(XNamespace ns, XElement projectElement)
         {
-            var includeItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-                                          let includeElements = itemGroupElement.Elements(ns + "ClInclude")
-                                          where includeElements.Any()
-                                          select itemGroupElement;
+            XElement includeItemGroupElement = (from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                                                let includeElements = itemGroupElement.Elements(ns + "ClInclude")
+                                                where includeElements.Any(includeElement => IsValidIncludeFileElement(ns, includeElement, "Include"))
+                                                select itemGroupElement).SingleOrDefault();
+            if (null == includeItemGroupElement)
+                return new List<string>();
+
             return (from includeElement in includeItemGroupElement.Elements(ns + "ClInclude")
                     where IsValidIncludeFileElement(ns, includeElement, "Include")
                     select includeElement.Attribute("Include").Value).ToList();
+        }
+
+        private IList<string> GetAllCppFileNames(XNamespace ns, XElement projectElement)
+        {
+            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
+            if (null == compileItemGroupElement)
+                return new List<string>();
+
+            return (from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+                    where IsValidCppFileElement(ns, compileElement, "Include")
+                    select compileElement.Attribute("Include").Value).ToList();
         }
 
         private static void AddExcludedFromBuild(XNamespace ns, XElement element)
@@ -239,7 +257,7 @@ namespace RudeBuild
 
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectFiltersDocument);
-            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
+            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
 
             if (compileItemGroupElement != null)
             {
@@ -274,36 +292,37 @@ namespace RudeBuild
             else
                 projectName = projectNameElement.Value;
 
-            XElement compileItemGroupElement = GetCompileItemGroupElement(projectConfig, ns, projectElement);
-            IList<string> cppFileNames = null;
-            IList<XElement> cppFileNameElements = null;
+            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
+            IList<string> mergableCppFileNames = null;
+            IList<XElement> mergableCppFileNameElements = null;
             if (compileItemGroupElement != null)
             {
-                cppFileNameElements = (
+                mergableCppFileNameElements = (
                     from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-                    where IsValidCppFileElement(projectConfig, ns, compileElement, "Include")
+                    where IsMergableCppFileElement(projectConfig, ns, compileElement, "Include")
                     select compileElement).ToList();
-                cppFileNames = (
-                    from compileElement in cppFileNameElements
+                mergableCppFileNames = (
+                    from compileElement in mergableCppFileNameElements
                     select compileElement.Attribute("Include").Value).ToList();
             }
             else
             {
-                cppFileNames = new List<string>();
+                mergableCppFileNames = new List<string>();
             }
 
-            IList<string> includeFileNames = GetIncludeFileNames(ns, projectElement);
+            IList<string> allCppFileNames = GetAllCppFileNames(ns, projectElement);
+            IList<string> allIncludeFileNames = GetAllIncludeFileNames(ns, projectElement);
             string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, cppFileNames, includeFileNames, precompiledHeaderName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, mergableCppFileNames, allCppFileNames, allIncludeFileNames, precompiledHeaderName);
 
             if (!performReadOnly)
             {
                 var merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                if (cppFileNameElements != null)
+                if (mergableCppFileNameElements != null)
                 {
-                    foreach (XElement cppFileNameElement in cppFileNameElements)
+                    foreach (XElement cppFileNameElement in mergableCppFileNameElements)
                     {
                         string cppFileName = cppFileNameElement.Attribute("Include").Value;
                         if (merger.MergedCppFileNames.Contains(cppFileName))
@@ -366,7 +385,7 @@ namespace RudeBuild
             return true;
         }
 
-        protected override bool IsValidCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
+        protected override bool IsMergableCppFileElementInternal(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement)
         {
             // Get all child elements called FileConfiguration with a Name and possibly ExcludedFromBuild attribute.
             // If others exist, we don't handle those currently, so don't include the file in the unity merge.
@@ -461,28 +480,34 @@ namespace RudeBuild
 
             XNamespace ns = projectDocument.Root.Name.Namespace;
 
-            var cppFileNameElements =
-                (from cppFileElement in projectDocument.Descendants(ns + "File")
-                 where IsValidCppFileElement(projectConfig, ns, cppFileElement, "RelativePath")
-                 select cppFileElement).ToList();
-            var cppFileNames =
-                from cppFileElement in cppFileNameElements
+            var fileElements = projectDocument.Descendants(ns + "File").ToList();
+            var mergableCppFileElements =
+                (from element in fileElements
+                 where IsMergableCppFileElement(projectConfig, ns, element, "RelativePath")
+                 select element).ToList();
+            var mergableCppFileNames =
+                from cppFileElement in mergableCppFileElements
                 select cppFileElement.Attribute("RelativePath").Value;
-            var includeFileNames =
-                from includeFileElement in projectDocument.Descendants(ns + "File")
-                where IsValidIncludeFileElement(ns, includeFileElement, "RelativePath")
-                select includeFileElement.Attribute("RelativePath").Value;
+            
+            var allCppFileNames =
+                from element in fileElements
+                where IsValidCppFileElement(ns, element, "RelativePath")
+                select element.Attribute("RelativePath").Value;
+            var allIncludeFileNames =
+                from element in fileElements
+                where IsValidIncludeFileElement(ns, element, "RelativePath")
+                select element.Attribute("RelativePath").Value;
 
             string projectName = Path.GetFileNameWithoutExtension(projectFileName);
             string precompiledHeaderName = GetPrecompiledHeader(projectConfig, projectDocument, ns);
-            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, cppFileNames.ToList(), includeFileNames.ToList(), precompiledHeaderName);
+            var projectInfo = new ProjectInfo(solutionInfo, projectName, projectFileName, mergableCppFileNames.ToList(), allCppFileNames.ToList(), allIncludeFileNames.ToList(), precompiledHeaderName);
 
             if (!performReadOnly)
             {
                 var merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                foreach (XElement cppFileNameElement in cppFileNameElements)
+                foreach (XElement cppFileNameElement in mergableCppFileElements)
                 {
                     string cppFileName = cppFileNameElement.Attribute("RelativePath").Value;
                     if (merger.MergedCppFileNames.Contains(cppFileName))

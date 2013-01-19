@@ -32,7 +32,7 @@ namespace RudeBuildAddIn
 
             var existingExcludedFileNames = _solutionSettings.GetExcludedCppFileNamesForProject(_projectInfo.Name);
             var fileNames = new ReadOnlyCollection<string>(
-                (from fileName in _projectInfo.CppFileNames
+                (from fileName in _projectInfo.AllCppFileNames
                  where !existingExcludedFileNames.Contains(fileName)
                  select fileName).ToList());
             _window.DataContext = fileNames;

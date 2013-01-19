@@ -48,7 +48,6 @@ namespace RudeBuild
             if (GetProjectByGuid(projectGuid) != null)
                 throw new InvalidDataException(string.Format("Project {0} with GUID {1} occurs twice in the solution!", projectFileName, projectGuid));
 
-            string projectName = Path.GetFileNameWithoutExtension(projectFileName);
             if (GetProjectByFileName(projectFileName) != null)
                 throw new InvalidDataException(string.Format("Project {0} with GUID {1} occurs twice in the solution!", projectFileName, projectGuid));
 
@@ -81,8 +80,8 @@ namespace RudeBuild
         public void SetProjectConfig(string projectGuid, string solutionConfig, string projectConfig)
         {
             var project = GetProjectByGuid(projectGuid);
-            if (null == project)
-                throw new InvalidDataException(string.Format("Cannot associate project config {0} of project GUID {1} with solution config {2}! The project doesn't exist!", projectConfig, projectGuid, solutionConfig));
+            if (null == project)        // If the project doesn't exist, it means that we're dealing with a non-C++ project, and so it didn't get parsed out of the solution file.
+                return;
             if (!SolutionConfigs.Contains(solutionConfig))
                 throw new InvalidDataException(string.Format("Cannot associate project config {0} of project GUID {1} with solution config {2}! The solution config doesn't exist!", projectConfig, projectGuid, solutionConfig));
 

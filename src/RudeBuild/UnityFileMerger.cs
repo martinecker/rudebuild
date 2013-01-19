@@ -123,7 +123,7 @@ namespace RudeBuild
             UnityFilePaths = new List<string>();
             MergedCppFileNames = new List<string>();
 
-            IList<string> cppFileNames = projectInfo.CppFileNames;
+            IList<string> cppFileNames = projectInfo.MergableCppFileNames;
             if (_settings.GlobalSettings.RandomizeOrderOfUnityMergedFiles)
             {
                 cppFileNames.Shuffle();

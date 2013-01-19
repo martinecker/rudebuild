@@ -55,7 +55,7 @@ namespace RudeBuildAddIn
         {
             if (IsSolutionOpen(commandManager))
             {
-                EnvDTE80.SolutionConfiguration2 config = (EnvDTE80.SolutionConfiguration2)commandManager.Application.Solution.SolutionBuild.ActiveConfiguration;
+                var config = (EnvDTE80.SolutionConfiguration2)commandManager.Application.Solution.SolutionBuild.ActiveConfiguration;
                 return config.Name + "|" + config.PlatformName;
             }
             return null;

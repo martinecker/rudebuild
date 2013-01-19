@@ -72,7 +72,7 @@ namespace RudeBuild
             {
                 for (int i = 0; i < cppFileNames.Count; ++i)
                 {
-                    if (!projectInfo.CppFileNames.Contains(cppFileNames[i]))
+                    if (!projectInfo.AllCppFileNames.Contains(cppFileNames[i]))
                     {
                         cppFileNames.RemoveAt(i);
                         --i;
@@ -129,7 +129,7 @@ namespace RudeBuild
             {
                 ProjectNameToExcludedCppFileNameMap = new SerializableDictionary<string, List<string>>();
             }
-            if (!projectInfo.CppFileNames.Contains(cppFileName))
+            if (!projectInfo.AllCppFileNames.Contains(cppFileName))
             {
                 throw new ArgumentException("The project " + projectInfo.Name + " does not contain the file '" + cppFileName + "' and so cannot be excluded.");
             }
