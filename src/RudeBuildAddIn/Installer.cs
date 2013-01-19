@@ -4,17 +4,34 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration.Install;
+using System.Security.Permissions;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml;
 using System.Windows;
+using Microsoft.Win32;
 using EnvDTE80;
 using RudeBuild;
 
 namespace RudeBuildAddIn
 {
-    [RunInstaller(true)]
+	/* This is a custom action used by the RudeBuildSetup setup project to patch and copy the RudeBuild.AddIn
+	 * file to the correct folder for every version of Visual Studio installed.
+	 * An example destination folder is <UserDocuments>\Visual Studio 2010\Addins.
+	 * 
+	 * To find where this custom action is hooked up in the RudeBuildSetup project, right-click on the project,
+	 * then select View/Custom Actions. Note that RudeBuildSetup has a custom post build step that patches
+	 * the generated .msi file to set the NoImpersonate flag to false (from its default value of true) for
+	 * custom actions. Normally the code of this class would run on a computer account not bound to the
+	 * user that started the installation. However, since we need to get the user's personal documents folder
+	 * we want to run this code with the permissions of the user. Setting NoImpersonate to false achieves this.
+	 * This also means this installer cannot access any machine-wide data, such as the HKLM registry key!
+	 * 
+	 * See http://msdn.microsoft.com/en-us/library/vstudio/2kt85ked(v=vs.100).aspx and
+	 * http://blogs.msdn.com/b/astebner/archive/2006/10/23/mailbag-how-to-set-the-noimpersonate-flag-for-a-custom-action-in-visual-studio-2005.aspx
+	 */
+	[RunInstaller(true)]
     public partial class Installer : System.Configuration.Install.Installer
     {
         private const string AddInFileName = "RudeBuild.AddIn";
@@ -39,28 +56,70 @@ namespace RudeBuildAddIn
             document.Save(filePath);
         }
 
-        private void InstallAddInFile(IDictionary savedState, string filePath, string vsVersion)
+        private static bool IsVisualStudioInstalled(VisualStudioVersion version)
         {
-            string userPersonalFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-            string installDirectory = Path.Combine(userPersonalFolder, "Visual Studio " + vsVersion);
-            installDirectory = Path.Combine(installDirectory, "Addins");
-
-            var directoryInfo = new DirectoryInfo(installDirectory);
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
-
-            string installPath = Path.Combine(installDirectory, AddInFileName);
-            File.Copy(filePath, installPath, true);
-            savedState.Add("AddInInstallPath" + vsVersion, installPath);            
+            string registryPath = ProcessLauncher.GetDevEvnBaseRegistryKey(version);
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath);
+            return registryKey != null;
         }
 
-        private void UninstallAddInFile(IDictionary savedState, string vsVersion)
+        private static string GetUserPersonalFolder(string versionString, VisualStudioVersion version)
         {
-            if (savedState.Contains("AddInInstallPath" + vsVersion))
+            string userPersonalFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+            if (!string.IsNullOrEmpty(userPersonalFolder))
+                return userPersonalFolder;
+
+            string registryPath = ProcessLauncher.GetDevEvnBaseRegistryKey(version);
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath);
+            if (null == registryKey)
+                throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+
+            userPersonalFolder = registryKey.GetValue("MyDocumentsLocation") as string;
+            if (!string.IsNullOrEmpty(userPersonalFolder))
+                return userPersonalFolder;
+
+            throw new ApplicationException("Couldn't determine the user's Documents folder for Visual Studio " + versionString);
+        }
+
+        private void InstallAddInFile(IDictionary savedState, string filePath, string versionString, VisualStudioVersion version)
+        {
+            if (!IsVisualStudioInstalled(version))
+                return;
+
+            try
             {
-                var installPath = (string)savedState["AddInInstallPath" + vsVersion];
+                string userPersonalFolder = GetUserPersonalFolder(versionString, version);
+                string installDirectory = Path.Combine(userPersonalFolder, "Visual Studio " + versionString);
+                installDirectory = Path.Combine(installDirectory, "Addins");
+
+                if (!Directory.Exists(installDirectory))
+                    Directory.CreateDirectory(installDirectory);
+
+                string installPath = Path.Combine(installDirectory, AddInFileName);
+                File.Copy(filePath, installPath, true);
+                savedState.Add("AddInInstallPath" + versionString, installPath);
+            }
+            catch (Exception ex)
+            {
+                string installDirectory = Path.Combine("Visual Studio " + versionString, "Addins");
+                MessageBox.Show(
+                    "Couldn't install RudeBuild.AddIn file to Visual Studio add-ins folder '" + installDirectory + "'.\n" +
+                    "You might be able to simply copy the file manually to the add-ins folder and Visual Studio should pick it up.\n" +
+                    "Alternatively, you can manually install the add-in in Visual Studio by going to Tools/Options/Add-in and adding the RudeBuild installation folder as add-in folder.\n\n" +
+                    "Exception message: " + ex.Message,
+                    "RudeBuild",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UninstallAddInFile(IDictionary savedState, string versionString, VisualStudioVersion version)
+        {
+            if (!IsVisualStudioInstalled(version))
+                return;
+
+            if (savedState.Contains("AddInInstallPath" + versionString))
+            {
+                var installPath = (string)savedState["AddInInstallPath" + versionString];
                 if (!string.IsNullOrEmpty(installPath))
                 {
                     if (File.Exists(installPath))
@@ -94,10 +153,26 @@ namespace RudeBuildAddIn
             return null;
         }
 
+        private void DebugBreak()
+        {
+            // If you want to debug this installer, follow these steps:
+            // - Uncomment the following line.
+            // - Rebuild the installer.
+            // - Run the installer.
+            // - When the first installer dialog comes up, attach the debugger to the installer process.
+            // - You need to attach to msiexec.exe. Often times there will be multiple processes with this name.
+            //   Find one that is managed (instead of fully native).
+            //   Alternatively, use Spy++ to find the process for the message box and then attach to that.
+            //   When you attach in Visual Studio, make sure to check "Show processes from all users" and enabled attaching to managed processes.
+            // - Continue normally through the installation process. You will hit this breakpoint eventually.
+            //MessageBox.Show("Attach debugger now!");
+            //Debugger.Break();
+        }
+
+        [SecurityPermission(SecurityAction.Demand)]
         public override void Install(IDictionary savedState)
         {
-            // Uncomment the following line, recompile, and run the built setup if you want to debug this installer.
-            //Debugger.Break();
+            DebugBreak();
 
             base.Install(savedState);
 
@@ -106,14 +181,22 @@ namespace RudeBuildAddIn
                 string installationPath = GetInstallationPath();
                 string addInFilePath = Path.Combine(installationPath, AddInFileName);
                 PatchAddInFile(addInFilePath, installationPath);
-                InstallAddInFile(savedState, addInFilePath, "2008");
-                InstallAddInFile(savedState, addInFilePath, "2010");
-                InstallAddInFile(savedState, addInFilePath, "11");
+                InstallAddInFile(savedState, addInFilePath, "2008", VisualStudioVersion.VS2008);
+                InstallAddInFile(savedState, addInFilePath, "2010", VisualStudioVersion.VS2010);
+                InstallAddInFile(savedState, addInFilePath, "2012", VisualStudioVersion.VS2012);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("RudeBuild install error!\n" + ex.Message, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        [SecurityPermission(SecurityAction.Demand)]
+        public override void Commit(IDictionary savedState)
+        {
+            DebugBreak();
+            base.Commit(savedState);
+            // Nothing to do here for now.
         }
 
         private static string GetDevEnvProgId(VisualStudioVersion version)
@@ -164,9 +247,9 @@ namespace RudeBuildAddIn
                 RemoveCommands(VisualStudioVersion.VS2010);
                 RemoveCommands(VisualStudioVersion.VS2012);
 
-                UninstallAddInFile(savedState, "2008");
-                UninstallAddInFile(savedState, "2010");
-                UninstallAddInFile(savedState, "2012");
+                UninstallAddInFile(savedState, "2008", VisualStudioVersion.VS2008);
+                UninstallAddInFile(savedState, "2010", VisualStudioVersion.VS2010);
+                UninstallAddInFile(savedState, "2012", VisualStudioVersion.VS2012);
 
                 string installationPath = GetInstallationPath();
                 string globalSettingsPath = Path.Combine(installationPath, GlobalSettingsFileName);
@@ -181,8 +264,10 @@ namespace RudeBuildAddIn
             }
         }
 
+        [SecurityPermission(SecurityAction.Demand)]
         public override void Rollback(IDictionary savedState)
         {
+            DebugBreak();
             base.Rollback(savedState);
             UninstallOrRollback(savedState);
         }
@@ -210,8 +295,10 @@ namespace RudeBuildAddIn
             }
         }
 
+        [SecurityPermission(SecurityAction.Demand)]
         public override void Uninstall(IDictionary savedState)
         {
+            DebugBreak();
             base.Rollback(savedState);
             UninstallOrRollback(savedState);
 

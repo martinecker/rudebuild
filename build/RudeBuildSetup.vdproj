@@ -15,24 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0140A19120767998C562B0E006E4D61C"
-        "OwnerKey" = "8:_64A05845583C4AC09E077767C8E8894C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0140A19120767998C562B0E006E4D61C"
-        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1CF250535FCC3E9B5FE34C57BAF984D7"
-        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_29EB346E9309D46471847E14C6167BE6"
         "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
         "MsmSig" = "8:_UNDEFINED"
@@ -59,6 +41,18 @@
         {
         "MsmKey" = "8:_33B7C4476150D4C0199F61D3BFF2B161"
         "OwnerKey" = "8:_A6F5802D0367931C2F022BEC09222B7E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4F2068983254FF1D913F295D9C67A708"
+        "OwnerKey" = "8:_64A05845583C4AC09E077767C8E8894C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4F2068983254FF1D913F295D9C67A708"
+        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -93,20 +87,32 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5B04D84028A25DF849BED92E398458D1"
-        "OwnerKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5B04D84028A25DF849BED92E398458D1"
-        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6064440507E9725209FFD2E95222E95E"
+        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6064440507E9725209FFD2E95222E95E"
+        "OwnerKey" = "8:_82B7C34245781770B4B470448C03F102"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6064440507E9725209FFD2E95222E95E"
+        "OwnerKey" = "8:_5661FD7893A642BFD70048EE822507FA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6064440507E9725209FFD2E95222E95E"
+        "OwnerKey" = "8:_29EB346E9309D46471847E14C6167BE6"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -141,6 +147,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8FB20BB923FB6B3D137DB76BEC709234"
+        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_983FECAF21E92F22ABB6F52F2A02D349"
+        "OwnerKey" = "8:_5F5605A52CB14FE884CC8A2C05C655B9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_983FECAF21E92F22ABB6F52F2A02D349"
+        "OwnerKey" = "8:_4F2068983254FF1D913F295D9C67A708"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A6EA059DF3804853B772812EB20462A0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -165,12 +189,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BFBA543C331DE8111478022E3E3592B5"
-        "OwnerKey" = "8:_64A05845583C4AC09E077767C8E8894C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_D9EAC0A3CAB910F261535942E3AAA23C"
         "OwnerKey" = "8:_5661FD7893A642BFD70048EE822507FA"
         "MsmSig" = "8:_UNDEFINED"
@@ -179,6 +197,18 @@
         {
         "MsmKey" = "8:_DD557910E6AFBD22571EF8E4476F1EB6"
         "OwnerKey" = "8:_29EB346E9309D46471847E14C6167BE6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E4F34225475C7C34A4CBB7C2EFD66330"
+        "OwnerKey" = "8:_64A05845583C4AC09E077767C8E8894C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E4F34225475C7C34A4CBB7C2EFD66330"
+        "OwnerKey" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -238,6 +268,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6064440507E9725209FFD2E95222E95E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_5661FD7893A642BFD70048EE822507FA"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -256,7 +292,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_1CF250535FCC3E9B5FE34C57BAF984D7"
+        "OwnerKey" = "8:_8FB20BB923FB6B3D137DB76BEC709234"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -268,19 +304,19 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0140A19120767998C562B0E006E4D61C"
+        "OwnerKey" = "8:_4F2068983254FF1D913F295D9C67A708"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_BFBA543C331DE8111478022E3E3592B5"
+        "OwnerKey" = "8:_E4F34225475C7C34A4CBB7C2EFD66330"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5B04D84028A25DF849BED92E398458D1"
+        "OwnerKey" = "8:_983FECAF21E92F22ABB6F52F2A02D349"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -379,6 +415,20 @@
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_46ED12FA3D5640C0B2D9AA4CA59CBA2D"
+            {
+            "Name" = "8:Primary output from RudeBuildAddIn (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_AB7428C8E28B43F6A435D843D2FA2C85"
+            "FileType" = "3:1"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_7635B22F_0467_4870_9EB9_50FDF61C2102"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6E6DAB2D22094277B1697CC026786B3E"
             {
             "Name" = "8:Primary output from RudeBuildAddIn (Active)"
@@ -430,68 +480,6 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0140A19120767998C562B0E006E4D61C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_0140A19120767998C562B0E006E4D61C"
-                    {
-                    "Name" = "8:RudeBuild.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:RudeBuild.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1CF250535FCC3E9B5FE34C57BAF984D7"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_1CF250535FCC3E9B5FE34C57BAF984D7"
-                    {
-                    "Name" = "8:CommandLineParser.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:CommandLineParser.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_29EB346E9309D46471847E14C6167BE6"
             {
             "AssemblyRegister" = "3:1"
@@ -543,6 +531,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4F2068983254FF1D913F295D9C67A708"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:RudeBuild, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_4F2068983254FF1D913F295D9C67A708"
+                    {
+                    "Name" = "8:RudeBuild.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:RudeBuild.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5661FD7893A642BFD70048EE822507FA"
             {
             "AssemblyRegister" = "3:1"
@@ -574,20 +593,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5B04D84028A25DF849BED92E398458D1"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6064440507E9725209FFD2E95222E95E"
             {
             "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_5B04D84028A25DF849BED92E398458D1"
+                    "_6064440507E9725209FFD2E95222E95E"
                     {
-                    "Name" = "8:CommandLineParser.dll"
+                    "Name" = "8:stdole.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:CommandLineParser.dll"
+            "SourcePath" = "8:stdole.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
@@ -696,6 +715,68 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8FB20BB923FB6B3D137DB76BEC709234"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+                "ScatterAssemblies"
+                {
+                    "_8FB20BB923FB6B3D137DB76BEC709234"
+                    {
+                    "Name" = "8:Extensibility.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Extensibility.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_983FECAF21E92F22ABB6F52F2A02D349"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_983FECAF21E92F22ABB6F52F2A02D349"
+                    {
+                    "Name" = "8:CommandLineParser.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CommandLineParser.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A6EA059DF3804853B772812EB20462A0"
             {
             "AssemblyRegister" = "3:1"
@@ -778,37 +859,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BFBA543C331DE8111478022E3E3592B5"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_BFBA543C331DE8111478022E3E3592B5"
-                    {
-                    "Name" = "8:CommandLineParser.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:CommandLineParser.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D9EAC0A3CAB910F261535942E3AAA23C"
             {
             "SourcePath" = "8:dte80a.olb"
@@ -833,6 +883,37 @@
             {
             "SourcePath" = "8:dte80.olb"
             "TargetName" = "8:dte80.olb"
+            "Tag" = "8:"
+            "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E4F34225475C7C34A4CBB7C2EFD66330"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_E4F34225475C7C34A4CBB7C2EFD66330"
+                    {
+                    "Name" = "8:CommandLineParser.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CommandLineParser.dll"
+            "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CFA10EB343FF4BEEB237C01BACAC75D5"
             "Condition" = "8:"
@@ -926,6 +1007,28 @@
             "Property" = "8:PersonalFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_31A2CBE733F545A6B098649CCCC603E7"
+                    {
+                    "Name" = "8:Visual Studio 2012"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_F60B01686C3D4F9DAA61B819675A2836"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_BBF5ED4498894D019CDF2DC4D5D686E3"
+                            {
+                            "Name" = "8:Addins"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_DD316C1A5F644F96B0D54316E7E95FC9"
+                                "Folders"
+                                {
+                                }
+                            }
+                        }
+                    }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_7201D93E9980411AADCAE6A2DE6110E4"
                     {
                     "Name" = "8:Visual Studio 2008"
@@ -1011,31 +1114,31 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RudeBuild"
-        "ProductCode" = "8:{AA93D3EB-CA3F-48F1-8324-C4B042E25E37}"
-        "PackageCode" = "8:{0AA66690-C7E0-4FCF-AD0A-C13336878E9D}"
+        "ProductCode" = "8:{7B33871F-FC79-4DF0-A0F1-A789EAD5AB4D}"
+        "PackageCode" = "8:{368FA7B8-81CB-423C-ABBC-28E342118FE7}"
         "UpgradeCode" = "8:{DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:TRUE"
-        "DetectNewerInstalledVersion" = "11:TRUE"
+        "RemovePreviousVersions" = "11:FALSE"
+        "DetectNewerInstalledVersion" = "11:FALSE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.3"
         "Manufacturer" = "8:PlayGroovy"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:"
+        "ARPHELPLINK" = "8:http://rudebuild.sourceforge.net"
         "Title" = "8:RudeBuild"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Martin Ecker / PlayGroovy"
-        "Keywords" = "8:"
+        "Keywords" = "8:C++ Visual Studio unity bulk build tool"
         "ARPCOMMENTS" = "8:RudeBuild - A bulk/unity C++ build tool for Visual Studio"
-        "ARPURLINFOABOUT" = "8:"
+        "ARPURLINFOABOUT" = "8:http://rudebuild.sourceforge.net"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
         "TargetPlatform" = "3:0"
         "PreBuildEvent" = "8:"
-        "PostBuildEvent" = "8:"
+        "PostBuildEvent" = "8:echo Setting NoImpersonate flag for custom actions to false, so that they run under current user permissions...\r\ncscript.exe \"$(ProjectDir)CustomAction_NoImpersonate.js\" \"$(BuiltOuputPath)\""
         "RunPostBuildEvent" = "3:0"
         }
         "Registry"
