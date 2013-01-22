@@ -198,13 +198,12 @@ namespace RudeBuild
             return globalPropertyGroupElement;
         }
 
-        private XElement GetCompileItemGroupElement(XNamespace ns, XElement projectElement)
+        private IEnumerable<XElement> GetCompileItemGroupElements(XNamespace ns, XElement projectElement)
         {
-            var compileItemGroupElement = from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-                                          let compileElements = itemGroupElement.Elements(ns + "ClCompile")
-                                          where compileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, "Include"))
-                                          select itemGroupElement;
-            return compileItemGroupElement.SingleOrDefault();
+            return from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                   let compileElements = itemGroupElement.Elements(ns + "ClCompile")
+                   where compileElements.Any(cppFileElement => IsValidCppFileElement(ns, cppFileElement, "Include"))
+                   select itemGroupElement;
         }
 
         private IList<string> GetAllIncludeFileNames(XNamespace ns, XElement projectElement)
@@ -223,13 +222,15 @@ namespace RudeBuild
 
         private IList<string> GetAllCppFileNames(XNamespace ns, XElement projectElement)
         {
-            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
-            if (null == compileItemGroupElement)
-                return new List<string>();
-
-            return (from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
-                    where IsValidCppFileElement(ns, compileElement, "Include")
-                    select compileElement.Attribute("Include").Value).ToList();
+            var compileItemGroupElements = GetCompileItemGroupElements(ns, projectElement);
+            var result = new List<string>();
+            foreach (var compileItemGroupElement in compileItemGroupElements)
+            {
+                result.AddRange(from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
+                                where IsValidCppFileElement(ns, compileElement, "Include")
+                                select compileElement.Attribute("Include").Value);
+            }
+            return result;
         }
 
         private static void AddExcludedFromBuild(XNamespace ns, XElement element)
@@ -257,11 +258,10 @@ namespace RudeBuild
 
             XNamespace ns = projectFiltersDocument.Root.Name.Namespace;
             XElement projectElement = GetProjectElement(projectFileName, ns, projectFiltersDocument);
-            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
-
-            if (compileItemGroupElement != null)
+            var compileItemGroupElements = GetCompileItemGroupElements(ns, projectElement);
+            if (compileItemGroupElements.Count() > 0)
             {
-                compileItemGroupElement.Add(
+                compileItemGroupElements.First().Add(
                     from unityFileName in merger.UnityFilePaths
                     select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
             }
@@ -292,23 +292,19 @@ namespace RudeBuild
             else
                 projectName = projectNameElement.Value;
 
-            XElement compileItemGroupElement = GetCompileItemGroupElement(ns, projectElement);
-            IList<string> mergableCppFileNames = null;
-            IList<XElement> mergableCppFileNameElements = null;
-            if (compileItemGroupElement != null)
+            var compileItemGroupElements = GetCompileItemGroupElements(ns, projectElement);
+            var mergableCppFileNames = new List<string>();
+            var mergableCppFileNameElements = new List<XElement>();
+            foreach (var compileItemGroupElement in compileItemGroupElements)
             {
-                mergableCppFileNameElements = (
+                mergableCppFileNameElements.AddRange(
                     from compileElement in compileItemGroupElement.Elements(ns + "ClCompile")
                     where IsMergableCppFileElement(projectConfig, ns, compileElement, "Include")
-                    select compileElement).ToList();
-                mergableCppFileNames = (
-                    from compileElement in mergableCppFileNameElements
-                    select compileElement.Attribute("Include").Value).ToList();
+                    select compileElement);
             }
-            else
-            {
-                mergableCppFileNames = new List<string>();
-            }
+            mergableCppFileNames.AddRange(
+                from compileElement in mergableCppFileNameElements
+                select compileElement.Attribute("Include").Value);
 
             IList<string> allCppFileNames = GetAllCppFileNames(ns, projectElement);
             IList<string> allIncludeFileNames = GetAllIncludeFileNames(ns, projectElement);
@@ -320,19 +316,16 @@ namespace RudeBuild
                 var merger = new UnityFileMerger(_settings);
                 merger.Process(projectInfo);
 
-                if (mergableCppFileNameElements != null)
+                foreach (XElement cppFileNameElement in mergableCppFileNameElements)
                 {
-                    foreach (XElement cppFileNameElement in mergableCppFileNameElements)
-                    {
-                        string cppFileName = cppFileNameElement.Attribute("Include").Value;
-                        if (merger.MergedCppFileNames.Contains(cppFileName))
-                            AddExcludedFromBuild(ns, cppFileNameElement);
-                    }
+                    string cppFileName = cppFileNameElement.Attribute("Include").Value;
+                    if (merger.MergedCppFileNames.Contains(cppFileName))
+                        AddExcludedFromBuild(ns, cppFileNameElement);
                 }
 
-                if (compileItemGroupElement != null)
+                if (mergableCppFileNameElements.Count() > 0)
                 {
-                    compileItemGroupElement.Add(
+                    mergableCppFileNameElements.First().Add(
                         from unityFileName in merger.UnityFilePaths
                         select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
                 }
