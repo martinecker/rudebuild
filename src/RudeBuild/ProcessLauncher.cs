@@ -92,27 +92,94 @@ namespace RudeBuild
         {
             const string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
-            string incrediBuildPath = (string)registryKey.GetValue("Folder");
-            incrediBuildPath = Path.Combine(incrediBuildPath, "BuildConsole.exe");
-            return incrediBuildPath;
+            string resultPath = (string)registryKey.GetValue("Folder");
+            resultPath = Path.Combine(resultPath, "BuildConsole.exe");
+            return resultPath;
         }
 
-        private void SetupIncrediBuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
+        private bool TryToSetupIncrediBuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
         {
-            info.FileName = GetIncrediBuildPath();
-
-            string buildCommand = string.Empty;
-            if (_settings.BuildOptions.Clean)
-                buildCommand = "/Clean";
-            else if (_settings.BuildOptions.Rebuild)
-                buildCommand = "/Rebuild";
-
-            info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
-            if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
+            try
             {
-                string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
-                info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
+                info.FileName = GetIncrediBuildPath();
+                if (!File.Exists(info.FileName))
+                {
+                    _settings.Output.WriteLine(
+                        "Warning: RudeBuild is setup to use IncrediBuild, but IncrediBuild doesn't seem to be installed properly.\n" +
+                        "Falling back to using a regular Visual Studio build.\n" +
+                        "Error: Couldn't find IncrediBuild command-line tool: " + info.FileName);
+                    return false;
+                }
+
+                string buildCommand = string.Empty;
+                if (_settings.BuildOptions.Clean)
+                    buildCommand = "/Clean";
+                else if (_settings.BuildOptions.Rebuild)
+                    buildCommand = "/Rebuild";
+
+                info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+                if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
+                {
+                    string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
+                    info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
+                }
             }
+            catch (Exception ex)
+            {
+                _settings.Output.WriteLine(
+                    "Warning: RudeBuild is setup to use IncrediBuild, but IncrediBuild doesn't seem to be installed properly.\n" +
+                    "Falling back to using a regular Visual Studio build.\n" +
+                    "Error: " + ex.Message);
+                return false;
+            }
+            return true;
+        }
+
+        private static string GetSnVs10BuildPath()
+        {
+            string commonPath = Environment.GetEnvironmentVariable("SN_COMMON_PATH");
+            string vsiPath = Path.Combine(commonPath, "SceVSI");
+            string resultPath = Path.Combine(vsiPath, "vs10build.exe");
+            return resultPath;
+        }
+
+        private bool TryToSetupSnVs10BuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
+        {
+            try
+            {
+                info.FileName = GetSnVs10BuildPath();
+                if (!File.Exists(info.FileName))
+                {
+                    _settings.Output.WriteLine(
+                        "Warning: RudeBuild is setup to use SN-DBS, but SN-DBS or VSI doesn't seem to be installed properly.\n" +
+                        "Falling back to using a regular Visual Studio build.\n" +
+                        "Error: Couldn't find VSI command-line tool: " + info.FileName);
+                    return false;
+                }
+
+                string buildCommand = string.Empty;
+                if (_settings.BuildOptions.Clean)
+                    buildCommand = "/clean";
+                else if (_settings.BuildOptions.Rebuild)
+                    buildCommand = "/rebuild";
+
+                info.Arguments = string.Format(" \"{0}\" {1} \"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
+                if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
+                {
+                    string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
+                    info.Arguments += string.Format(" /project \"{0}\"", projectName);
+                }
+                info.Arguments += " /sn-dbs";
+            }
+            catch (Exception ex)
+            {
+                _settings.Output.WriteLine(
+                    "Warning: RudeBuild is setup to use SN-DBS, but SN-DBS doesn't seem to be installed properly.\n" +
+                    "Falling back to using a regular Visual Studio build.\n" +
+                    "Error: " + ex.Message);
+                return false;
+            }
+            return true;
         }
 
         private Process CreateProcessObject(SolutionInfo solutionInfo)
@@ -129,30 +196,13 @@ namespace RudeBuild
             };
 
             bool useDevEnvBuildTool = true;
-            if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild)
-            {
+            if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild && TryToSetupIncrediBuildProcessObject(solutionInfo, ref info))
                 useDevEnvBuildTool = false;
-                try
-                {
-                    SetupIncrediBuildProcessObject(solutionInfo, ref info);
-                    if (!File.Exists(info.FileName))
-                        useDevEnvBuildTool = true;
-                }
-                catch
-                {
-                    useDevEnvBuildTool = true;
-                }
-
-                if (useDevEnvBuildTool)
-                {
-                    _settings.Output.WriteLine("Warning: RudeBuild is setup to use IncrediBuild, but IncrediBuild doesn't seem to be installed properly. Falling back to using a regular Visual Studio build.");
-                }
-            }
+            else if (_settings.GlobalSettings.BuildTool == BuildTool.SN_DBS && TryToSetupSnVs10BuildProcessObject(solutionInfo, ref info))
+                useDevEnvBuildTool = false;
 
             if (useDevEnvBuildTool)
-            {
                 SetupDevEnvProcessObject(solutionInfo, ref info);
-            }
 
             _settings.Output.WriteLine("Launching: " + info.FileName + info.Arguments);
 

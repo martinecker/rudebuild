@@ -11,7 +11,9 @@ namespace RudeBuild
         [DisplayValue("Visual Studio")]
         VisualStudio,
         [DisplayValue("IncrediBuild")]
-        IncrediBuild
+        IncrediBuild,
+        [DisplayValue("SN-DBS")]
+        SN_DBS
     }
 
     public class GlobalSettings
