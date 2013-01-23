@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.IO;
-using System.Xml;
 
 namespace RudeBuild
 {
@@ -323,9 +322,9 @@ namespace RudeBuild
                         AddExcludedFromBuild(ns, cppFileNameElement);
                 }
 
-                if (mergableCppFileNameElements.Count() > 0)
+                if (compileItemGroupElements.Count() > 0)
                 {
-                    mergableCppFileNameElements.First().Add(
+                    compileItemGroupElements.First().Add(
                         from unityFileName in merger.UnityFilePaths
                         select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
                 }
