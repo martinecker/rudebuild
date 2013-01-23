@@ -92,7 +92,12 @@ namespace RudeBuild
         {
             const string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
             RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
+            if (registryKey == null)
+                return null;
+
             string resultPath = (string)registryKey.GetValue("Folder");
+            if (string.IsNullOrEmpty(resultPath))
+                return null;
             resultPath = Path.Combine(resultPath, "BuildConsole.exe");
             return resultPath;
         }
@@ -102,7 +107,7 @@ namespace RudeBuild
             try
             {
                 info.FileName = GetIncrediBuildPath();
-                if (!File.Exists(info.FileName))
+                if (string.IsNullOrEmpty(info.FileName) || !File.Exists(info.FileName))
                 {
                     _settings.Output.WriteLine(
                         "Warning: RudeBuild is setup to use IncrediBuild, but IncrediBuild doesn't seem to be installed properly.\n" +
@@ -138,6 +143,8 @@ namespace RudeBuild
         private static string GetSnVs10BuildPath()
         {
             string commonPath = Environment.GetEnvironmentVariable("SN_COMMON_PATH");
+            if (string.IsNullOrEmpty(commonPath))
+                return null;
             string vsiPath = Path.Combine(commonPath, "SceVSI");
             string resultPath = Path.Combine(vsiPath, "vs10build.exe");
             return resultPath;
@@ -148,7 +155,7 @@ namespace RudeBuild
             try
             {
                 info.FileName = GetSnVs10BuildPath();
-                if (!File.Exists(info.FileName))
+                if (string.IsNullOrEmpty(info.FileName) || !File.Exists(info.FileName))
                 {
                     _settings.Output.WriteLine(
                         "Warning: RudeBuild is setup to use SN-DBS, but SN-DBS or VSI doesn't seem to be installed properly.\n" +
