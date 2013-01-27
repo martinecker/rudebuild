@@ -59,6 +59,11 @@ namespace RudeBuild
             XAttribute pathAttribute = includeFileElement.Attribute(pathAttributeName);
             return pathAttribute != null && IsValidIncludeFileName(pathAttribute.Value);
         }
+
+        protected bool ShouldDisablePrecompiledHeaders(ProjectInfo projectInfo)
+        {
+            return _settings.SolutionSettings.DisablePrecompiledHeaders || string.IsNullOrEmpty(projectInfo.PrecompiledHeaderName);
+        }
     }
 
     internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
@@ -329,7 +334,7 @@ namespace RudeBuild
                         select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
                 }
 
-                if (_settings.SolutionSettings.DisablePrecompiledHeaders)
+                if (ShouldDisablePrecompiledHeaders(projectInfo))
                 {
                     DisablePrecompiledHeaders(projectDocument, ns);
                 }
@@ -511,7 +516,7 @@ namespace RudeBuild
                     from unityFileName in merger.UnityFilePaths
                     select new XElement(ns + "File", new XAttribute("RelativePath", unityFileName)));
 
-                if (_settings.SolutionSettings.DisablePrecompiledHeaders)
+                if (ShouldDisablePrecompiledHeaders(projectInfo))
                 {
                     DisablePrecompiledHeaders(projectDocument, ns);
                 }

@@ -13,8 +13,9 @@ namespace RudeBuild
         public IList<string> MergableCppFileNames { get; private set; }
         public IList<string> AllCppFileNames { get; private set; }
         public IList<string> IncludeFileNames { get; private set; }
-        public string PrecompiledHeaderName { get; private set; }       // Name of precompiled header without path.
-        public string PrecompiledHeaderFileName { get; private set; }   // Project-relative path of precompiled header as parsed out of the project file.
+        public string PrecompiledHeaderName { get; private set; }
+        public string PrecompiledHeaderProjectRelativePath { get; private set; }
+        public string PrecompiledHeaderAbsolutePath { get; private set; }
 
         public ProjectInfo(SolutionInfo solution, string name, string fileName, IList<string> mergableCppFileNames, IList<string> allCppFileNames, IList<string> allIncludeFileNames, string precompiledHeaderName)
         {
@@ -24,18 +25,37 @@ namespace RudeBuild
             AllCppFileNames = allCppFileNames;
             IncludeFileNames = allIncludeFileNames;
             Name = name;
-            PrecompiledHeaderName = ExpandMacros(precompiledHeaderName);
-            PrecompiledHeaderFileName = GetPrecompiledHeaderFileName(PrecompiledHeaderName, IncludeFileNames);
+            SetupPrecompiledHeader(precompiledHeaderName);
         }
 
-        private static string GetPrecompiledHeaderFileName(string precompiledHeaderName, IEnumerable<string> includeFileNames)
+        private static string GetPrecompiledHeaderProjectRelativePath(string precompiledHeaderName, IEnumerable<string> includeFileNames)
         {
             var result = from includeFileName in includeFileNames
                          let nameWithoutPath = Path.GetFileName(includeFileName)
-                         where string.Compare(includeFileName, precompiledHeaderName, StringComparison.OrdinalIgnoreCase) == 0 || 
+                         where string.Compare(includeFileName, precompiledHeaderName, StringComparison.OrdinalIgnoreCase) == 0 ||
                             (!string.IsNullOrEmpty(nameWithoutPath) && string.Compare(nameWithoutPath, precompiledHeaderName, StringComparison.OrdinalIgnoreCase) == 0)
                          select includeFileName;
-            return result.SingleOrDefault();
+            string resultRelativePath = result.SingleOrDefault();
+            if (string.IsNullOrEmpty(resultRelativePath))
+                resultRelativePath = precompiledHeaderName;
+            return resultRelativePath;
+        }
+
+        private void SetupPrecompiledHeader(string precompiledHeaderName)
+        {
+            precompiledHeaderName = ExpandMacros(precompiledHeaderName);
+            string precompiledHeaderProjectRelativePath = ExpandMacros(GetPrecompiledHeaderProjectRelativePath(precompiledHeaderName, IncludeFileNames));
+
+            if (string.IsNullOrEmpty(precompiledHeaderName) || string.IsNullOrEmpty(precompiledHeaderProjectRelativePath))
+                return;
+
+            string precompiledHeaderAbsolutePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(FileName), precompiledHeaderProjectRelativePath));
+            if (File.Exists(precompiledHeaderAbsolutePath))
+            {
+                PrecompiledHeaderName = precompiledHeaderName;
+                PrecompiledHeaderProjectRelativePath = precompiledHeaderProjectRelativePath;
+                PrecompiledHeaderAbsolutePath = precompiledHeaderAbsolutePath;
+            }
         }
 
         public string ExpandMacros(string value)
@@ -51,7 +71,7 @@ namespace RudeBuild
             value = value.Replace("$(SolutionFileName)", Path.GetFileName(solutionPath));
             value = value.Replace("$(SolutionDir)", Path.GetDirectoryName(solutionPath) + Path.DirectorySeparatorChar);
             value = value.Replace("$(SolutionExt)", Path.GetExtension(solutionPath));
-            
+
             value = value.Replace("$(ProjectName)", Name);
             value = value.Replace("$(ProjectPath)", projectPath);
             value = value.Replace("$(ProjectFileName)", Path.GetFileName(projectPath));
