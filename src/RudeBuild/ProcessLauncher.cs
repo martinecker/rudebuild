@@ -142,9 +142,10 @@ namespace RudeBuild
 
         private static string GetSnVs10BuildPath()
         {
-            string commonPath = Environment.GetEnvironmentVariable("SN_COMMON_PATH");
+            string commonPath = Environment.GetEnvironmentVariable("SCE_ROOT_DIR");
             if (string.IsNullOrEmpty(commonPath))
                 return null;
+            commonPath = Path.Combine(commonPath, "Common");
             string vsiPath = Path.Combine(commonPath, "SceVSI");
             string resultPath = Path.Combine(vsiPath, "vs10build.exe");
             return resultPath;
