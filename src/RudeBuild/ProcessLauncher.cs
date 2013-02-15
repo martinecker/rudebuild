@@ -146,7 +146,7 @@ namespace RudeBuild
             if (string.IsNullOrEmpty(sceRootPath))
                 return null;
             string result = Path.Combine(sceRootPath, "Common\\SceVSI\\bin\\vs10build.exe");
-            return resultPath;
+            return result;
         }
 
         private bool TryToSetupSnVs10BuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)

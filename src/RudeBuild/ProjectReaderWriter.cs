@@ -189,17 +189,17 @@ namespace RudeBuild
             return projectElement;
         }
 
-        private XElement GetGlobalPropertyGroupElement(string projectFileName, XNamespace ns, XElement projectElement)
+        private XElement GetGlobalProjectPropertyGroupElement(string projectFileName, XNamespace ns, XElement projectElement)
         {
-            XElement globalPropertyGroupElement = (from element in projectElement.Elements()
-                                                   let labelAttribute = element.Attribute("Label")
-                                                   where labelAttribute != null && labelAttribute.Value == "Globals"
-                                                   select element).SingleOrDefault();
-            if (null == globalPropertyGroupElement)
+            var globalPropertyGroupElements = from element in projectElement.Elements()
+                                              let labelAttribute = element.Attribute("Label")
+                                              where labelAttribute != null && labelAttribute.Value == "Globals" && element.Element(ns + "ProjectGuid") != null
+                                              select element;
+            if (globalPropertyGroupElements.Count() != 1)
             {
-                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find PropertyGroup XML element with Label=\"Globals\".");
+                throw new InvalidDataException("Project file '" + projectFileName + "' is corrupt. Couldn't find PropertyGroup XML element with Label=\"Globals\" and a ProjectGuid child element.");
             }
-            return globalPropertyGroupElement;
+            return globalPropertyGroupElements.Single();
         }
 
         private IEnumerable<XElement> GetCompileItemGroupElements(XNamespace ns, XElement projectElement)
@@ -289,7 +289,7 @@ namespace RudeBuild
             
             // Determine the project name and ensure the generated RudeBuild project has a ProjectName element.
             string projectName = Path.GetFileNameWithoutExtension(projectFileName);
-            XElement globalPropertyGroupElement = GetGlobalPropertyGroupElement(projectFileName, ns, projectElement);
+            XElement globalPropertyGroupElement = GetGlobalProjectPropertyGroupElement(projectFileName, ns, projectElement);
             XElement projectNameElement = globalPropertyGroupElement.Element(ns + "ProjectName");
             if (projectNameElement == null)
                 globalPropertyGroupElement.Add(new XElement(ns + "ProjectName", projectName));
