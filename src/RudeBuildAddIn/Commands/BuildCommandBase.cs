@@ -19,6 +19,11 @@ namespace RudeBuildAddIn
             BuildMode = buildMode;
         }
 
+        public override void Execute(CommandManager commandManager)
+        {
+            commandManager.Application.ExecuteCommand("File.SaveAll");
+        }
+
         public override bool IsEnabled(CommandManager commandManager)
         {
             return IsSolutionOpen(commandManager) && !Builder.IsBuilding;

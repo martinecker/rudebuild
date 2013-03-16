@@ -13,8 +13,11 @@ namespace RudeBuildAddIn
         {
             BuildOptions options = new BuildOptions();
             options.Project = GetActiveProjectName(commandManager);
-            if (null == options.Project)
+            if (string.IsNullOrEmpty(options.Project))
                 return;
+
+            base.Execute(commandManager);
+
             options.Solution = GetSolutionFileInfo(commandManager);
             options.Config = GetActiveSolutionConfig(commandManager);
             options.Clean = BuildMode == Mode.Clean;
@@ -24,7 +27,7 @@ namespace RudeBuildAddIn
 
         public override bool IsEnabled(CommandManager commandManager)
         {
-            return base.IsEnabled(commandManager) && GetActiveProjectName(commandManager) != null;
+            return base.IsEnabled(commandManager) && !string.IsNullOrEmpty(GetActiveProjectName(commandManager));
         }
     }
 }
