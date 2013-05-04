@@ -116,27 +116,27 @@ namespace RudeBuild
             return true;
         }
 
-        private XElement GetConfigurationElement(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
+        private IEnumerable<XElement> GetConfigurationElements(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
             var configElements =
                 from configElement in projectDocument.Descendants(ns + "ItemDefinitionGroup")
                 let configConditionElement = configElement.Attribute("Condition")
-                where configConditionElement != null && IsConfigConditionTrue(projectConfig, configConditionElement.Value)
+                where configConditionElement == null || IsConfigConditionTrue(projectConfig, configConditionElement.Value)
                 select configElement;
-            return configElements.SingleOrDefault();
+            return configElements;
         }
 
         private string GetPrecompiledHeader(SolutionConfigManager.ProjectConfig projectConfig, XDocument projectDocument, XNamespace ns)
         {
-            XElement configElement = GetConfigurationElement(projectConfig, projectDocument, ns);
-            if (null == configElement)
+            IEnumerable<XElement> configElements = GetConfigurationElements(projectConfig, projectDocument, ns);
+            int precompiledHeaderUseCount = (from precompiledHeaderElement in configElements.Descendants(ns + "PrecompiledHeader")
+                                             where precompiledHeaderElement.Value == "Use"
+                                             select precompiledHeaderElement).Count();
+            if (0 == precompiledHeaderUseCount)
                 return string.Empty;
 
-            XElement precompiledHeaderElement = configElement.Descendants(ns + "PrecompiledHeader").SingleOrDefault();
-            XElement precompiledHeaderFileElement = configElement.Descendants(ns + "PrecompiledHeaderFile").SingleOrDefault();
-            if (null == precompiledHeaderElement || precompiledHeaderElement.Value != "Use")
-                return string.Empty;
-
+            XElement precompiledHeaderFileElement = (from element in configElements.Descendants(ns + "PrecompiledHeaderFile")
+                                                     select element).SingleOrDefault();
             return null != precompiledHeaderFileElement ? precompiledHeaderFileElement.Value : "StdAfx.h";
         }
 
