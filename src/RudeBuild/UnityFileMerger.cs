@@ -125,6 +125,7 @@ namespace RudeBuild
             _unityFiles = new Dictionary<string, UnityFile>();
 
             int currentUnityFileIndex = 1;
+            int currentSourceFileIndex = 1;
             foreach (string cppFileName in cppFileNames)
             {
                 string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
@@ -165,7 +166,10 @@ namespace RudeBuild
                 unityFile.Contents.AppendLine("#ifdef RUDE_BUILD_SUPPORTS_PRAGMA_MESSAGE");
                 unityFile.Contents.AppendLine("#pragma message(\"" + Path.GetFileName(cppFileName) + "\")");
                 unityFile.Contents.AppendLine("#endif");
+                unityFile.Contents.AppendLine("#define RUDE_BUILD_FILEID (" + currentSourceFileIndex + ")");
                 unityFile.Contents.AppendLine("#include \"" + cppFilePath + "\"");
+                unityFile.Contents.AppendLine("#undef RUDE_BUILD_FILEID");
+                ++currentSourceFileIndex;
 
                 MergedCppFileNames.Add(cppFileName);
             }
