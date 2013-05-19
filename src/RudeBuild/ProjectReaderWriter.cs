@@ -210,18 +210,25 @@ namespace RudeBuild
                    select itemGroupElement;
         }
 
+        private IEnumerable<XElement> GetIncludeItemGroupElements(XNamespace ns, XElement projectElement)
+        {
+            return from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
+                   let includeElements = itemGroupElement.Elements(ns + "ClInclude")
+                   where includeElements.Any(includeElement => IsValidIncludeFileElement(ns, includeElement, "Include"))
+                   select itemGroupElement;
+        }
+
         private IList<string> GetAllIncludeFileNames(XNamespace ns, XElement projectElement)
         {
-            XElement includeItemGroupElement = (from itemGroupElement in projectElement.Elements(ns + "ItemGroup")
-                                                let includeElements = itemGroupElement.Elements(ns + "ClInclude")
-                                                where includeElements.Any(includeElement => IsValidIncludeFileElement(ns, includeElement, "Include"))
-                                                select itemGroupElement).SingleOrDefault();
-            if (null == includeItemGroupElement)
-                return new List<string>();
-
-            return (from includeElement in includeItemGroupElement.Elements(ns + "ClInclude")
-                    where IsValidIncludeFileElement(ns, includeElement, "Include")
-                    select includeElement.Attribute("Include").Value).ToList();
+            var includeItemGroupElements = GetIncludeItemGroupElements(ns, projectElement);
+            var result = new List<string>();
+            foreach (var includeItemGroupElement in includeItemGroupElements)
+            {
+                result.AddRange(from includeElement in includeItemGroupElement.Elements(ns + "ClInclude")
+                                where IsValidIncludeFileElement(ns, includeElement, "Include")
+                                select includeElement.Attribute("Include").Value);
+            }
+            return result;
         }
 
         private IList<string> GetAllCppFileNames(XNamespace ns, XElement projectElement)
