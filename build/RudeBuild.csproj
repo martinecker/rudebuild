@@ -90,7 +90,17 @@
       <Link>UnityFileMerger.cs</Link>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LICENSE.rtf" />
+    <Content Include="..\LICENSE.txt" />
+    <Content Include="..\README.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(ProjectDir)..\LICENSE.rtf" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)..\LICENSE.txt" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)..\README.txt" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

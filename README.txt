@@ -1,4 +1,4 @@
-RudeBuild, Version 1.3
+RudeBuild, Version 1.4
 ----------------------
 
 A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.
@@ -19,5 +19,6 @@ The command line version of RudeBuild is useful for automated builds, for exampl
 
 ----------------------
 
-RudeBuild is written in C# and requires the .NET framework 3.5 or higher.  It also uses the CommandLineParser library that is available here: http://commandline.codeplex.com/
+RudeBuild is written in C# and requires the .NET framework 3.5 or higher.
+RudeBuild uses the CommandLineParser library that is available at https://commandline.codeplex.com as well as Wix# to generate the MSI setup available at https://wixsharp.codeplex.com.
 

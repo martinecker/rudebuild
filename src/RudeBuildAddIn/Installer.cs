@@ -184,6 +184,8 @@ namespace RudeBuildAddIn
                 InstallAddInFile(savedState, addInFilePath, "2008", VisualStudioVersion.VS2008);
                 InstallAddInFile(savedState, addInFilePath, "2010", VisualStudioVersion.VS2010);
                 InstallAddInFile(savedState, addInFilePath, "2012", VisualStudioVersion.VS2012);
+                InstallAddInFile(savedState, addInFilePath, "2013", VisualStudioVersion.VS2013);
+                InstallAddInFile(savedState, addInFilePath, "2015", VisualStudioVersion.VS2015);
             }
             catch (Exception ex)
             {
@@ -207,6 +209,8 @@ namespace RudeBuildAddIn
             case VisualStudioVersion.VS2008: return "VisualStudio.DTE.9.0";
             case VisualStudioVersion.VS2010: return "VisualStudio.DTE.10.0";
             case VisualStudioVersion.VS2012: return "VisualStudio.DTE.11.0";
+            case VisualStudioVersion.VS2013: return "VisualStudio.DTE.12.0";
+            case VisualStudioVersion.VS2015: return "VisualStudio.DTE.14.0";
             default: return null;
             }
         }
@@ -246,10 +250,14 @@ namespace RudeBuildAddIn
                 RemoveCommands(VisualStudioVersion.VS2008);
                 RemoveCommands(VisualStudioVersion.VS2010);
                 RemoveCommands(VisualStudioVersion.VS2012);
+                RemoveCommands(VisualStudioVersion.VS2013);
+                RemoveCommands(VisualStudioVersion.VS2015);
 
                 UninstallAddInFile(savedState, "2008", VisualStudioVersion.VS2008);
                 UninstallAddInFile(savedState, "2010", VisualStudioVersion.VS2010);
                 UninstallAddInFile(savedState, "2012", VisualStudioVersion.VS2012);
+                UninstallAddInFile(savedState, "2013", VisualStudioVersion.VS2013);
+                UninstallAddInFile(savedState, "2015", VisualStudioVersion.VS2015);
 
                 string installationPath = GetInstallationPath();
                 string globalSettingsPath = Path.Combine(installationPath, GlobalSettingsFileName);
@@ -305,6 +313,8 @@ namespace RudeBuildAddIn
 //             ResetAddIn(VisualStudioVersion.VS2008);
 //             ResetAddIn(VisualStudioVersion.VS2010);
 //             ResetAddIn(VisualStudioVersion.VS2012);
+//             ResetAddIn(VisualStudioVersion.VS2013);
+//             ResetAddIn(VisualStudioVersion.VS2015);
         }
     }
 }

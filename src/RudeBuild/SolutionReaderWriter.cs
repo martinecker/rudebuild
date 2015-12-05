@@ -14,13 +14,27 @@ namespace RudeBuild
             _settings = settings;
         }
 
-        private static bool ParseVisualStudioVersion(string line, string solutionFormatVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
+        private static bool ParseSolutionFormatVersion(string line, string solutionFormatVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
         {
             if (line.StartsWith("Microsoft Visual Studio Solution File, Format Version " + solutionFormatVersionString))
             {
                 if (versionToChange != VisualStudioVersion.VSUnknown)
                 {
                     throw new InvalidDataException("Solution file is corrupt. It contains two lines declaring the solution file format version.");
+                }
+                versionToChange = versionToSet;
+                return true;
+            }
+            return false;
+        }
+
+        private static bool ParseVisualStudioVersion(string line, string visualStudioVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
+        {
+            if (line.StartsWith("VisualStudioFormat = " + visualStudioVersionString))
+            {
+                if (versionToChange != VisualStudioVersion.VSUnknown)
+                {
+                    throw new InvalidDataException("Solution file is corrupt. It contains two lines declaring the Visual Studio version.");
                 }
                 versionToChange = versionToSet;
                 return true;
@@ -100,6 +114,8 @@ namespace RudeBuild
 
         public SolutionInfo Read(string fileName)
         {
+            var solutionFormatVersion = VisualStudioVersion.VSUnknown;
+            var visualStudioVersion = VisualStudioVersion.VSUnknown;
             var version = VisualStudioVersion.VSUnknown;
             var configManager = new SolutionConfigManager();
             var destSolutionText = new StringBuilder();
@@ -116,11 +132,21 @@ namespace RudeBuild
                     {
                         line = null;
                     }
-                    else if (ParseVisualStudioVersion(line, "9.00", VisualStudioVersion.VS2005, ref version) ||
-                             ParseVisualStudioVersion(line, "10.00", VisualStudioVersion.VS2008, ref version) ||
-                             ParseVisualStudioVersion(line, "11.00", VisualStudioVersion.VS2010, ref version) ||
-                             ParseVisualStudioVersion(line, "12.00", VisualStudioVersion.VS2012, ref version))
+                    else if (ParseSolutionFormatVersion(line, "9.00", VisualStudioVersion.VS2005, ref solutionFormatVersion) ||
+                             ParseSolutionFormatVersion(line, "10.00", VisualStudioVersion.VS2008, ref solutionFormatVersion) ||
+                             ParseSolutionFormatVersion(line, "11.00", VisualStudioVersion.VS2010, ref solutionFormatVersion) ||
+                             ParseSolutionFormatVersion(line, "12.00", VisualStudioVersion.VS2012, ref solutionFormatVersion))  // Note that VS 2013 and 2015 retain solution formation version 12.00!
                     {
+                        version = solutionFormatVersion;
+                    }
+                    else if (ParseVisualStudioVersion(line, "8.0", VisualStudioVersion.VS2005, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "9.0", VisualStudioVersion.VS2008, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "10.0", VisualStudioVersion.VS2010, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "11.0", VisualStudioVersion.VS2012, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "12.0", VisualStudioVersion.VS2013, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "14.0", VisualStudioVersion.VS2015, ref visualStudioVersion))
+                    {
+                        version = visualStudioVersion;
                     }
                     else if (ParseCppProject(ref line, version, solutionDirectory, configManager))
                     {

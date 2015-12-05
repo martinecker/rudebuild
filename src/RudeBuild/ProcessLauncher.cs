@@ -25,6 +25,8 @@ namespace RudeBuild
                 case VisualStudioVersion.VS2008: return @"SOFTWARE\Microsoft\VisualStudio\9.0\";
                 case VisualStudioVersion.VS2010: return @"SOFTWARE\Microsoft\VisualStudio\10.0\";
                 case VisualStudioVersion.VS2012: return @"SOFTWARE\Microsoft\VisualStudio\11.0\";
+                case VisualStudioVersion.VS2013: return @"SOFTWARE\Microsoft\VisualStudio\12.0\";
+                case VisualStudioVersion.VS2015: return @"SOFTWARE\Microsoft\VisualStudio\14.0\";
                 default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
             }
         }

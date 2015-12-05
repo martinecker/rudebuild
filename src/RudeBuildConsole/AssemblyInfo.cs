@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RudeBuildConsole")]
 [assembly: AssemblyDescription("A unity C++ build tool for Visual Studio developed by Martin Ecker.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Martin Ecker/PlayGroovy")]
+[assembly: AssemblyCompany("Martin Ecker")]
 [assembly: AssemblyProduct("RudeBuildConsole")]
-[assembly: AssemblyCopyright("Copyright © Martin Ecker/PlayGroovy 2011-2013")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyVersion("1.4.0.0")]

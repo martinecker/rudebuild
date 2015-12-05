@@ -242,7 +242,8 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>set SDKDIR="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
+    <PostBuildEvent>copy "$(ProjectDir)..\src\RudeBuildAddin\RudeBuild.AddIn" "$(ProjectDir)$(OutDir)"
+set SDKDIR="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
 mkdir "$(ProjectDir)$(OutDir)en-US"
 cd "$(ProjectDir)..\src\RudeBuildAddIn"
 %25SDKDIR%25\resgen Icons.resx
