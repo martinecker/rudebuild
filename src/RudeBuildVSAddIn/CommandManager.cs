@@ -4,11 +4,11 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.CommandBars;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public class CommandManager
     {
-        public const string CommandPrefix = "RudeBuildAddIn.Connect.";
+        public const string CommandPrefix = "RudeBuildVSAddIn.Connect.";
 
         public DTE2 Application { get; private set; }
         public AddIn AddInInstance { get; private set; }

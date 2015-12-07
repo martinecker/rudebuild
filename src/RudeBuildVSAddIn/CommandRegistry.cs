@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public class CommandRegistry
     {

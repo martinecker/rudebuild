@@ -5,7 +5,7 @@ using System.Threading;
 using System.Diagnostics;
 using RudeBuild;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public class Builder
     {

@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using RudeBuild;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public partial class GlobalSettingsDialog : Window
     {

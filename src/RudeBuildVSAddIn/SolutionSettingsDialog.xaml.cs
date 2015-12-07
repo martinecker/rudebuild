@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using RudeBuild;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public partial class SolutionSettingsDialog : Window
     {

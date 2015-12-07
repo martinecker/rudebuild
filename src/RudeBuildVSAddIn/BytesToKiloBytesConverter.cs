@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Globalization;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public class BytesToKiloBytesConverter : IValueConverter
     {

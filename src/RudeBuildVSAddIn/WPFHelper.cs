@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public static class DependencyObjectExtensions
     {

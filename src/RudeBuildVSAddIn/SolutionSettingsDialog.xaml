@@ -1,11 +1,11 @@
-﻿<Window x:Class="RudeBuildAddIn.SolutionSettingsDialog"
+﻿<Window x:Class="RudeBuildVSAddIn.SolutionSettingsDialog"
              Name="_window"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
-             xmlns:RudeBuildAddIn="clr-namespace:RudeBuildAddIn"
+             xmlns:RudeBuildVSAddIn="clr-namespace:RudeBuildVSAddIn"
              Title="RudeBuild Solution Settings" Width="500" Height="533">
     <Grid>
         <Grid.RowDefinitions>

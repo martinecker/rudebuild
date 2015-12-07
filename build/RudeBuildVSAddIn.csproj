@@ -10,7 +10,7 @@
     <StartupObject>
     </StartupObject>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>RudeBuildAddIn</AssemblyName>
+    <AssemblyName>RudeBuildVSAddIn</AssemblyName>
     <DeploymentDirectory>..\bin\</DeploymentDirectory>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
@@ -38,7 +38,7 @@
     </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>RudeBuildAddIn</RootNamespace>
+    <RootNamespace>RudeBuildVSAddIn</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
@@ -59,67 +59,67 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\RudeBuildAddIn\AssemblyInfo.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Builder.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Builder.cs">
       <Link>Builder.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\BytesToKiloBytesConverter.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\BytesToKiloBytesConverter.cs">
       <Link>BytesToKiloBytesConverter.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\CommandManager.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\CommandManager.cs">
       <Link>CommandManager.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\CommandRegistry.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\CommandRegistry.cs">
       <Link>CommandRegistry.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\AboutCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\AboutCommand.cs">
       <Link>Commands\AboutCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildCommandBase.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildCommandBase.cs">
       <Link>Commands\BuildCommandBase.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildProjectCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildProjectCommand.cs">
       <Link>Commands\BuildProjectCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\BuildSolutionCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildSolutionCommand.cs">
       <Link>Commands\BuildSolutionCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\CleanCacheCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\CleanCacheCommand.cs">
       <Link>Commands\CleanCacheCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\GlobalSettingsCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\GlobalSettingsCommand.cs">
       <Link>Commands\GlobalSettingsCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\ICommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\ICommand.cs">
       <Link>Commands\ICommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\SolutionSettingsCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\SolutionSettingsCommand.cs">
       <Link>Commands\SolutionSettingsCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Commands\StopBuildCommand.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Commands\StopBuildCommand.cs">
       <Link>Commands\StopBuildCommand.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Connect.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\Connect.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\EnumDisplayer.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\EnumDisplayer.cs">
       <Link>EnumDisplayer.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\OutputPane.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\OutputPane.cs">
       <Link>OutputPane.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\GlobalSettingsDialog.xaml.cs">
       <DependentUpon>GlobalSettingsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\SolutionSettingsDialog.xaml.cs">
       <DependentUpon>SolutionSettingsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml.cs">
       <DependentUpon>SolutionSettingsAddExcludedCppFileNameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\WPFHelper.cs">
+    <Compile Include="..\src\RudeBuildVSAddIn\WPFHelper.cs">
       <Link>WPFHelper.cs</Link>
     </Compile>
   </ItemGroup>
@@ -180,30 +180,30 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\src\RudeBuildAddIn\RudeBuild.AddIn">
+    <Content Include="..\src\RudeBuildVSAddIn\RudeBuild.AddIn">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="..\src\RudeBuildAddIn\RudeBuildTest.AddIn">
+    <Content Include="..\src\RudeBuildVSAddIn\RudeBuildTest.AddIn">
       <Link>RudeBuildTest.AddIn</Link>
     </Content>
-    <None Include="..\src\RudeBuildAddIn\Resources\StopBuild.bmp">
+    <None Include="..\src\RudeBuildVSAddIn\Resources\StopBuild.bmp">
       <Link>Resources\StopBuild.bmp</Link>
     </None>
-    <None Include="..\src\RudeBuildAddIn\Resources\Configure.bmp">
+    <None Include="..\src\RudeBuildVSAddIn\Resources\Configure.bmp">
       <Link>Resources\Configure.bmp</Link>
     </None>
-    <None Include="..\src\RudeBuildAddIn\Resources\BuildSolution.bmp">
+    <None Include="..\src\RudeBuildVSAddIn\Resources\BuildSolution.bmp">
       <Link>Resources\BuildSolution.bmp</Link>
     </None>
-    <None Include="..\src\RudeBuildAddIn\Resources\BuildProject.bmp">
+    <None Include="..\src\RudeBuildVSAddIn\Resources\BuildProject.bmp">
       <Link>Resources\BuildProject.bmp</Link>
     </None>
-    <None Include="..\src\RudeBuildAddIn\Resources\BuildFile.bmp">
+    <None Include="..\src\RudeBuildVSAddIn\Resources\BuildFile.bmp">
       <Link>Resources\BuildFile.bmp</Link>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\src\RudeBuildAddIn\Icons.resx">
+    <EmbeddedResource Include="..\src\RudeBuildVSAddIn\Icons.resx">
       <Link>Icons.resx</Link>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -215,19 +215,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml">
+    <Page Include="..\src\RudeBuildVSAddIn\GlobalSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\src\RudeBuildAddIn\SolutionSettingsDialog.xaml">
+    <Page Include="..\src\RudeBuildVSAddIn\SolutionSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\src\RudeBuildAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml">
+    <Page Include="..\src\RudeBuildVSAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -236,10 +236,10 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>copy "$(ProjectDir)..\src\RudeBuildAddin\RudeBuild.AddIn" "$(ProjectDir)$(OutDir)"
+    <PostBuildEvent>copy "$(ProjectDir)..\src\RudeBuildVSAddIn\RudeBuild.AddIn" "$(ProjectDir)$(OutDir)"
 set SDKDIR="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
 mkdir "$(ProjectDir)$(OutDir)en-US"
-cd "$(ProjectDir)..\src\RudeBuildAddIn"
+cd "$(ProjectDir)..\src\RudeBuildVSAddIn"
 %25SDKDIR%25\resgen Icons.resx
 %25SDKDIR%25\al /embed:Icons.resources /culture:en-US /out:"$(ProjectDir)$(OutDir)en-US\RudeBuild.resources.dll"
 del Icons.resources</PostBuildEvent>

@@ -1,4 +1,4 @@
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public abstract class BuildCommandBase : CommandBase
     {

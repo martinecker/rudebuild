@@ -18,7 +18,7 @@ class Script
     {
         var customActionInstall = new ManagedAction("OnInstall", Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Installed, Sequence.InstallExecuteSequence);
         var customActionUninstall = new ManagedAction("OnUninstall", Return.ignore, When.Before, Step.RemoveFiles, Condition.Installed, Sequence.InstallExecuteSequence);
-        customActionInstall.RefAssemblies = customActionUninstall.RefAssemblies = new string[] { "CommandLineParser.dll", "RudeBuild.dll", "RudeBuildAddIn.dll" };
+        customActionInstall.RefAssemblies = customActionUninstall.RefAssemblies = new string[] { "CommandLineParser.dll", "RudeBuild.dll", "RudeBuildVSAddIn.dll" };
 
         var project = new Project()
         {
@@ -46,7 +46,7 @@ class Script
                         new File(@"CommandLineParser.dll"),
                         new File(@"RudeBuild.AddIn"),
                         new File(@"RudeBuild.dll"),
-                        new File(@"RudeBuildAddIn.dll"),
+                        new File(@"RudeBuildVSAddIn.dll"),
                         new File(@"RudeBuildConsole.exe"),
                         new File(@"LICENSE.rtf"),
                         new File(@"LICENSE.txt"),
@@ -122,7 +122,7 @@ public class CustomActions
 
         XNamespace ns = document.Root.Name.Namespace;
         XElement assemblyElement = document.Descendants(ns + "Assembly").Single();
-        assemblyElement.Value = System.IO.Path.Combine(installationPath, "RudeBuildAddIn.dll");
+        assemblyElement.Value = System.IO.Path.Combine(installationPath, "RudeBuildVSAddIn.dll");
         document.Save(filePath);
     }
 
@@ -266,7 +266,7 @@ public class CustomActions
 
             MessageFilter.Register();
 
-            var connect = new RudeBuildAddIn.Connect();
+            var connect = new RudeBuildVSAddIn.Connect();
             connect.OnUninstall(application);
         }
         catch (Exception ex)
@@ -295,7 +295,7 @@ public class CustomActions
             info.WindowStyle = ProcessWindowStyle.Hidden;
             info.ErrorDialog = false;
             info.FileName = RudeBuild.ProcessLauncher.GetDevEnvPath(version);
-            info.Arguments = " /ResetAddIn RudeBuildAddIn.Connect /Command File.Exit";
+            info.Arguments = " /ResetAddIn RudeBuildVSAddIn.Connect /Command File.Exit";
             if (process.Start())
             {
                 process.WaitForExit();

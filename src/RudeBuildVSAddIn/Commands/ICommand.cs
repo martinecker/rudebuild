@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
     public interface ICommand
     {

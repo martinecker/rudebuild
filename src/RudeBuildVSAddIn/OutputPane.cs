@@ -1,7 +1,7 @@
 using System.Linq;
 using RudeBuild;
 
-namespace RudeBuildAddIn
+namespace RudeBuildVSAddIn
 {
 	public class OutputPane : IOutput
 	{
