@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Diagnostics;
 using RudeBuild;
@@ -11,8 +9,6 @@ namespace RudeBuildVSAddIn
     {
         private GlobalSettings _globalSettings;
 
-        private EnvDTE80.DTE2 _application;
-        
         private readonly IOutput _output;
         public IOutput Output
         {
@@ -48,9 +44,8 @@ namespace RudeBuildVSAddIn
             get { lock (_lock) { return _lastBuildWasStopped; } }
         }
 
-        public Builder(EnvDTE80.DTE2 application, IOutput output)
+        public Builder(IOutput output)
         {
-            _application = application;
             _output = output;
             _stopwatch = new Stopwatch();
 

@@ -8,39 +8,39 @@ namespace RudeBuildVSAddIn
 {
     public class CommandManager
     {
-        public const string CommandPrefix = "RudeBuildVSAddIn.Connect.";
+        public const string VSAddInCommandPrefix = "RudeBuildVSAddIn.Connect.";
 
         public DTE2 Application { get; private set; }
-        public AddIn AddInInstance { get; private set; }
-        
+
+		private readonly AddIn _addInInstance;
         private readonly CommandRegistry _commandRegistry = new CommandRegistry();
         private readonly Commands2 _vsCommands;
 
         public CommandManager(DTE2 application, AddIn addInInstance)
         {
             Application = application;
-            AddInInstance = addInInstance;
+            _addInInstance = addInInstance;
 
             _vsCommands = (Commands2)Application.Commands;
         }
 
         #region Command registration/execution functions
 
-        private Command GetVSCommand(string name)
+        private Command GetVSAddInCommand(string name)
         {
             var vsCommand = from Command command in _vsCommands
-                            where command.Name == CommandPrefix + name
+                            where command.Name == VSAddInCommandPrefix + name
                             select command;
             return vsCommand.SingleOrDefault();
         }
 
         public void RegisterCommand(string name, string caption, string toolTip, string icon, ICommand command)
         {
-            if (GetCommand(name) != null)
+            if (_addInInstance == null || GetCommand(name) != null)
                 return;
 
-            Command vsCommand = GetVSCommand(name) ??
-                                _vsCommands.AddNamedCommand2(AddInInstance, name, caption, toolTip, false, icon);
+            Command vsCommand = GetVSAddInCommand(name) ??
+                                _vsCommands.AddNamedCommand2(_addInInstance, name, caption, toolTip, false, icon);
             command.Initialize(name, caption, toolTip, icon, vsCommand);
             _commandRegistry.Register(command);
         }
@@ -48,7 +48,7 @@ namespace RudeBuildVSAddIn
         public void UnregisterCommand(string name)
         {
             _commandRegistry.Unregister(name);
-            Command vsCommand = GetVSCommand(name);
+            Command vsCommand = GetVSAddInCommand(name);
             if (null != vsCommand)
             {
                 vsCommand.Delete();
