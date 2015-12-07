@@ -9,7 +9,7 @@ using System.Windows.Data;
 using System.Globalization;
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class EnumDisplayer : IValueConverter
     {

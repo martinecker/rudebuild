@@ -62,65 +62,8 @@
     <Compile Include="..\src\RudeBuildVSAddIn\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Builder.cs">
-      <Link>Builder.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\BytesToKiloBytesConverter.cs">
-      <Link>BytesToKiloBytesConverter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\CommandManager.cs">
-      <Link>CommandManager.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\CommandRegistry.cs">
-      <Link>CommandRegistry.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\AboutCommand.cs">
-      <Link>Commands\AboutCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildCommandBase.cs">
-      <Link>Commands\BuildCommandBase.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildProjectCommand.cs">
-      <Link>Commands\BuildProjectCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\BuildSolutionCommand.cs">
-      <Link>Commands\BuildSolutionCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\CleanCacheCommand.cs">
-      <Link>Commands\CleanCacheCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\GlobalSettingsCommand.cs">
-      <Link>Commands\GlobalSettingsCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\ICommand.cs">
-      <Link>Commands\ICommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\SolutionSettingsCommand.cs">
-      <Link>Commands\SolutionSettingsCommand.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\Commands\StopBuildCommand.cs">
-      <Link>Commands\StopBuildCommand.cs</Link>
-    </Compile>
     <Compile Include="..\src\RudeBuildVSAddIn\Connect.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\EnumDisplayer.cs">
-      <Link>EnumDisplayer.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\OutputPane.cs">
-      <Link>OutputPane.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\GlobalSettingsDialog.xaml.cs">
-      <DependentUpon>GlobalSettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\SolutionSettingsDialog.xaml.cs">
-      <DependentUpon>SolutionSettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml.cs">
-      <DependentUpon>SolutionSettingsAddExcludedCppFileNameDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\src\RudeBuildVSAddIn\WPFHelper.cs">
-      <Link>WPFHelper.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -213,24 +156,10 @@
       <Project>{344A8E8A-9F1B-45F8-B03D-03CE5534572D}</Project>
       <Name>RudeBuild</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\src\RudeBuildVSAddIn\GlobalSettingsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\src\RudeBuildVSAddIn\SolutionSettingsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\src\RudeBuildVSAddIn\SolutionSettingsAddExcludedCppFileNameDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <ProjectReference Include="RudeBuildVSShared.csproj">
+      <Project>{725d4418-b658-489e-be5b-ca0f147a0496}</Project>
+      <Name>RudeBuildVSShared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>

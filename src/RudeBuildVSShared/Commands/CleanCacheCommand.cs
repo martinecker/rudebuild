@@ -1,23 +1,20 @@
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
-    public class BuildSolutionCommand : BuildCommandBase
+    public class CleanCacheCommand : BuildCommandBase
     {
-        public BuildSolutionCommand(Builder builder, Mode buildMode)
-            :   base(builder, buildMode)
+        public CleanCacheCommand(Builder builder)
+            : base(builder, Mode.CleanCache)
         {
         }
 
         public override void Execute(CommandManager commandManager)
         {
-            base.Execute(commandManager);
-
             BuildOptions options = new BuildOptions();
             options.Solution = GetSolutionFileInfo(commandManager);
             options.Config = GetActiveSolutionConfig(commandManager);
-            options.Clean = BuildMode == Mode.Clean;
-            options.Rebuild = BuildMode == Mode.Rebuild;
+            options.CleanCache = true;
             Builder.Build(options);
         }
     }

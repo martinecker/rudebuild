@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public partial class SolutionSettingsAddExcludedCppFileNameDialog : Window
     {

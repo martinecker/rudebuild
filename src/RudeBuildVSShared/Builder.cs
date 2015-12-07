@@ -3,7 +3,7 @@ using System.Threading;
 using System.Diagnostics;
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class Builder
     {

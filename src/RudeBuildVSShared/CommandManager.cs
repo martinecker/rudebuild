@@ -4,7 +4,7 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.CommandBars;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class CommandManager
     {

@@ -1,6 +1,6 @@
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class GlobalSettingsCommand : CommandBase
     {

@@ -1,4 +1,4 @@
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class StopBuildCommand : CommandBase
     {

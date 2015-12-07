@@ -1,15 +1,15 @@
-﻿<Window x:Class="RudeBuildVSAddIn.GlobalSettingsDialog"
+﻿<Window x:Class="RudeBuildVSShared.GlobalSettingsDialog"
              Name="_window"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
-             xmlns:RudeBuildVSAddIn="clr-namespace:RudeBuildVSAddIn"
+             xmlns:RudeBuildVSShared="clr-namespace:RudeBuildVSShared"
              Title="RudeBuild Global Settings" Width="500" Height="260">
     <Window.Resources>
-        <RudeBuildVSAddIn:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
-        <RudeBuildVSAddIn:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
+        <RudeBuildVSShared:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
+        <RudeBuildVSShared:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

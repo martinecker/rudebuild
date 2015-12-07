@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSAddIn", "RudeBuildVSAddIn.csproj", "{0F73A40E-95BA-4285-9740-3E3B35D0828F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{725D4418-B658-489E-BE5B-CA0F147A0496} = {725D4418-B658-489E-BE5B-CA0F147A0496}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
 EndProject
@@ -17,6 +20,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildWixSetup", "RudeBu
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSIX", "RudeBuildVSIX.csproj", "{4868C849-9124-434B-BC83-B43570436771}"
+	ProjectSection(ProjectDependencies) = postProject
+		{725D4418-B658-489E-BE5B-CA0F147A0496} = {725D4418-B658-489E-BE5B-CA0F147A0496}
+		{344A8E8A-9F1B-45F8-B03D-03CE5534572D} = {344A8E8A-9F1B-45F8-B03D-03CE5534572D}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSShared", "RudeBuildVSShared.csproj", "{725D4418-B658-489E-BE5B-CA0F147A0496}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +53,10 @@ Global
 		{4868C849-9124-434B-BC83-B43570436771}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4868C849-9124-434B-BC83-B43570436771}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4868C849-9124-434B-BC83-B43570436771}.Release|Any CPU.Build.0 = Release|Any CPU
+		{725D4418-B658-489E-BE5B-CA0F147A0496}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{725D4418-B658-489E-BE5B-CA0F147A0496}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{725D4418-B658-489E-BE5B-CA0F147A0496}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{725D4418-B658-489E-BE5B-CA0F147A0496}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 using System.Windows;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class AboutCommand : CommandBase
     {

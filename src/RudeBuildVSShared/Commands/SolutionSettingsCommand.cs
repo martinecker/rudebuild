@@ -1,7 +1,7 @@
 using System.IO;
 using RudeBuild;
 
-namespace RudeBuildVSAddIn
+namespace RudeBuildVSShared
 {
     public class SolutionSettingsCommand : CommandBase
     {
