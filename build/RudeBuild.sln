@@ -1,13 +1,13 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildAddIn", "RudeBuildAddIn.csproj", "{0F73A40E-95BA-4285-9740-3E3B35D0828F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuild", "RudeBuild.csproj", "{344A8E8A-9F1B-45F8-B03D-03CE5534572D}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RudeBuildSetup", "RudeBuildSetup.vdproj", "{2980695F-782D-4D3E-9F62-8DAB3EA7EBC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildWixSetup", "RudeBuildWixSetup.csproj", "{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildWixSetup", "RudeBu
 		{7DC0315A-DBD6-4790-94EC-4526A8B9300B} = {7DC0315A-DBD6-4790-94EC-4526A8B9300B}
 		{344A8E8A-9F1B-45F8-B03D-03CE5534572D} = {344A8E8A-9F1B-45F8-B03D-03CE5534572D}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSIX", "RudeBuildVSIX.csproj", "{4868C849-9124-434B-BC83-B43570436771}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,14 +36,14 @@ Global
 		{344A8E8A-9F1B-45F8-B03D-03CE5534572D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{344A8E8A-9F1B-45F8-B03D-03CE5534572D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{344A8E8A-9F1B-45F8-B03D-03CE5534572D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2980695F-782D-4D3E-9F62-8DAB3EA7EBC0}.Debug|Any CPU.ActiveCfg = Debug
-		{2980695F-782D-4D3E-9F62-8DAB3EA7EBC0}.Debug|Any CPU.Build.0 = Debug
-		{2980695F-782D-4D3E-9F62-8DAB3EA7EBC0}.Release|Any CPU.ActiveCfg = Release
-		{2980695F-782D-4D3E-9F62-8DAB3EA7EBC0}.Release|Any CPU.Build.0 = Release
 		{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4868C849-9124-434B-BC83-B43570436771}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4868C849-9124-434B-BC83-B43570436771}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4868C849-9124-434B-BC83-B43570436771}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4868C849-9124-434B-BC83-B43570436771}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

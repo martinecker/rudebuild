@@ -110,12 +110,6 @@
     <Compile Include="..\src\RudeBuildAddIn\OutputPane.cs">
       <Link>OutputPane.cs</Link>
     </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Installer.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="..\src\RudeBuildAddIn\Installer.Designer.cs">
-      <DependentUpon>Installer.cs</DependentUpon>
-    </Compile>
     <Compile Include="..\src\RudeBuildAddIn\GlobalSettingsDialog.xaml.cs">
       <DependentUpon>GlobalSettingsDialog.xaml</DependentUpon>
     </Compile>
