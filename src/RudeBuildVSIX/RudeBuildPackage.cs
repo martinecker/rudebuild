@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 
 namespace RudeBuildVSIX
 {
@@ -23,6 +24,8 @@ namespace RudeBuildVSIX
 	/// </para>
 	/// </remarks>
 	[PackageRegistration(UseManagedResourcesOnly = true)]
+	[ProvideAutoLoad(UIContextGuids80.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
+	[ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 	[InstalledProductRegistration("#110", "#112", "1.4", IconResourceID = 400)] // Info on this package for Help/About
 	[ProvideMenuResource("Menus.ctmenu", 1)]
 	[Guid(RudeBuildPackage.PackageGuidString)]

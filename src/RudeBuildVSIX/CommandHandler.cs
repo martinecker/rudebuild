@@ -150,7 +150,6 @@ namespace RudeBuildVSIX
 					if (isEnabled != menuCommand.Enabled)
 					{
 						menuCommand.Enabled = isEnabled;
-						UpdateUI();
 					}
 				}
 			}
@@ -158,16 +157,6 @@ namespace RudeBuildVSIX
 			{
 				VsShellUtilities.ShowMessageBox(ServiceProvider, "An internal RudeBuild exception occurred!\n" + ex.Message, "RudeBuild",
 					OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-			}
-		}
-
-		private void UpdateUI()
-		{
-			IVsUIShell vsShell = ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
-			if (null != vsShell)
-			{
-				int hr = vsShell.UpdateCommandUI(0);
-				Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
 			}
 		}
 	}

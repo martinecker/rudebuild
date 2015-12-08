@@ -44,7 +44,7 @@
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
           <ButtonText>RudeBuild</ButtonText>
-          <CommandName>RudeBuild</CommandName>
+          <CommandName>RudeBuildToolbar</CommandName>
         </Strings>
       </Menu>
     </Menus>
@@ -94,29 +94,37 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_BuildSolution" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSolutionMenuGroup" />
         <Icon guid="guidImages" id="bmpBuildSolution" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_BuildSolution</CommandName>
           <ButtonText>&amp;Build Solution</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_RebuildSolution" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSolutionMenuGroup" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_RebuildSolution</CommandName>
           <ButtonText>&amp;Rebuild Solution</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_CleanSolution" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSolutionMenuGroup" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_CleanSolution</CommandName>
           <ButtonText>&amp;Clean Solution</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_CleanCache" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSolutionMenuGroup" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_CleanCache</CommandName>
           <ButtonText>C&amp;lean Cache</ButtonText>
         </Strings>
       </Button>
@@ -124,22 +132,28 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_BuildProject" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildProjectMenuGroup" />
         <Icon guid="guidImages" id="bmpBuildProject" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_BuildProject</CommandName>
           <ButtonText>B&amp;uild Project</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_RebuildProject" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildProjectMenuGroup" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_RebuildProject</CommandName>
           <ButtonText>R&amp;ebuild Project</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_CleanProject" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildProjectMenuGroup" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_CleanProject</CommandName>
           <ButtonText>Clea&amp;n Project</ButtonText>
         </Strings>
       </Button>
@@ -147,8 +161,10 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_StopBuild" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildStopMenuGroup" />
         <Icon guid="guidImages" id="bmpStopBuild" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_StopBuild</CommandName>
           <ButtonText>&amp;Stop Build</ButtonText>
         </Strings>
       </Button>
@@ -156,16 +172,20 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_GlobalSettings" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSettingsMenuGroup" />
         <Icon guid="guidImages" id="bmpConfigure" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_GlobalSettings</CommandName>
           <ButtonText>&amp;Global Settings...</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_SolutionSettings" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildSettingsMenuGroup" />
         <Icon guid="guidImages" id="bmpConfigure" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_SolutionSettings</CommandName>
           <ButtonText>S&amp;olution Settings...</ButtonText>
         </Strings>
       </Button>
@@ -173,6 +193,7 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_About" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildAboutMenuGroup" />
         <Strings>
+          <CommandName>CommandId_About</CommandName>
           <ButtonText>&amp;About</ButtonText>
         </Strings>
       </Button>
@@ -181,16 +202,20 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_BuildProject" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildBuildToolbarGroup" />
         <Icon guid="guidImages" id="bmpBuildProject" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_BuildProject</CommandName>
           <ButtonText>RudeBuild: Build Project</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_BuildSolution" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildBuildToolbarGroup" />
         <Icon guid="guidImages" id="bmpBuildSolution" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_BuildSolution</CommandName>
           <ButtonText>RudeBuild: Build Solution</ButtonText>
         </Strings>
       </Button>
@@ -198,8 +223,10 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_StopBuild" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildStopToolbarGroup" />
         <Icon guid="guidImages" id="bmpStopBuild" />
-        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
+          <CommandName>CommandId_StopBuild</CommandName>
           <ButtonText>RudeBuild: Stop Build</ButtonText>
         </Strings>
       </Button>
