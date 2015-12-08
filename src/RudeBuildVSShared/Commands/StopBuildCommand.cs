@@ -11,7 +11,10 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
-            _builder.Stop();
+			if (!IsEnabled(commandManager))
+				return;
+
+			_builder.Stop();
         }
 
         public override bool IsEnabled(CommandManager commandManager)

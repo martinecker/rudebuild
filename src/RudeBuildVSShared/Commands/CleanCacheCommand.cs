@@ -11,7 +11,10 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
-            BuildOptions options = new BuildOptions();
+			if (!IsEnabled(commandManager))
+				return;
+
+			BuildOptions options = new BuildOptions();
             options.Solution = GetSolutionFileInfo(commandManager);
             options.Config = GetActiveSolutionConfig(commandManager);
             options.CleanCache = true;

@@ -11,7 +11,10 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
-            base.Execute(commandManager);
+			if (!IsEnabled(commandManager))
+				return;
+
+			base.Execute(commandManager);
 
             BuildOptions options = new BuildOptions();
             options.Solution = GetSolutionFileInfo(commandManager);

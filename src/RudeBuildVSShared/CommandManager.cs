@@ -6,52 +6,48 @@ using Microsoft.VisualStudio.CommandBars;
 
 namespace RudeBuildVSShared
 {
+	public interface ICommandRegistrar
+	{
+		EnvDTE.Command GetCommand(DTE2 application, string name);
+		EnvDTE.Command RegisterCommand(DTE2 application, int id, string name, string caption, string toolTip, string icon, ICommand command);
+	}
+
     public class CommandManager
     {
-        public const string VSAddInCommandPrefix = "RudeBuildVSAddIn.Connect.";
+		public DTE2 Application { get; private set; }
 
-        public DTE2 Application { get; private set; }
+		private readonly ICommandRegistrar _commandRegistrar;
+		private readonly CommandRegistry _commandRegistry = new CommandRegistry();
 
-		private readonly AddIn _addInInstance;
-        private readonly CommandRegistry _commandRegistry = new CommandRegistry();
-        private readonly Commands2 _vsCommands;
-
-        public CommandManager(DTE2 application, AddIn addInInstance)
+		public CommandManager(DTE2 application, ICommandRegistrar commandRegistrar)
         {
             Application = application;
-            _addInInstance = addInInstance;
-
-            _vsCommands = (Commands2)Application.Commands;
+			_commandRegistrar = commandRegistrar;
         }
 
         #region Command registration/execution functions
 
-        private Command GetVSAddInCommand(string name)
+		public void RegisterCommand(int id, string name, string caption, string toolTip, string icon, ICommand command)
         {
-            var vsCommand = from Command command in _vsCommands
-                            where command.Name == VSAddInCommandPrefix + name
-                            select command;
-            return vsCommand.SingleOrDefault();
-        }
-
-        public void RegisterCommand(string name, string caption, string toolTip, string icon, ICommand command)
-        {
-            if (_addInInstance == null || GetCommand(name) != null)
+            if (GetCommand(name) != null)
                 return;
 
-            Command vsCommand = GetVSAddInCommand(name) ??
-                                _vsCommands.AddNamedCommand2(_addInInstance, name, caption, toolTip, false, icon);
-            command.Initialize(name, caption, toolTip, icon, vsCommand);
-            _commandRegistry.Register(command);
+			EnvDTE.Command vsCommand = _commandRegistrar.RegisterCommand(Application, id, name, caption, toolTip, icon, command);
+			if (vsCommand != null)
+			{
+				command.Initialize(name, caption, toolTip, vsCommand);
+				_commandRegistry.Register(command);
+			}
         }
 
         public void UnregisterCommand(string name)
         {
             _commandRegistry.Unregister(name);
-            Command vsCommand = GetVSAddInCommand(name);
+
+			EnvDTE.Command vsCommand = _commandRegistrar.GetCommand(Application, name);
             if (null != vsCommand)
             {
-                vsCommand.Delete();
+				vsCommand.Delete();
             }
         }
 

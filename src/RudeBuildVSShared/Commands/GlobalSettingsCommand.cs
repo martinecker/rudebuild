@@ -13,7 +13,10 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
-            GlobalSettingsDialog dialog = new GlobalSettingsDialog(_builder.Output);
+			if (!IsEnabled(commandManager))
+				return;
+
+			GlobalSettingsDialog dialog = new GlobalSettingsDialog(_builder.Output);
             try
             {
                 dialog.ShowDialog();

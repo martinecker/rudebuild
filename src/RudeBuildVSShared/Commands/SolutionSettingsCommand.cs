@@ -49,7 +49,10 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
-            CacheSolutionInfo(commandManager);
+			if (!IsEnabled(commandManager))
+				return;
+
+			CacheSolutionInfo(commandManager);
             if (null == _cachedSolutionInfo || null == _cachedSettings)
                 return;
 

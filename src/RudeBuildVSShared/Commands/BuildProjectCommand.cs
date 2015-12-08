@@ -11,6 +11,9 @@ namespace RudeBuildVSShared
 
         public override void Execute(CommandManager commandManager)
         {
+			if (!IsEnabled(commandManager))
+				return;
+
             BuildOptions options = new BuildOptions();
             options.Project = GetActiveProjectName(commandManager);
             if (string.IsNullOrEmpty(options.Project))

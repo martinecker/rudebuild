@@ -1,25 +1,18 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="CommandHandler.cs" company="Martin Ecker">
-//     Copyright (c) Martin Ecker.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
+using EnvDTE80;
+using RudeBuildVSShared;
 
 namespace RudeBuildVSIX
 {
-	/// <summary>
-	/// Command handler
-	/// </summary>
-	internal sealed class CommandHandler
+	internal sealed class CommandHandler : ICommandRegistrar
 	{
-		/// <summary>
-		/// Command ID.
-		/// </summary>
+		// Command IDs. Have to match the IDs in the .vsct file!
 		public const int CommandId_BuildSolution	= 0x0100;
 		public const int CommandId_RebuildSolution	= 0x0102;
 		public const int CommandId_CleanSolution	= 0x0103;
@@ -32,21 +25,64 @@ namespace RudeBuildVSIX
 		public const int CommandId_SolutionSettings = 0x010A;
 		public const int CommandId_About			= 0x010B;
 
-		/// <summary>
-		/// Command menu group (command set GUID).
-		/// </summary>
-		public static readonly Guid CommandSet = new Guid("21ed6ae9-d3ad-4002-bc33-c339b7cf3eeb");
+		public static readonly Guid CommandSet = new Guid("21ed6ae9-d3ad-4002-bc33-c339b7cf3eeb");	// Has to match the GUID in the .vsct file!
 
-		/// <summary>
-		/// VS Package that provides this command, not null.
-		/// </summary>
-		private readonly Package package;
+		private readonly Package _package;
+		private readonly DTE2 _application;
+		private readonly OleMenuCommandService _commandService;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CommandHandler"/> class.
-		/// Adds our command handlers for menu (commands must exist in the command table file)
-		/// </summary>
-		/// <param name="package">Owner package, not null.</param>
+		private CommandManager _commandManager;
+		private OutputPane _outputPane;
+		private Builder _builder;
+
+		private IDictionary<int, ICommand> _commands = new Dictionary<int, ICommand>();
+
+		public static CommandHandler Instance { get; private set; }
+		private IServiceProvider ServiceProvider { get { return _package; } }
+
+		#region ICommandRegistrar implementation
+
+		public const string VSIXCommandPrefix = "RudeBuild.";
+
+		public EnvDTE.Command GetCommand(DTE2 application, string name)
+		{
+			Commands2 vsCommands = (Commands2)application.Commands;
+			var vsCommand = from Command command in vsCommands
+							where command.Name == VSIXCommandPrefix + name
+							select command;
+			return vsCommand.FirstOrDefault();
+		}
+
+		public EnvDTE.Command RegisterCommand(DTE2 application, int id, string name, string caption, string toolTip, string icon, ICommand command)
+		{
+			if (!_commands.ContainsKey(id))
+			{
+				OleMenuCommand menuItem = new OleMenuCommand(OnExecuteCommand, new CommandID(CommandSet, id));
+				menuItem.BeforeQueryStatus += new EventHandler(OnBeforeQueryStatus);
+				_commandService.AddCommand(menuItem);
+
+				_commands.Add(id, command);
+			}
+			return GetCommand(application, name);
+		}
+
+		#endregion
+
+		private void RegisterCommands()
+		{
+			_commandManager.RegisterCommand(CommandId_BuildSolution, "BuildSolution", "&Build Solution", "RudeBuild: Build Solution", "3", new BuildSolutionCommand(_builder, BuildCommandBase.Mode.Build));
+			_commandManager.RegisterCommand(CommandId_RebuildSolution, "RebuildSolution", "&Rebuild Solution", "RudeBuild: Rebuild Solution", null, new BuildSolutionCommand(_builder, BuildCommandBase.Mode.Rebuild));
+			_commandManager.RegisterCommand(CommandId_CleanSolution, "CleanSolution", "&Clean Solution", "RudeBuild: Clean Solution", null, new BuildSolutionCommand(_builder, BuildCommandBase.Mode.Clean));
+			_commandManager.RegisterCommand(CommandId_CleanCache, "CleanCache", "C&lean Cache", "RudeBuild: Clean RudeBuild Solution Cache", null, new CleanCacheCommand(_builder));
+			_commandManager.RegisterCommand(CommandId_BuildProject, "BuildProject", "B&uild Project", "RudeBuild: Build Project", "2", new BuildProjectCommand(_builder, BuildCommandBase.Mode.Build));
+			_commandManager.RegisterCommand(CommandId_RebuildProject, "RebuildProject", "R&ebuild Project", "RudeBuild: Rebuild Project", null, new BuildProjectCommand(_builder, BuildCommandBase.Mode.Rebuild));
+			_commandManager.RegisterCommand(CommandId_CleanProject, "CleanProject", "Clea&n Project", "RudeBuild: Clean Project", null, new BuildProjectCommand(_builder, BuildCommandBase.Mode.Clean));
+			_commandManager.RegisterCommand(CommandId_StopBuild, "StopBuild", "&Stop Build", "RudeBuild: Stop Build", "5", new StopBuildCommand(_builder));
+			_commandManager.RegisterCommand(CommandId_GlobalSettings, "GlobalSettings", "&Global Settings...", "Opens the RudeBuild Global Settings Dialog", "4", new GlobalSettingsCommand(_builder));
+			_commandManager.RegisterCommand(CommandId_SolutionSettings, "SolutionSettings", "S&olution Settings...", "Opens the RudeBuild Solution Settings Dialog", "4", new SolutionSettingsCommand(_builder, _outputPane));
+			_commandManager.RegisterCommand(CommandId_About, "About", "&About", "About RudeBuild", null, new AboutCommand());
+		}
+
 		private CommandHandler(Package package)
 		{
 			if (package == null)
@@ -54,67 +90,85 @@ namespace RudeBuildVSIX
 				throw new ArgumentNullException("package");
 			}
 
-			this.package = package;
-
-			OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-			if (commandService != null)
+			try
 			{
-				commandService.AddCommand(new MenuCommand(MenuItemCallback, new CommandID(CommandSet, CommandId_BuildSolution)));
-				commandService.AddCommand(new MenuCommand(MenuItemCallback, new CommandID(CommandSet, CommandId_RebuildSolution)));
-				commandService.AddCommand(new MenuCommand(MenuItemCallback, new CommandID(CommandSet, CommandId_CleanSolution)));
-				commandService.AddCommand(new MenuCommand(MenuItemCallback, new CommandID(CommandSet, CommandId_CleanCache)));
+				_package = package;
+				_application = (DTE2)ServiceProvider.GetService(typeof(DTE));
+				_commandService = (OleMenuCommandService)ServiceProvider.GetService(typeof(IMenuCommandService));
+
+				_commandManager = new CommandManager(_application, this);
+				_outputPane = new OutputPane(_application, "RudeBuild");
+				_builder = new Builder(_outputPane);
+
+				RegisterCommands();
+			}
+			catch (System.Exception ex)
+			{
+				VsShellUtilities.ShowMessageBox(ServiceProvider, "RudeBuild initialization error!\n" + ex.Message, "RudeBuild",
+					OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
 			}
 		}
 
-		/// <summary>
-		/// Gets the instance of the command.
-		/// </summary>
-		public static CommandHandler Instance
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the service provider from the owner package.
-		/// </summary>
-		private IServiceProvider ServiceProvider
-		{
-			get
-			{
-				return this.package;
-			}
-		}
-
-		/// <summary>
-		/// Initializes the singleton instance of the command.
-		/// </summary>
-		/// <param name="package">Owner package, not null.</param>
 		public static void Initialize(Package package)
 		{
 			Instance = new CommandHandler(package);
 		}
 
-		/// <summary>
-		/// This function is the callback used to execute the command when the menu item is clicked.
-		/// See the constructor to see how the menu item is associated with this function using
-		/// OleMenuCommandService service and MenuCommand class.
-		/// </summary>
-		/// <param name="sender">Event sender.</param>
-		/// <param name="e">Event args.</param>
-		private void MenuItemCallback(object sender, EventArgs e)
+		private void OnExecuteCommand(object sender, EventArgs e)
 		{
-			string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-			string title = "Command1";
+			var menuCommand = sender as MenuCommand;
+			if (null == menuCommand)
+				return;
 
-			// Show a message box to prove we were here
-			VsShellUtilities.ShowMessageBox(
-				this.ServiceProvider,
-				message,
-				title,
-				OLEMSGICON.OLEMSGICON_INFO,
-				OLEMSGBUTTON.OLEMSGBUTTON_OK,
-				OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			try
+			{
+				ICommand command;
+				if (_commands.TryGetValue(menuCommand.CommandID.ID, out command))
+				{
+					command.Execute(_commandManager);
+				}
+			}
+			catch (Exception ex)
+			{
+				VsShellUtilities.ShowMessageBox(ServiceProvider, "An internal RudeBuild exception occurred!\n" + ex.Message, "RudeBuild",
+					OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			}
+		}
+
+		private void OnBeforeQueryStatus(object sender, EventArgs e)
+		{
+			var menuCommand = sender as MenuCommand;
+			if (null == menuCommand)
+				return;
+
+			try
+			{
+				ICommand command;
+				if (_commands.TryGetValue(menuCommand.CommandID.ID, out command))
+				{
+					bool isEnabled = command.IsEnabled(_commandManager);
+					if (isEnabled != menuCommand.Enabled)
+					{
+						menuCommand.Enabled = isEnabled;
+						UpdateUI();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				VsShellUtilities.ShowMessageBox(ServiceProvider, "An internal RudeBuild exception occurred!\n" + ex.Message, "RudeBuild",
+					OLEMSGICON.OLEMSGICON_CRITICAL, OLEMSGBUTTON.OLEMSGBUTTON_OK, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+			}
+		}
+
+		private void UpdateUI()
+		{
+			IVsUIShell vsShell = ServiceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+			if (null != vsShell)
+			{
+				int hr = vsShell.UpdateCommandUI(0);
+				Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
+			}
 		}
 	}
 }
