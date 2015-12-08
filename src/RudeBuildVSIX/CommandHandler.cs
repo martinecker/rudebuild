@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.CommandBars;
 using EnvDTE;
 using EnvDTE80;
 using RudeBuildVSShared;
@@ -83,6 +84,54 @@ namespace RudeBuildVSIX
 			_commandManager.RegisterCommand(CommandId_About, "About", "&About", "About RudeBuild", null, new AboutCommand());
 		}
 
+		private int GetPopupMenuBarInsertIndex(CommandBar parentCommandBar)
+		{
+			CommandBarControl commandBarControl = _commandManager.FindCommandBarControlByCaption(parentCommandBar, "IncrediBuild");
+			if (null != commandBarControl)
+				return commandBarControl.Index;
+
+			if (parentCommandBar.Name == "Project")
+			{
+				commandBarControl = _commandManager.FindCommandBarControlByCaption(parentCommandBar, "Clean");
+				if (null != commandBarControl)
+					return commandBarControl.Index + 1;
+			}
+			else if (parentCommandBar.Name == "Solution")
+			{
+				commandBarControl = _commandManager.FindCommandBarControlByCaption(parentCommandBar, "Clean Solution");
+				if (null != commandBarControl)
+					return commandBarControl.Index + 1;
+			}
+
+			return 5;
+		}
+
+		private void AddProjectRightClickMenuToUI()
+		{
+			IList<CommandBar> parentCommandBars = _commandManager.FindCommandBars("Project");
+			foreach (CommandBar parentCommandBar in parentCommandBars)
+			{
+				CommandBar commandBar = _commandManager.AddPopupCommandBar(parentCommandBar, "RudeBuild", "R&udeBuild", GetPopupMenuBarInsertIndex(parentCommandBar), beginGroup: true);
+				int insertIndex = 1;
+				_commandManager.AddCommandToCommandBar(commandBar, "BuildProject", insertIndex++);
+				_commandManager.AddCommandToCommandBar(commandBar, "RebuildProject", insertIndex++);
+				_commandManager.AddCommandToCommandBar(commandBar, "CleanProject", insertIndex++);
+			}
+		}
+
+		private void AddSolutionRightClickMenuToUI()
+		{
+			IList<CommandBar> parentCommandBars = _commandManager.FindCommandBars("Solution");
+			foreach (CommandBar parentCommandBar in parentCommandBars)
+			{
+				CommandBar commandBar = _commandManager.AddPopupCommandBar(parentCommandBar, "RudeBuild", "R&udeBuild", GetPopupMenuBarInsertIndex(parentCommandBar), beginGroup: true);
+				int insertIndex = 1;
+				_commandManager.AddCommandToCommandBar(commandBar, "BuildSolution", insertIndex++);
+				_commandManager.AddCommandToCommandBar(commandBar, "RebuildSolution", insertIndex++);
+				_commandManager.AddCommandToCommandBar(commandBar, "CleanSolution", insertIndex++);
+			}
+		}
+
 		private CommandHandler(Package package)
 		{
 			if (package == null)
@@ -101,6 +150,8 @@ namespace RudeBuildVSIX
 				_builder = new Builder(_outputPane);
 
 				RegisterCommands();
+				AddProjectRightClickMenuToUI();
+				AddSolutionRightClickMenuToUI();
 			}
 			catch (System.Exception ex)
 			{

@@ -97,7 +97,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_BuildSolution</CommandName>
+          <CommandName>Build Solution</CommandName>
           <ButtonText>&amp;Build Solution</ButtonText>
         </Strings>
       </Button>
@@ -106,7 +106,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_RebuildSolution</CommandName>
+          <CommandName>Rebuild Solution</CommandName>
           <ButtonText>&amp;Rebuild Solution</ButtonText>
         </Strings>
       </Button>
@@ -115,7 +115,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_CleanSolution</CommandName>
+          <CommandName>Clean Solution</CommandName>
           <ButtonText>&amp;Clean Solution</ButtonText>
         </Strings>
       </Button>
@@ -124,7 +124,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_CleanCache</CommandName>
+          <CommandName>Clean Cache</CommandName>
           <ButtonText>C&amp;lean Cache</ButtonText>
         </Strings>
       </Button>
@@ -135,7 +135,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_BuildProject</CommandName>
+          <CommandName>Build Project</CommandName>
           <ButtonText>B&amp;uild Project</ButtonText>
         </Strings>
       </Button>
@@ -144,7 +144,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_RebuildProject</CommandName>
+          <CommandName>Rebuild Project</CommandName>
           <ButtonText>R&amp;ebuild Project</ButtonText>
         </Strings>
       </Button>
@@ -153,7 +153,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_CleanProject</CommandName>
+          <CommandName>Clean Project</CommandName>
           <ButtonText>Clea&amp;n Project</ButtonText>
         </Strings>
       </Button>
@@ -164,7 +164,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_StopBuild</CommandName>
+          <CommandName>Stop Build</CommandName>
           <ButtonText>&amp;Stop Build</ButtonText>
         </Strings>
       </Button>
@@ -175,7 +175,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_GlobalSettings</CommandName>
+          <CommandName>Global Settings</CommandName>
           <ButtonText>&amp;Global Settings...</ButtonText>
         </Strings>
       </Button>
@@ -185,7 +185,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
         <Strings>
-          <CommandName>CommandId_SolutionSettings</CommandName>
+          <CommandName>Solution Settings</CommandName>
           <ButtonText>S&amp;olution Settings...</ButtonText>
         </Strings>
       </Button>
@@ -193,7 +193,7 @@
       <Button guid="guidRudeBuildPackageCmdSet" id="CommandId_About" priority="0x0100" type="Button">
         <Parent guid="guidRudeBuildPackageCmdSet" id="RudeBuildAboutMenuGroup" />
         <Strings>
-          <CommandName>CommandId_About</CommandName>
+          <CommandName>About</CommandName>
           <ButtonText>&amp;About</ButtonText>
         </Strings>
       </Button>
@@ -204,8 +204,9 @@
         <Icon guid="guidImages" id="bmpBuildProject" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>Pict</CommandFlag>
         <Strings>
-          <CommandName>CommandId_BuildProject</CommandName>
+          <CommandName>Build Project</CommandName>
           <ButtonText>RudeBuild: Build Project</ButtonText>
         </Strings>
       </Button>
@@ -214,8 +215,9 @@
         <Icon guid="guidImages" id="bmpBuildSolution" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>Pict</CommandFlag>
         <Strings>
-          <CommandName>CommandId_BuildSolution</CommandName>
+          <CommandName>Build Solution</CommandName>
           <ButtonText>RudeBuild: Build Solution</ButtonText>
         </Strings>
       </Button>
@@ -225,8 +227,9 @@
         <Icon guid="guidImages" id="bmpStopBuild" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>Pict</CommandFlag>
         <Strings>
-          <CommandName>CommandId_StopBuild</CommandName>
+          <CommandName>Stop Build</CommandName>
           <ButtonText>RudeBuild: Stop Build</ButtonText>
         </Strings>
       </Button>
