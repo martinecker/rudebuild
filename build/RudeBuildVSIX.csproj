@@ -60,6 +60,10 @@
     <None Include="..\src\RudeBuildVSIX\source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="LICENSE.rtf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <VSCTCompile Include="..\src\RudeBuildVSIX\RudeBuildPackage.vsct">
@@ -67,7 +71,10 @@
       <SubType>Designer</SubType>
     </VSCTCompile>
     <Content Include="..\src\RudeBuildVSIX\Resources\RudeBuildCommands.png" />
-    <Content Include="..\src\RudeBuildVSIX\Resources\RudeBuildPackage.ico" />
+    <Content Include="..\src\RudeBuildVSIX\Resources\RudeBuildPackage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
