@@ -132,6 +132,15 @@ namespace RudeBuildVSIX
 			}
 		}
 
+		private void AddToolbarToUI()
+		{
+			CommandBar commandBar = _commandManager.AddCommandBar("RudeBuild", MsoBarPosition.msoBarTop);
+			int insertIndex = 1;
+			_commandManager.AddCommandToCommandBar(commandBar, "BuildProject", insertIndex++, style: MsoButtonStyle.msoButtonIcon);
+			_commandManager.AddCommandToCommandBar(commandBar, "BuildSolution", insertIndex++, style: MsoButtonStyle.msoButtonIcon);
+			_commandManager.AddCommandToCommandBar(commandBar, "StopBuild", insertIndex++, beginGroup: true, style: MsoButtonStyle.msoButtonIcon);
+		}
+
 		private CommandHandler(Package package)
 		{
 			if (package == null)
@@ -152,6 +161,7 @@ namespace RudeBuildVSIX
 				RegisterCommands();
 				AddProjectRightClickMenuToUI();
 				AddSolutionRightClickMenuToUI();
+				AddToolbarToUI();
 			}
 			catch (System.Exception ex)
 			{
