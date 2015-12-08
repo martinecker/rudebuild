@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("RudeBuildVSIX")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A unity C++ build tool for Visual Studio developed by Martin Ecker.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Martin Ecker")]
 [assembly: AssemblyProduct("RudeBuildVSIX")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

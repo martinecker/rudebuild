@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="RudeBuildVSIX.Martin Ecker.25450272-5342-4e0e-a5b8-5d77da5de289" Version="1.4" Language="en-US" Publisher="Martin Ecker" />
-    <DisplayName>RudeBuildVSIX</DisplayName>
+    <Identity Id="RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289" Version="1.4" Language="en-US" Publisher="Martin Ecker" />
+    <DisplayName>RudeBuild</DisplayName>
     <Description xml:space="preserve">RudeBuild - A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.</Description>
     <MoreInfo>http://rudebuild.sourceforge.net</MoreInfo>
     <License>LICENSE.rtf</License>
@@ -14,7 +14,7 @@
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0]" />
   </Installation>
   <Dependencies>
-    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[3.5,)" />
+    <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5.2,)" />
     <Dependency Id="Microsoft.VisualStudio.MPF.14.0" DisplayName="Visual Studio MPF 14.0" d:Source="Installed" Version="[14.0]" />
   </Dependencies>
   <Assets>

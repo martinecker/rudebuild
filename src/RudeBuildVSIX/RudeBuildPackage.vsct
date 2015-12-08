@@ -44,7 +44,7 @@
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
           <ButtonText>RudeBuild</ButtonText>
-          <CommandName>RudeBuildToolbar</CommandName>
+          <CommandName>RudeBuild</CommandName>
         </Strings>
       </Menu>
     </Menus>

@@ -31,15 +31,20 @@ namespace RudeBuild
             }
         }
 
-        public static string GetDevEnvPath(VisualStudioVersion version)
+		public static string GetDevEnvDir(VisualStudioVersion version)
+		{
+			string registryPath = GetDevEvnBaseRegistryKey(version) + @"Setup\VS";
+			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
+			if (null == registryKey)
+				throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+
+			var devEnvDir = (string)registryKey.GetValue("EnvironmentDirectory");
+			return devEnvDir;
+		}
+
+		public static string GetDevEnvPath(VisualStudioVersion version)
         {
-            string registryPath = GetDevEvnBaseRegistryKey(version) + @"Setup\VS";
-            RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
-            if (null == registryKey)
-                throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
-            
-            var devEnvPath = (string)registryKey.GetValue("EnvironmentDirectory");
-            devEnvPath = Path.Combine(devEnvPath, "devenv.com");
+            var devEnvPath = Path.Combine(GetDevEnvDir(version), "devenv.com");
             return devEnvPath;
         }
 
