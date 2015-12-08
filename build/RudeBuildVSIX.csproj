@@ -60,7 +60,7 @@
     <None Include="..\src\RudeBuildVSIX\source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="LICENSE.rtf">
+    <Content Include="..\LICENSE.rtf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
