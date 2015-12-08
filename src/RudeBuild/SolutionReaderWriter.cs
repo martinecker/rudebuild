@@ -30,7 +30,7 @@ namespace RudeBuild
 
         private static bool ParseVisualStudioVersion(string line, string visualStudioVersionString, VisualStudioVersion versionToSet, ref VisualStudioVersion versionToChange)
         {
-            if (line.StartsWith("VisualStudioFormat = " + visualStudioVersionString))
+            if (line.StartsWith("VisualStudioVersion = " + visualStudioVersionString))
             {
                 if (versionToChange != VisualStudioVersion.VSUnknown)
                 {
