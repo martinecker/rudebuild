@@ -3,7 +3,11 @@
   <Metadata>
     <Identity Id="RudeBuildVSIX.Martin Ecker.25450272-5342-4e0e-a5b8-5d77da5de289" Version="1.4" Language="en-US" Publisher="Martin Ecker" />
     <DisplayName>RudeBuildVSIX</DisplayName>
-    <Description xml:space="preserve">RudeBuild</Description>
+    <Description xml:space="preserve">RudeBuild - A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.</Description>
+    <MoreInfo>http://rudebuild.sourceforge.net</MoreInfo>
+    <License>LICENSE.rtf</License>
+    <Icon>RudeBuildPackage.ico</Icon>
+    <Tags>build,c++,unity,bulk</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0]" />
