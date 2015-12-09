@@ -8,6 +8,7 @@ namespace RudeBuildVSShared
         private readonly Builder _builder;
         private readonly OutputPane _outputPane;
         private SolutionInfo _cachedSolutionInfo;
+		private FileInfo _cachedSolutionFileInfo;
         private Settings _cachedSettings;
 
         public SolutionSettingsCommand(Builder builder, OutputPane outputPane)
@@ -16,23 +17,40 @@ namespace RudeBuildVSShared
             _outputPane = outputPane;
         }
 
-        private void CacheSolutionInfo(CommandManager commandManager)
+		private bool HasUpToDateCachedsolutionInfo(FileInfo solutionFileInfo)
+		{
+			if (_cachedSolutionInfo == null)
+				return false;
+
+			if (_cachedSolutionInfo.FilePath != solutionFileInfo.FullName)
+				return false;
+
+			if (_cachedSolutionFileInfo.LastWriteTime != solutionFileInfo.LastWriteTime)
+				return false;
+
+			if (_cachedSolutionFileInfo.Length != solutionFileInfo.Length)
+				return false;
+
+			return true;
+		}
+
+		private void CacheSolutionInfo(CommandManager commandManager)
         {
-            string solutionPath = commandManager.Application.Solution.FullName;
-            if (_cachedSolutionInfo != null && _cachedSolutionInfo.FilePath == solutionPath)
-                return;
-            if (!File.Exists(solutionPath))
-            {
-                _cachedSolutionInfo = null;
-                _cachedSettings = null;
-                return;
-            }
+			FileInfo solutionFileInfo = GetSolutionFileInfo(commandManager);
+			if (null == solutionFileInfo || !solutionFileInfo.Exists)
+			{
+				_cachedSolutionInfo = null;
+				_cachedSolutionFileInfo = null;
+				_cachedSettings = null;
+				return;
+			}
 
-            FileInfo solutionFileInfo = GetSolutionFileInfo(commandManager);
-            if (null == solutionFileInfo || !solutionFileInfo.Exists)
-                return;
+			if (HasUpToDateCachedsolutionInfo(solutionFileInfo))
+				return;
 
-            GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
+			_cachedSolutionFileInfo = solutionFileInfo;
+
+			GlobalSettings globalSettings = GlobalSettings.Load(_outputPane);
             var buildOptions = new BuildOptions();
             buildOptions.Solution = solutionFileInfo;
             buildOptions.Config = GetActiveSolutionConfig(commandManager);

@@ -6,40 +6,42 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
              xmlns:RudeBuildVSShared="clr-namespace:RudeBuildVSShared"
-             Title="RudeBuild Global Settings" Width="500" Height="260">
+             Title="RudeBuild Global Settings" Width="649.27" Height="263.451">
     <Window.Resources>
         <RudeBuildVSShared:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
         <RudeBuildVSShared:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="36*" />
-            <RowDefinition Height="36*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="36" />
         </Grid.RowDefinitions>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="0">Cache Path:</Label>
-        <TextBox Height="25" Name="_textBoxCachePath" Width="Auto" Margin="150,0,6,0" Grid.Row="0"
+        <TextBox Height="25" Name="_textBoxCachePath" Width="Auto" Margin="150,5,6,5" Grid.Row="0"
                  Text="{Binding Path=CachePath,ValidatesOnExceptions=True}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="1">Filename Prefix:</Label>
-        <TextBox Height="25" Name="_textBoxFileNamePrefix" Width="Auto" Margin="150,0,6,0" Grid.Row="1"
+        <TextBox Height="25" Name="_textBoxFileNamePrefix" Width="Auto" Margin="150,5,6,5" Grid.Row="1"
                  Text="{Binding Path=FileNamePrefix,ValidatesOnExceptions=True}"/>
         <Label Height="25" Margin="8,0,0,0" Grid.Row="2">Max. Unity File Size (KBs):</Label>
-        <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,0,6,0" Grid.Row="2"
+        <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,5,6,5" Grid.Row="2"
                  Text="{Binding Path=MaxUnityFileSizeInBytes,ValidatesOnExceptions=True, Converter={StaticResource bytesToKiloBytesConverter}}"/>
-        <Label Height="25" Margin="8,0,0,0" Grid.Row="3">Build Tool:</Label>
-        <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,0,6,0" Grid.Row="3"
+        <Label Height="25" Margin="8,0" Grid.Row="3">Build Tool:</Label>
+        <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,5,6,5" Grid.Row="3"
                   ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
-        <CheckBox Content="Exclude Writable Files from Unity Merge" Margin="8,6,6,0" Grid.Row="4"
+        <CheckBox Content="Exclude Writable Files from Unity Merge" Margin="8,5" Grid.Row="4"
                   IsChecked="{Binding Path=ExcludeWritableFilesFromUnityMerge}" />
-        <CheckBox Content="Randomize Order of Unity Merged Files per Build" Margin="8,6,6,0" Grid.Row="5"
+        <CheckBox Content="Randomize Order of Unity Merged Files per Build (Useful for Unity Testing on Nightly Builds)" Margin="8,5" Grid.Row="5"
                   IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="6">
-            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Width="75" Click="OnOK" />
-            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Width="75" Click="OnCancel" />
+        <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="8,5">
+            <StackPanel Margin="0" Orientation="Horizontal">
+                <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Width="75" Click="OnOK" />
+                <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Width="75" Click="OnCancel" Margin="6,0,0,0" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

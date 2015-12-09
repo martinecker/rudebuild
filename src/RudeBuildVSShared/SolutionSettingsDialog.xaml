@@ -6,17 +6,18 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
              xmlns:RudeBuildVSShared="clr-namespace:RudeBuildVSShared"
-             Title="RudeBuild Solution Settings" Width="500" Height="533">
+             Title="RudeBuild Solution Settings" Width="621.236" Height="582.15">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="36*" />
-            <RowDefinition Height="28" />
-			<RowDefinition Height="28" />
-            <RowDefinition Height="36" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Label Height="25" Margin="6,0,6,0" Grid.Row="0" 
-               Content="Files Excluded from RudeBuild per Project:" />
+        <Label Margin="8,0" Grid.Row="0">
+            <TextBlock>Files Excluded from RudeBuild per Project:<LineBreak/>(If you're missing projects here make sure to save the solution!)</TextBlock>
+        </Label> 
         <TreeView Name="_treeViewExcludedFileNames" Margin="6,0,6,0" Grid.Row="1" ToolTip="Right click project to add, right click file to remove."
                   ItemsSource="{Binding Path=ProjectNameToExcludedCppFileNameMap}" SelectedValuePath="Key" PreviewMouseRightButtonDown="OnPreviewMouseRightButtonDown" 
                   TreeViewItem.Selected="OnTreeViewItemSelected" TreeViewItem.Unselected="OnTreeViewItemUnselected">
@@ -48,13 +49,13 @@
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
-        <CheckBox Content="Disable Precompiled Headers" Margin="8,6,6,0" Grid.Row="2" ToolTip="If checked, precompiled headers will be turned off for all projects in the solution even if normally enabled."
+        <CheckBox Content="Disable Precompiled Headers" Margin="8,6,8,0" Grid.Row="2" ToolTip="If checked, precompiled headers will be turned off for all projects in the solution even if normally enabled."
                   IsChecked="{Binding Path=DisablePrecompiledHeaders}" />
-        <CheckBox Content="Set Big Object Compiler Flag" Margin="8,6,6,0" Grid.Row="3" ToolTip="If checked, the /bigobj compiler flag is specified for all projects. Useful if you get compiler errors about object files being too large."
+        <CheckBox Content="Set Big Object Compiler Flag" Margin="8,6,8,0" Grid.Row="3" ToolTip="If checked, the /bigobj compiler flag is specified for all projects. Useful if you get compiler errors about object files being too large."
                   IsChecked="{Binding Path=SetBigObjCompilerFlag}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="4">
-            <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Margin="315,0,6,0" Width="75" Click="OnOK" />
-            <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Margin="0,0,6,0" Width="75" Click="OnCancel" />
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Margin="8,6">
+            <Button Content="OK" IsDefault="True" Height="25" Margin="0,0,5,0" Width="75" Click="OnOK" />
+            <Button Content="Cancel" IsCancel="True"  Height="25" Margin="0,0,6,0" Width="75" Click="OnCancel" />
         </StackPanel>
     </Grid>
 </Window>

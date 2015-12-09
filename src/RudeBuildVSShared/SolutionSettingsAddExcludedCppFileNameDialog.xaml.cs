@@ -13,7 +13,7 @@ namespace RudeBuildVSShared
         private readonly ProjectInfo _projectInfo;
         private readonly SolutionSettings _solutionSettings;
 
-        public IList<string> FileNamesToExclude;
+        public IList<string> FileNamesToExclude { get; private set; }
 
         public SolutionSettingsAddExcludedCppFileNameDialog(ProjectInfo projectInfo, SolutionSettings solutionSettings)
         {
@@ -70,5 +70,5 @@ namespace RudeBuildVSShared
                 }
             }
         }
-    }
+	}
 }
