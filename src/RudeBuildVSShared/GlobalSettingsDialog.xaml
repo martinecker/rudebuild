@@ -21,21 +21,21 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="36" />
         </Grid.RowDefinitions>
-        <Label Height="25" Margin="8,0,0,0" Grid.Row="0">Cache Path:</Label>
+        <Label Height="25" Target="{Binding ElementName=_textBoxCachePath}" Margin="8,0,0,0" Grid.Row="0">Cache _Path:</Label>
         <TextBox Height="25" Name="_textBoxCachePath" Width="Auto" Margin="150,5,6,5" Grid.Row="0"
                  Text="{Binding Path=CachePath,ValidatesOnExceptions=True}"/>
-        <Label Height="25" Margin="8,0,0,0" Grid.Row="1">Filename Prefix:</Label>
+        <Label Height="25" Target="{Binding ElementName=_textBoxFileNamePrefix}" Margin="8,0,0,0" Grid.Row="1">_Filename Prefix:</Label>
         <TextBox Height="25" Name="_textBoxFileNamePrefix" Width="Auto" Margin="150,5,6,5" Grid.Row="1"
                  Text="{Binding Path=FileNamePrefix,ValidatesOnExceptions=True}"/>
-        <Label Height="25" Margin="8,0,0,0" Grid.Row="2">Max. Unity File Size (KBs):</Label>
+        <Label Height="25" Target="{Binding ElementName=_textBoxMaxUnityFileSize}" Margin="8,0,0,0" Grid.Row="2">_Max. Unity File Size (KBs):</Label>
         <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,5,6,5" Grid.Row="2"
                  Text="{Binding Path=MaxUnityFileSizeInBytes,ValidatesOnExceptions=True, Converter={StaticResource bytesToKiloBytesConverter}}"/>
-        <Label Height="25" Margin="8,0" Grid.Row="3">Build Tool:</Label>
+        <Label Height="25" Target="{Binding ElementName=_comboBoxBuildTool}" Margin="8,0" Grid.Row="3">_Build Tool:</Label>
         <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,5,6,5" Grid.Row="3"
                   ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
-        <CheckBox Content="Exclude Writable Files from Unity Merge" Margin="8,5" Grid.Row="4"
+        <CheckBox Content="_Exclude Writable Files from Unity Merge" Margin="8,5" Grid.Row="4"
                   IsChecked="{Binding Path=ExcludeWritableFilesFromUnityMerge}" />
-        <CheckBox Content="Randomize Order of Unity Merged Files per Build (Useful for Unity Testing on Nightly Builds)" Margin="8,5" Grid.Row="5"
+        <CheckBox Content="_Randomize Order of Unity Merged Files per Build" ToolTip="On every build, randomizes which C++ files get merged into a unity file. This is useful for unity build testing on nightly builds and shouldn't be used otherwise." Margin="8,5" Grid.Row="5"
                   IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
         <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="8,5">
             <StackPanel Margin="0" Orientation="Horizontal">

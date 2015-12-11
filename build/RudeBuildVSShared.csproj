@@ -206,6 +206,9 @@
     <Resource Include="..\src\RudeBuildVSShared\Resources\Editing-Expand-icon.png">
       <Link>Resources\Editing-Expand-icon.png</Link>
     </Resource>
+    <Resource Include="..\src\RudeBuildVSShared\Resources\Filter-icon.png">
+      <Link>Resources\Filter-icon.png</Link>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

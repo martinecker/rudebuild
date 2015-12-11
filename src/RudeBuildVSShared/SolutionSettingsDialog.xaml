@@ -20,7 +20,13 @@
             <TextBlock><Run Text="Files Excluded from Unity Builds per Project:"/><LineBreak/><Run Text="(If you're missing projects here make sure to save the solution!)"/></TextBlock>
         </Label>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <Button x:Name="_buttonExpandAll" HorizontalAlignment="Left" Margin="10,5,0,5" VerticalAlignment="Top">
+            <Button x:Name="_buttonFilter" HorizontalAlignment="Left" Margin="10,5,0,5" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/RudeBuildVSShared;component/Resources/Filter-icon.png" Width="22" Height="22" />
+                    <AccessText VerticalAlignment="Center" Margin="5,0">_Filter</AccessText>
+                </StackPanel>
+            </Button>
+            <Button x:Name="_buttonExpandAll" HorizontalAlignment="Left" Margin="5,5,0,5" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/RudeBuildVSShared;component/Resources/Editing-Expand-icon.png" Width="22" Height="22" />
                     <AccessText VerticalAlignment="Center" Margin="5,0">_Expand All</AccessText>
