@@ -39,8 +39,12 @@
                   IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
         <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="8,5">
             <StackPanel Margin="0" Orientation="Horizontal">
-                <Button Content="OK" IsDefault="True" Height="25" HorizontalAlignment="Right" Width="75" Click="OnOK" />
-                <Button Content="Cancel" IsCancel="True"  Height="25" HorizontalAlignment="Right" Width="75" Click="OnCancel" Margin="6,0,0,0" />
+                <Button IsDefault="True" Height="25" HorizontalAlignment="Right" Width="75" Click="OnOK">
+                    <AccessText>_OK</AccessText>
+                </Button>
+                <Button IsCancel="True"  Height="25" HorizontalAlignment="Right" Width="75" Click="OnCancel" Margin="6,0,0,0">
+                    <AccessText>_Cancel</AccessText>
+                </Button>
             </StackPanel>
         </StackPanel>
     </Grid>

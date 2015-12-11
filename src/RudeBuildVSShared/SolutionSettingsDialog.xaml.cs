@@ -377,9 +377,9 @@ namespace RudeBuildVSShared
 			_solutionHierarchy = new SolutionHierarchy(commandManager, settings);
 
 			InitializeComponent();
-            _window.DataContext = _solutionSettings;
+            _window.DataContext = _solutionSettings;	// Used to bind the checkboxes in the dialog to the solution settings.
 
-			RefreshProjectsTreeView();
+			RefreshProjectsTreeView();		// The projects tree view is explicitly created in code, no WPF data binding is used for simplicity.
         }
 
 		private void ExpandOrCollapseTreeViewItemRecursively(TreeViewItem treeViewItem, bool expand)
@@ -507,6 +507,17 @@ namespace RudeBuildVSShared
 			{
 				AddProjectsTreeViewItem(_treeViewProjects.Items, project.Key, project.Value);
 			}
+
+			_buttonExpandAll.Click += (sender, eventArgs) =>
+			{
+				foreach (TreeViewItem treeViewItem in _treeViewProjects.Items)
+					ExpandOrCollapseTreeViewItemRecursively(treeViewItem, true);
+			};
+			_buttonCollapseAll.Click += (sender, eventArgs) =>
+			{
+				foreach (TreeViewItem treeViewItem in _treeViewProjects.Items)
+					ExpandOrCollapseTreeViewItemRecursively(treeViewItem, false);
+			};
 		}
 
 		private void OnOK(object sender, RoutedEventArgs e)

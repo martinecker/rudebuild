@@ -10,6 +10,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -18,15 +19,37 @@
         <Label Margin="8,0" Grid.Row="0">
             <TextBlock><Run Text="Files Excluded from Unity Builds per Project:"/><LineBreak/><Run Text="(If you're missing projects here make sure to save the solution!)"/></TextBlock>
         </Label>
-        <TreeView Name="_treeViewProjects" Margin="5" Grid.Row="1" ToolTip="Uncheck the checkboxes next to files to explicitly exclude them from unity builds.">
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <Button x:Name="_buttonExpandAll" HorizontalAlignment="Left" Margin="10,5,0,5" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/RudeBuildVSShared;component/Resources/Editing-Expand-icon.png" Width="22" Height="22" />
+                    <AccessText VerticalAlignment="Center" Margin="5,0">_Expand All</AccessText>
+                </StackPanel>
+            </Button>
+            <Button x:Name="_buttonCollapseAll" HorizontalAlignment="Left" Margin="5,5,0,5" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/RudeBuildVSShared;component/Resources/Editing-Collapse-icon.png" Width="22" Height="22" />
+                    <AccessText VerticalAlignment="Center" Margin="5,0">Co_llapse All</AccessText>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <TreeView Name="_treeViewProjects" Margin="5" Grid.Row="2" ToolTip="Uncheck the checkboxes next to files to explicitly exclude them from unity builds.">
         </TreeView>
-        <CheckBox Content="Disable Precompiled Headers" Margin="8,6,8,0" Grid.Row="2" ToolTip="If checked, precompiled headers will be turned off for all projects in the solution even if normally enabled."
-                  IsChecked="{Binding Path=DisablePrecompiledHeaders}" />
-        <CheckBox Content="Set Big Object Compiler Flag" Margin="8,6,8,0" Grid.Row="3" ToolTip="If checked, the /bigobj compiler flag is specified for all projects. Useful if you get compiler errors about object files being too large."
-                  IsChecked="{Binding Path=SetBigObjCompilerFlag}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="4" Margin="8,6">
-            <Button Content="OK" IsDefault="True" Height="25" Margin="0,0,5,0" Width="75" Click="OnOK" />
-            <Button Content="Cancel" IsCancel="True"  Height="25" Margin="0,0,6,0" Width="75" Click="OnCancel" />
+        <CheckBox Margin="8,6,8,0" Grid.Row="3" ToolTip="If checked, precompiled headers will be turned off for all projects in the solution even if normally enabled."
+                  IsChecked="{Binding Path=DisablePrecompiledHeaders}">
+            <AccessText>_Disable Precompiled Headers</AccessText>
+        </CheckBox>
+        <CheckBox Margin="8,6,8,0" Grid.Row="4" ToolTip="If checked, the /bigobj compiler flag is specified for all projects. Useful if you get compiler errors about object files being too large."
+                  IsChecked="{Binding Path=SetBigObjCompilerFlag}">
+            <AccessText>Set _Big Object Compiler Flag</AccessText>
+        </CheckBox>
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Margin="8,6">
+            <Button IsDefault="True" Height="25" Margin="0,0,5,0" Width="75" Click="OnOK">
+                <AccessText>_OK</AccessText>
+            </Button>
+            <Button IsCancel="True"  Height="25" Margin="0,0,6,0" Width="75" Click="OnCancel">
+                <AccessText>_Cancel</AccessText>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

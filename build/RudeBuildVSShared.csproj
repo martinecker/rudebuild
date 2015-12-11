@@ -199,6 +199,17 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\src\RudeBuildVSShared\Resources\Editing-Collapse-icon.png">
+      <Link>Resources\Editing-Collapse-icon.png</Link>
+    </Resource>
+    <Resource Include="..\src\RudeBuildVSShared\Resources\Editing-Expand-icon.png">
+      <Link>Resources\Editing-Expand-icon.png</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions />
 </Project>
