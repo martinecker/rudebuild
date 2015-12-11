@@ -22,16 +22,10 @@ namespace RudeBuild
             return projectConfig.GetProjectConfig(solutionConfigName) ?? solutionConfigName;
         }
 
-        protected static bool IsValidCppFileName(string fileName)
-        {
-            string extension = Path.GetExtension(fileName);
-            return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
-        }
-
         protected bool IsValidCppFileElement(XNamespace ns, XElement cppFileElement, string pathAttributeName)
         {
             XAttribute pathAttribute = cppFileElement.Attribute(pathAttributeName);
-            return pathAttribute != null && IsValidCppFileName(pathAttribute.Value);
+            return pathAttribute != null && _settings.IsValidCppFileName(pathAttribute.Value);
         }
 
         protected bool IsMergableCppFileElement(SolutionConfigManager.ProjectConfig projectConfig, XNamespace ns, XElement cppFileElement, string pathAttributeName)

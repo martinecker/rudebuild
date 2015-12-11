@@ -74,5 +74,11 @@ namespace RudeBuild
             string modifiedFileName = Path.Combine(Path.GetDirectoryName(fileName), GlobalSettings.FileNamePrefix + Path.GetFileName(fileName));
             return modifiedFileName;
         }
-    }
+
+		public bool IsValidCppFileName(string fileName)
+		{
+			string extension = Path.GetExtension(fileName);
+			return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
+		}
+	}
 }

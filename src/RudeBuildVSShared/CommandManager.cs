@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.CommandBars;
 
@@ -192,6 +192,48 @@ namespace RudeBuildVSShared
             commandBarButton.Style = style;
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region Service functions
+
+		public T GetService<T>(System.Type type)
+		{
+			var serviceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)Application;
+			return GetService<T>(serviceProvider, type);
+		}
+
+		public T GetService<T>(object serviceProvider, System.Type type)
+		{
+			return GetService<T>(serviceProvider, type.GUID);
+		}
+
+		public T GetService<T>(object serviceProvider, System.Guid guid)
+		{
+			object objService = null;
+			Microsoft.VisualStudio.OLE.Interop.IServiceProvider objIServiceProvider = null;
+			IntPtr objIntPtr;
+			int hr = 0;
+			Guid objSIDGuid;
+			Guid objIIDGuid;
+
+			objSIDGuid = guid;
+			objIIDGuid = objSIDGuid;
+
+			objIServiceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)serviceProvider;
+
+			hr = objIServiceProvider.QueryService(ref objSIDGuid, ref objIIDGuid, out objIntPtr);
+			if (hr != 0)
+			{
+				System.Runtime.InteropServices.Marshal.ThrowExceptionForHR(hr);
+			}
+			else if (!objIntPtr.Equals(IntPtr.Zero))
+			{
+				objService = System.Runtime.InteropServices.Marshal.GetObjectForIUnknown(objIntPtr);
+				System.Runtime.InteropServices.Marshal.Release(objIntPtr);
+			}
+			return (T)objService;
+		}
+
+		#endregion
+	}
 }

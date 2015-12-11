@@ -74,7 +74,7 @@ namespace RudeBuildVSShared
             if (null == _cachedSolutionInfo || null == _cachedSettings)
                 return;
 
-            var dialog = new SolutionSettingsDialog(_cachedSettings, _cachedSolutionInfo);
+            var dialog = new SolutionSettingsDialog(commandManager, _cachedSettings, _cachedSolutionInfo);
             try
             {
                 dialog.ShowDialog();
