@@ -420,7 +420,7 @@ namespace RudeBuildVSShared
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.Folder) };
 			var label = new Label() { Content = folderName };
 
-			var stack = new StackPanel() { Orientation = Orientation.Horizontal };
+			var stack = new StackPanel() { Orientation = Orientation.Horizontal, Margin = new Thickness(0, -2, 0, -2) };
 			stack.Children.Add(image);
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
@@ -438,24 +438,52 @@ namespace RudeBuildVSShared
 
 		private void AddCppFileTreeViewItem(ProjectInfo projectInfo, ItemCollection items, string cppFileName)
 		{
+			const string kExcludeFromUnityBuild = "Exclude from Unity Build";
+			const string kIncludeInUnityBuild = "Include in Unity Build";
+
 			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
+			treeViewItem.ContextMenu = new ContextMenu();
 
 			var checkBox = new CheckBox()
 			{
 				IsChecked = !_solutionSettings.IsExcludedCppFileNameForProject(projectInfo, cppFileName),
 				VerticalAlignment = VerticalAlignment.Center
 			};
-			checkBox.Checked += (sender, eventArgs) => { _solutionSettings.RemoveExcludedCppFileNameForProject(projectInfo, cppFileName); };
-			checkBox.Unchecked += (sender, eventArgs) => { _solutionSettings.ExcludeCppFileNameForProject(projectInfo, cppFileName); };
+
+			var contextMenuItemExclude = new MenuItem()
+			{
+				Header = checkBox.IsChecked.Value ? kExcludeFromUnityBuild : kIncludeInUnityBuild,
+			};
+			contextMenuItemExclude.Click += (sender, eventArgs) =>
+			{
+				checkBox.IsChecked = !checkBox.IsChecked.Value;
+			};
+			treeViewItem.ContextMenu.Items.Add(contextMenuItemExclude);
+
+			checkBox.Checked += (sender, eventArgs) => 
+			{
+				_solutionSettings.RemoveExcludedCppFileNameForProject(projectInfo, cppFileName);
+				contextMenuItemExclude.Header = kExcludeFromUnityBuild;
+			};
+			checkBox.Unchecked += (sender, eventArgs) => 
+			{
+				_solutionSettings.ExcludeCppFileNameForProject(projectInfo, cppFileName);
+				contextMenuItemExclude.Header = kIncludeInUnityBuild;
+			};
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.CppFile) };
 			var label = new Label() { Content = cppFileName };
 
-			var stack = new StackPanel() { Orientation = Orientation.Horizontal };
+			var stack = new StackPanel() { Orientation = Orientation.Horizontal, Margin = new Thickness(0, -2, 0, -2) };
 			stack.Children.Add(checkBox);
 			stack.Children.Add(image);
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
+
+			/*			treeViewItem.PreviewMouseRightButtonDown += (sender, eventArgs)
+						{
+
+						};*/
 
 			items.Add(treeViewItem);
 		}
