@@ -46,6 +46,8 @@ namespace RudeBuildVSShared
 		}
 
 		private readonly Settings _settings;
+		private readonly SolutionInfo _solutionInfo;
+
 		private IDictionary<IconType, BitmapSource> _icons = new Dictionary<IconType, BitmapSource>();
 
 		public Dictionary<string, List<Item>> ProjectNameToCppFileNameMap { get; private set; }
@@ -79,9 +81,11 @@ namespace RudeBuildVSShared
 		[DllImport("gdi32.dll")]
 		public static extern bool DeleteObject(IntPtr hObject);
 
-		public SolutionHierarchy(CommandManager commandManager, Settings settings)
+		public SolutionHierarchy(CommandManager commandManager, SolutionInfo solutionInfo, Settings settings)
 		{
+			_solutionInfo = solutionInfo;
 			_settings = settings;
+
 			_icons[IconType.Project] = null;
 			_icons[IconType.Folder] = null;
 			_icons[IconType.CppFile] = null;
@@ -259,24 +263,31 @@ namespace RudeBuildVSShared
 			if (GetIcon(type) != null)
 				return;
 
-			// Case 1: Try to get the icon from the hierachy with imagelist
-			BitmapSource icon = ExtractIconWithImageList(projectHierarchy, projectItemId, FolderState.Open);
-			if (null == icon)
+			try
 			{
-				// Case 2: Try to get the icon from the hierachy without imagelist
-				// This is the case, for example, of files of project VS 2010, Database > SQL Server > SQL Server 2005 Database Project
-				icon = ExtractIconWithoutImageList(projectHierarchy, projectItemId, FolderState.Open);
+				// Case 1: Try to get the icon from the hierachy with imagelist
+				BitmapSource icon = ExtractIconWithImageList(projectHierarchy, projectItemId, FolderState.Open);
 				if (null == icon)
 				{
-					// Case 3: Try to get the icon from the Windows shell
-					string canonicalName;
-					projectHierarchy.GetCanonicalName(projectItemId, out canonicalName);
-					icon = ExtractIconFromShell(canonicalName);
+					// Case 2: Try to get the icon from the hierachy without imagelist
+					// This is the case, for example, of files of project VS 2010, Database > SQL Server > SQL Server 2005 Database Project
+					icon = ExtractIconWithoutImageList(projectHierarchy, projectItemId, FolderState.Open);
+					if (null == icon)
+					{
+						// Case 3: Try to get the icon from the Windows shell
+						string canonicalName;
+						projectHierarchy.GetCanonicalName(projectItemId, out canonicalName);
+						icon = ExtractIconFromShell(canonicalName);
+					}
 				}
-			}
 
-			if (null != icon)
-				_icons[type] = icon;
+				if (null != icon)
+					_icons[type] = icon;
+			}
+			catch
+			{
+				// Ignore exceptions. If we couldn't extract the icon that's not the end of the world.
+			}
 		}
 
 		private void ProcessSolution(CommandManager commandManager)
@@ -285,14 +296,18 @@ namespace RudeBuildVSShared
 
 			foreach (EnvDTE.Project project in commandManager.Application.Solution.Projects)
 			{
-				var projectData = new List<Item>();
-				ProcessProject(solutionService, project, projectData);
-				if (projectData.Count > 0)
-					ProjectNameToCppFileNameMap[project.Name] = projectData;
+				var projectInfo = _solutionInfo.GetProjectInfo(project.Name);
+				if (null != projectInfo)
+				{
+					var projectData = new List<Item>();
+					ProcessProject(solutionService, project, projectInfo, projectData);
+					if (projectData.Count > 0)
+						ProjectNameToCppFileNameMap[project.Name] = projectData;
+				}
 			}
 		}
 
-		private void ProcessProject(IVsSolution solutionService, EnvDTE.Project project, List<Item> projectData)
+		private void ProcessProject(IVsSolution solutionService, EnvDTE.Project project, ProjectInfo projectInfo, List<Item> projectData)
 		{
 			IVsHierarchy projectHierarchy = null;
 
@@ -304,12 +319,12 @@ namespace RudeBuildVSShared
 					if (projectHierarchy.ParseCanonicalName(project.FileName, out projectItemId) == 0)
 						ExtractIcon(IconType.Project, projectHierarchy, projectItemId);
 
-					ProcessProjectItems(solutionService, projectHierarchy, project.ProjectItems, projectData);
+					ProcessProjectItems(solutionService, projectHierarchy, projectInfo, project.ProjectItems, projectData);
 				}
 			}
 		}
 
-		private void ProcessProjectItems(IVsSolution solutionService, IVsHierarchy projectHierarchy, EnvDTE.ProjectItems projectItems, List<Item> projectData)
+		private void ProcessProjectItems(IVsSolution solutionService, IVsHierarchy projectHierarchy, ProjectInfo projectInfo, EnvDTE.ProjectItems projectItems, List<Item> projectData)
 		{
 			if (projectItems != null)
 			{
@@ -319,16 +334,17 @@ namespace RudeBuildVSShared
 					{
 						var folderItems = new List<Item>();
 
-						ProcessProject(solutionService, projectItem.SubProject, folderItems);
+						ProcessProject(solutionService, projectItem.SubProject, projectInfo, folderItems);
 
 						if (folderItems.Count > 0)
 						{
 							projectData.Add(new Item(projectItem.SubProject.Name, folderItems));
 						}
 					}
-					else
+					else if (projectItem.FileCount >= 1)
 					{
-						string name = projectItem.Name;
+						string name = null;
+						try { name = projectItem.get_FileNames(0); } catch { }
 						if (!string.IsNullOrEmpty(name))
 						{
 							if (projectItem.FileCount == 1)
@@ -336,18 +352,19 @@ namespace RudeBuildVSShared
 								if (_settings.IsValidCppFileName(name))
 								{
 									ExtractIcon(IconType.CppFile, projectHierarchy, projectItem);
-									projectData.Add(new Item(name));
+
+									string projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(name);
+									if (projectInfo.AllCppFileNames.Contains(projectRelativeName))
+										projectData.Add(new Item(projectRelativeName));
 								}
 							}
-							else if (projectItem.FileCount > 1)
+							else
 							{
-								var folderItems = new List<Item>();
-
 								ExtractIcon(IconType.Folder, projectHierarchy, projectItem);
 
 								// Enter folder recursively
-								ProcessProjectItems(solutionService, projectHierarchy, projectItem.ProjectItems, folderItems);
-
+								var folderItems = new List<Item>();
+								ProcessProjectItems(solutionService, projectHierarchy, projectInfo, projectItem.ProjectItems, folderItems);
 								if (folderItems.Count > 0)
 									projectData.Add(new Item(name, folderItems));
 							}
@@ -374,7 +391,7 @@ namespace RudeBuildVSShared
             _solutionInfo = solutionInfo;
             _solutionSettings = SolutionSettings.Load(settings, solutionInfo);
 
-			_solutionHierarchy = new SolutionHierarchy(commandManager, settings);
+			_solutionHierarchy = new SolutionHierarchy(commandManager, solutionInfo, settings);
 
 			InitializeComponent();
             _window.DataContext = _solutionSettings;	// Used to bind the checkboxes in the dialog to the solution settings.
@@ -489,7 +506,7 @@ namespace RudeBuildVSShared
 			};
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.CppFile) };
-			var label = new Label() { Content = cppFileName };
+			var label = new Label() { Content = System.IO.Path.GetFileName(cppFileName) };
 
 			var stack = new StackPanel() { Orientation = Orientation.Horizontal, Margin = new Thickness(0, -2, 0, -2) };
 			stack.Children.Add(checkBox);
