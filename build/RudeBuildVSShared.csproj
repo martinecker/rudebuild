@@ -121,9 +121,6 @@
     <Compile Include="..\src\RudeBuildVSShared\SolutionSettingsDialog.xaml.cs">
       <DependentUpon>SolutionSettingsDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\src\RudeBuildVSShared\SolutionSettingsAddExcludedCppFileNameDialog.xaml.cs">
-      <DependentUpon>SolutionSettingsAddExcludedCppFileNameDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="..\src\RudeBuildVSShared\WPFHelper.cs">
       <Link>WPFHelper.cs</Link>
     </Compile>
@@ -198,12 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="..\src\RudeBuildVSShared\SolutionSettingsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="..\src\RudeBuildVSShared\SolutionSettingsAddExcludedCppFileNameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
