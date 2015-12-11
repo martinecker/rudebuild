@@ -79,6 +79,8 @@ namespace RudeBuildVSShared
 		[DllImport("user32.dll")]
 		private static extern bool DestroyIcon(IntPtr hIcon);
 
+		[DllImport("gdi32.dll")]
+		public static extern bool DeleteObject(IntPtr hObject);
 
 		public SolutionHierarchy(CommandManager commandManager, Settings settings)
 		{
@@ -143,8 +145,16 @@ namespace RudeBuildVSShared
 					graphics.DrawIcon(icon, 0, 0);
 				}
 
-				result = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
-					IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(icon.Width, icon.Height));
+				IntPtr bitmapHandle = bitmap.GetHbitmap();
+				try
+				{
+					result = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bitmapHandle,
+						IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromWidthAndHeight(icon.Width, icon.Height));
+				}
+				finally
+				{
+					DeleteObject(bitmapHandle);
+				}
 			}
 
 			if (shouldDestroyIcon == ShouldDestroyIcon.Yes)
@@ -382,12 +392,12 @@ namespace RudeBuildVSShared
 			if (null == projectInfo)
 				return;
 
-			var treeViewItem = new TreeViewItem() { IsExpanded = true, FontWeight = FontWeights.Bold };
+			var treeViewItem = new TreeViewItem() { FontSize = 11, FontWeight = FontWeights.Bold };
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.Project) };
 			var label = new Label() { Content = projectName };
 
-			var stack = new StackPanel() { Orientation = Orientation.Horizontal };
+			var stack = new StackPanel() { Orientation = Orientation.Horizontal, Margin = new Thickness(0, -2, 0, -2) };
 			stack.Children.Add(image);
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
@@ -405,7 +415,7 @@ namespace RudeBuildVSShared
 
 		private void AddFolderTreeViewITem(ProjectInfo projectInfo, ItemCollection items, string folderName, IList<SolutionHierarchy.Item> folderItems)
 		{
-			var treeViewItem = new TreeViewItem() { IsExpanded = true, FontWeight = FontWeights.Normal };
+			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.Folder) };
 			var label = new Label() { Content = folderName };
@@ -428,7 +438,7 @@ namespace RudeBuildVSShared
 
 		private void AddCppFileTreeViewItem(ProjectInfo projectInfo, ItemCollection items, string cppFileName)
 		{
-			var treeViewItem = new TreeViewItem() { IsExpanded = true, FontWeight = FontWeights.Normal };
+			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
 
 			var checkBox = new CheckBox()
 			{
