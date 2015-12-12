@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -394,10 +395,11 @@ namespace RudeBuildVSShared
 			_solutionHierarchy = new SolutionHierarchy(commandManager, solutionInfo, settings);
 
 			InitializeComponent();
-            _window.DataContext = _solutionSettings;	// Used to bind the checkboxes in the dialog to the solution settings.
+            _window.DataContext = _solutionSettings;    // Used to bind the checkboxes in the dialog to the solution settings.
 
-			RefreshProjectsTreeView();		// The projects tree view is explicitly created in code, no WPF data binding is used for simplicity.
-        }
+			RefreshProjectsTreeView();      // The projects tree view is explicitly created in code, no WPF data binding is used for simplicity.
+			InitializeProjectsTreeViewButtons();
+		}
 
 		private void ExpandOrCollapseTreeViewItemRecursively(TreeViewItem treeViewItem, bool expand)
 		{
@@ -524,7 +526,40 @@ namespace RudeBuildVSShared
 			{
 				AddProjectsTreeViewItem(_treeViewProjects.Items, project.Key, project.Value);
 			}
+		}
 
+		private void InitializeProjectsTreeViewButtons()
+		{
+			var filterContextMenu = new ContextMenu();
+			filterContextMenu.Placement = PlacementMode.Bottom;
+			filterContextMenu.PlacementTarget = _buttonFilter;
+			_buttonFilter.ContextMenu = filterContextMenu;
+
+			var filterContextMenuItemAll = new MenuItem() { Header = "All" };
+			filterContextMenuItemAll.Click += (sender, eventArgs) =>
+			{
+				filterContextMenu.IsOpen = false;
+			};
+			filterContextMenu.Items.Add(filterContextMenuItemAll);
+
+			var filterContextMenuItemOnlyExcluded = new MenuItem() { Header = "Only Excluded Files" };
+			filterContextMenuItemOnlyExcluded.Click += (sender, eventArgs) =>
+			{
+				filterContextMenu.IsOpen = false;
+			};
+			filterContextMenu.Items.Add(filterContextMenuItemOnlyExcluded);
+
+			var filterContextMenuItemOnlyIncluded = new MenuItem() { Header = "Only Included Files" };
+			filterContextMenuItemOnlyIncluded.Click += (sender, eventArgs) =>
+			{
+				filterContextMenu.IsOpen = false;
+			};
+			filterContextMenu.Items.Add(filterContextMenuItemOnlyIncluded);
+
+			_buttonFilter.Click += (sender, eventsArgs) =>
+			{
+				filterContextMenu.IsOpen = true;
+			};
 			_buttonExpandAll.Click += (sender, eventArgs) =>
 			{
 				foreach (TreeViewItem treeViewItem in _treeViewProjects.Items)
