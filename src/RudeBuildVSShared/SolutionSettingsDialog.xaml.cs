@@ -401,24 +401,25 @@ namespace RudeBuildVSShared
 			InitializeProjectsTreeViewButtons();
 		}
 
-		private void PerformActionOnProjectsTreeViewItems(TreeViewItem treeViewItem, Action<TreeViewItem> action)
+		private void PerformActionOnTreeViewItems(TreeViewItem treeViewItem, Action<TreeViewItem> action)
 		{
-			action(treeViewItem);
 			foreach (TreeViewItem childTreeViewItem in treeViewItem.Items)
 			{
+				PerformActionOnTreeViewItems(childTreeViewItem, action);
 				action(childTreeViewItem);
-				PerformActionOnProjectsTreeViewItems(childTreeViewItem, action);
 			}
+
+			action(treeViewItem);
 		}
 
 		private void ExpandTreeViewItemRecursively(TreeViewItem startTreeViewItem)
 		{
-			PerformActionOnProjectsTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = true; });
+			PerformActionOnTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = true; });
 		}
 
 		private void CollapseTreeViewItemRecursively(TreeViewItem startTreeViewItem)
 		{
-			PerformActionOnProjectsTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = false; });
+			PerformActionOnTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = false; });
 		}
 
 		private void AddExpandAndCollapseAllContextMenuItems(ContextMenu contextMenu, TreeViewItem treeViewItem)
@@ -431,13 +432,14 @@ namespace RudeBuildVSShared
 			contextMenu.Items.Add(contextMenuItemCollapseAll);
 		}
 
-		private void AddProjectsTreeViewItem(ItemCollection items, string projectName, IList<SolutionHierarchy.Item> projectItems)
+		private void AddProjectsTreeViewItem(TreeView treeView, string projectName, IList<SolutionHierarchy.Item> projectItems)
 		{
 			ProjectInfo projectInfo = _solutionInfo.GetProjectInfo(projectName);
 			if (null == projectInfo)
 				return;
 
 			var treeViewItem = new TreeViewItem() { FontSize = 11, FontWeight = FontWeights.Bold };
+			treeViewItem.DataContext = projectInfo;
 			treeViewItem.ContextMenu = new ContextMenu();
 			AddExpandAndCollapseAllContextMenuItems(treeViewItem.ContextMenu, treeViewItem);
 
@@ -449,7 +451,7 @@ namespace RudeBuildVSShared
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
 
-			items.Add(treeViewItem);
+			treeView.Items.Add(treeViewItem);
 
 			foreach (var item in projectItems)
 			{
@@ -540,37 +542,105 @@ namespace RudeBuildVSShared
 			_treeViewProjects.Items.Clear();
 			foreach (var project in _solutionHierarchy.ProjectNameToCppFileNameMap)
 			{
-				AddProjectsTreeViewItem(_treeViewProjects.Items, project.Key, project.Value);
+				AddProjectsTreeViewItem(_treeViewProjects, project.Key, project.Value);
 			}
 		}
 
-		private void InitializeProjectsTreeViewButtons()
+		private void CollapseTreeViewItemIfAllChildrenCollapsed(TreeViewItem treeViewItem)
+		{
+			bool allCollapsed = true;
+			foreach (TreeViewItem childTreeViewItem in treeViewItem.Items)
+			{
+				if (childTreeViewItem.Visibility == Visibility.Visible)
+				{
+					allCollapsed = false;
+					break;
+				}
+			}
+			if (allCollapsed)
+				treeViewItem.Visibility = Visibility.Collapsed;
+		}
+
+		private ContextMenu CreateFilterButtonContextMenu()
 		{
 			var filterContextMenu = new ContextMenu();
 			filterContextMenu.Placement = PlacementMode.Bottom;
 			filterContextMenu.PlacementTarget = _buttonFilter;
 			_buttonFilter.ContextMenu = filterContextMenu;
 
-			var filterContextMenuItemAll = new MenuItem() { Header = "All" };
+			var filterContextMenuItemAll = new MenuItem() { Header = "Show All" };
 			filterContextMenuItemAll.Click += (sender, eventArgs) =>
 			{
+				foreach (TreeViewItem projectTreeViewItem in _treeViewProjects.Items)
+				{
+					PerformActionOnTreeViewItems(projectTreeViewItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
+				}
 				filterContextMenu.IsOpen = false;
 			};
 			filterContextMenu.Items.Add(filterContextMenuItemAll);
 
-			var filterContextMenuItemOnlyExcluded = new MenuItem() { Header = "Only Excluded Files" };
+			var filterContextMenuItemOnlyExcluded = new MenuItem() { Header = "Show Only Excluded Files" };
 			filterContextMenuItemOnlyExcluded.Click += (sender, eventArgs) =>
 			{
+				foreach (TreeViewItem projectTreeViewItem in _treeViewProjects.Items)
+				{
+					ProjectInfo projectInfo = (ProjectInfo)projectTreeViewItem.DataContext;
+
+					PerformActionOnTreeViewItems(projectTreeViewItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
+
+					PerformActionOnTreeViewItems(projectTreeViewItem,
+						(treeViewItem) =>
+						{
+							SolutionHierarchy.Item item = treeViewItem.DataContext as SolutionHierarchy.Item;
+							if (null != item && item.Type == SolutionHierarchy.Item.ItemType.CppFile)
+							{
+								treeViewItem.Visibility = _solutionSettings.IsExcludedCppFileNameForProject(projectInfo, item.Name) ?
+									Visibility.Visible : Visibility.Collapsed;
+							}
+							else
+							{
+								CollapseTreeViewItemIfAllChildrenCollapsed(treeViewItem);
+							}
+						});
+				}
 				filterContextMenu.IsOpen = false;
 			};
 			filterContextMenu.Items.Add(filterContextMenuItemOnlyExcluded);
 
-			var filterContextMenuItemOnlyIncluded = new MenuItem() { Header = "Only Included Files" };
+			var filterContextMenuItemOnlyIncluded = new MenuItem() { Header = "Show Only Included Files" };
 			filterContextMenuItemOnlyIncluded.Click += (sender, eventArgs) =>
 			{
+				foreach (TreeViewItem projectTreeViewItem in _treeViewProjects.Items)
+				{
+					ProjectInfo projectInfo = (ProjectInfo)projectTreeViewItem.DataContext;
+
+					PerformActionOnTreeViewItems(projectTreeViewItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
+
+					PerformActionOnTreeViewItems(projectTreeViewItem,
+						(treeViewItem) =>
+						{
+							SolutionHierarchy.Item item = treeViewItem.DataContext as SolutionHierarchy.Item;
+							if (null != item && item.Type == SolutionHierarchy.Item.ItemType.CppFile)
+							{
+								treeViewItem.Visibility = !_solutionSettings.IsExcludedCppFileNameForProject(projectInfo, item.Name) ?
+									Visibility.Visible : Visibility.Collapsed;
+							}
+							else
+							{
+								CollapseTreeViewItemIfAllChildrenCollapsed(treeViewItem);
+							}
+						});
+				}
 				filterContextMenu.IsOpen = false;
 			};
 			filterContextMenu.Items.Add(filterContextMenuItemOnlyIncluded);
+
+			return filterContextMenu;
+		}
+
+		private void InitializeProjectsTreeViewButtons()
+		{
+			var filterContextMenu = CreateFilterButtonContextMenu();
 
 			_buttonFilter.Click += (sender, eventsArgs) =>
 			{
