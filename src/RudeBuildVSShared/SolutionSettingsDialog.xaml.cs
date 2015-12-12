@@ -454,13 +454,13 @@ namespace RudeBuildVSShared
 			foreach (var item in projectItems)
 			{
 				if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
-					AddCppFileTreeViewItem(projectInfo, treeViewItem.Items, item.Name);
+					AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
 				else
-					AddFolderTreeViewITem(projectInfo, treeViewItem.Items, item.Name, item.Items);
+					AddFolderTreeViewITem(projectInfo, treeViewItem, item.Name, item.Items);
 			}
 		}
 
-		private void AddFolderTreeViewITem(ProjectInfo projectInfo, ItemCollection items, string folderName, IList<SolutionHierarchy.Item> folderItems)
+		private void AddFolderTreeViewITem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, string folderName, IList<SolutionHierarchy.Item> folderItems)
 		{
 			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
 			treeViewItem.ContextMenu = new ContextMenu();
@@ -474,23 +474,26 @@ namespace RudeBuildVSShared
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
 
-			items.Add(treeViewItem);
+			parentTreeViewItem.Items.Add(treeViewItem);
 
 			foreach (var item in folderItems)
 			{
 				if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
-					AddCppFileTreeViewItem(projectInfo, treeViewItem.Items, item.Name);
+					AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
 				else
-					AddFolderTreeViewITem(projectInfo, treeViewItem.Items, item.Name, item.Items);
+					AddFolderTreeViewITem(projectInfo, treeViewItem, item.Name, item.Items);
 			}
 		}
 
-		private void AddCppFileTreeViewItem(ProjectInfo projectInfo, ItemCollection items, string cppFileName)
+		private void AddCppFileTreeViewItem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, SolutionHierarchy.Item item)
 		{
 			const string kExcludeFromUnityBuild = "Exclude from Unity Build";
 			const string kIncludeInUnityBuild = "Include in Unity Build";
 
+			string cppFileName = item.Name;
+
 			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
+			treeViewItem.DataContext = item;
 			treeViewItem.ContextMenu = new ContextMenu();
 
 			var checkBox = new CheckBox()
@@ -529,7 +532,7 @@ namespace RudeBuildVSShared
 			stack.Children.Add(label);
 			treeViewItem.Header = stack;
 
-			items.Add(treeViewItem);
+			parentTreeViewItem.Items.Add(treeViewItem);
 		}
 
 		private void RefreshProjectsTreeView()
