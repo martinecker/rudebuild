@@ -401,19 +401,32 @@ namespace RudeBuildVSShared
 			InitializeProjectsTreeViewButtons();
 		}
 
-		private void ExpandOrCollapseTreeViewItemRecursively(TreeViewItem treeViewItem, bool expand)
+		private void PerformActionOnProjectsTreeViewItems(TreeViewItem treeViewItem, Action<TreeViewItem> action)
 		{
-			treeViewItem.IsExpanded = expand;
+			action(treeViewItem);
 			foreach (TreeViewItem childTreeViewItem in treeViewItem.Items)
-				ExpandOrCollapseTreeViewItemRecursively(childTreeViewItem, expand);
+			{
+				action(childTreeViewItem);
+				PerformActionOnProjectsTreeViewItems(childTreeViewItem, action);
+			}
+		}
+
+		private void ExpandTreeViewItemRecursively(TreeViewItem startTreeViewItem)
+		{
+			PerformActionOnProjectsTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = true; });
+		}
+
+		private void CollapseTreeViewItemRecursively(TreeViewItem startTreeViewItem)
+		{
+			PerformActionOnProjectsTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = false; });
 		}
 
 		private void AddExpandAndCollapseAllContextMenuItems(ContextMenu contextMenu, TreeViewItem treeViewItem)
 		{
 			var contextMenuItemExpandAll = new MenuItem() { Header = "Expand All" };
 			var contextMenuItemCollapseAll = new MenuItem() { Header = "Collapse All" };
-			contextMenuItemExpandAll.Click += (sender, eventArgs) => { ExpandOrCollapseTreeViewItemRecursively(treeViewItem, true); };
-			contextMenuItemCollapseAll.Click += (sender, eventArgs) => { ExpandOrCollapseTreeViewItemRecursively(treeViewItem, false); };
+			contextMenuItemExpandAll.Click += (sender, eventArgs) => { ExpandTreeViewItemRecursively(treeViewItem); };
+			contextMenuItemCollapseAll.Click += (sender, eventArgs) => { CollapseTreeViewItemRecursively(treeViewItem); };
 			contextMenu.Items.Add(contextMenuItemExpandAll);
 			contextMenu.Items.Add(contextMenuItemCollapseAll);
 		}
@@ -563,12 +576,12 @@ namespace RudeBuildVSShared
 			_buttonExpandAll.Click += (sender, eventArgs) =>
 			{
 				foreach (TreeViewItem treeViewItem in _treeViewProjects.Items)
-					ExpandOrCollapseTreeViewItemRecursively(treeViewItem, true);
+					ExpandTreeViewItemRecursively(treeViewItem);
 			};
 			_buttonCollapseAll.Click += (sender, eventArgs) =>
 			{
 				foreach (TreeViewItem treeViewItem in _treeViewProjects.Items)
-					ExpandOrCollapseTreeViewItemRecursively(treeViewItem, false);
+					CollapseTreeViewItemRecursively(treeViewItem);
 			};
 		}
 
