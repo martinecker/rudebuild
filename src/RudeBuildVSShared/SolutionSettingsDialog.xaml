@@ -17,7 +17,10 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Label Margin="8,0" Grid.Row="0">
-            <TextBlock><Run Text="Files Excluded from Unity Builds per Project:"/><LineBreak/><Run Text="(If you're missing projects here make sure to save the solution!)"/></TextBlock>
+            <TextBlock>
+                <Run Text="Unity Build Source Files:"/><LineBreak/>
+                <Run Text="(If you're missing projects here make sure to save the solution!)"/>
+            </TextBlock>
         </Label>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
             <Button x:Name="_buttonFilter" HorizontalAlignment="Left" Margin="10,5,0,5" VerticalAlignment="Top">

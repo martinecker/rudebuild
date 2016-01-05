@@ -422,7 +422,22 @@ namespace RudeBuildVSShared
 			PerformActionOnTreeViewItems(startTreeViewItem, (treeViewItem) => { treeViewItem.IsExpanded = false; });
 		}
 
-		private void AddExpandAndCollapseAllContextMenuItems(ContextMenu contextMenu, TreeViewItem treeViewItem)
+		private void SetIncludeStateForAllFilesForTreeViewItemRecursively(TreeViewItem startTreeViewItem, bool isIncluded)
+		{
+			PerformActionOnTreeViewItems(startTreeViewItem, (treeViewItem) => 
+			{
+				foreach (var child in LogicalTreeHelper.GetChildren((StackPanel)treeViewItem.Header))
+				{
+					CheckBox checkBox = child as CheckBox;
+					if (checkBox != null)
+					{
+						checkBox.IsChecked = isIncluded;
+					}
+				}
+			});
+		}
+
+		private void AddProjectOrFolderTreeViewItemContextMenu(ContextMenu contextMenu, TreeViewItem treeViewItem)
 		{
 			var contextMenuItemExpandAll = new MenuItem() { Header = "Expand All" };
 			var contextMenuItemCollapseAll = new MenuItem() { Header = "Collapse All" };
@@ -430,9 +445,18 @@ namespace RudeBuildVSShared
 			contextMenuItemCollapseAll.Click += (sender, eventArgs) => { CollapseTreeViewItemRecursively(treeViewItem); };
 			contextMenu.Items.Add(contextMenuItemExpandAll);
 			contextMenu.Items.Add(contextMenuItemCollapseAll);
+
+			contextMenu.Items.Add(new Separator());
+
+			var contextMenuItemIncludeAll = new MenuItem() { Header = "Include All Files in Unity Build" };
+			var contextMenuItemExcludeAll = new MenuItem() { Header = "Exclude All Files from Unity Build" };
+			contextMenuItemIncludeAll.Click += (sender, eventArgs) => { SetIncludeStateForAllFilesForTreeViewItemRecursively(treeViewItem, true); };
+			contextMenuItemExcludeAll.Click += (sender, eventArgs) => { SetIncludeStateForAllFilesForTreeViewItemRecursively(treeViewItem, false); };
+			contextMenu.Items.Add(contextMenuItemIncludeAll);
+			contextMenu.Items.Add(contextMenuItemExcludeAll);
 		}
 
-		private void AddProjectsTreeViewItem(TreeView treeView, string projectName, IList<SolutionHierarchy.Item> projectItems)
+		private void AddProjectTreeViewItem(TreeView treeView, string projectName, IList<SolutionHierarchy.Item> projectItems)
 		{
 			ProjectInfo projectInfo = _solutionInfo.GetProjectInfo(projectName);
 			if (null == projectInfo)
@@ -441,7 +465,7 @@ namespace RudeBuildVSShared
 			var treeViewItem = new TreeViewItem() { FontSize = 11, FontWeight = FontWeights.Bold };
 			treeViewItem.DataContext = projectInfo;
 			treeViewItem.ContextMenu = new ContextMenu();
-			AddExpandAndCollapseAllContextMenuItems(treeViewItem.ContextMenu, treeViewItem);
+			AddProjectOrFolderTreeViewItemContextMenu(treeViewItem.ContextMenu, treeViewItem);
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.Project) };
 			var label = new Label() { Content = projectName };
@@ -458,15 +482,15 @@ namespace RudeBuildVSShared
 				if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
 					AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
 				else
-					AddFolderTreeViewITem(projectInfo, treeViewItem, item.Name, item.Items);
+					AddFolderTreeViewItem(projectInfo, treeViewItem, item.Name, item.Items);
 			}
 		}
 
-		private void AddFolderTreeViewITem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, string folderName, IList<SolutionHierarchy.Item> folderItems)
+		private void AddFolderTreeViewItem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, string folderName, IList<SolutionHierarchy.Item> folderItems)
 		{
 			var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
 			treeViewItem.ContextMenu = new ContextMenu();
-			AddExpandAndCollapseAllContextMenuItems(treeViewItem.ContextMenu, treeViewItem);
+			AddProjectOrFolderTreeViewItemContextMenu(treeViewItem.ContextMenu, treeViewItem);
 
 			var image = new Image() { Source = _solutionHierarchy.GetIcon(SolutionHierarchy.IconType.Folder) };
 			var label = new Label() { Content = folderName };
@@ -483,7 +507,7 @@ namespace RudeBuildVSShared
 				if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
 					AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
 				else
-					AddFolderTreeViewITem(projectInfo, treeViewItem, item.Name, item.Items);
+					AddFolderTreeViewItem(projectInfo, treeViewItem, item.Name, item.Items);
 			}
 		}
 
@@ -542,7 +566,7 @@ namespace RudeBuildVSShared
 			_treeViewProjects.Items.Clear();
 			foreach (var project in _solutionHierarchy.ProjectNameToCppFileNameMap)
 			{
-				AddProjectsTreeViewItem(_treeViewProjects, project.Key, project.Value);
+				AddProjectTreeViewItem(_treeViewProjects, project.Key, project.Value);
 			}
 		}
 
