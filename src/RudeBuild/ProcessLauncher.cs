@@ -19,14 +19,21 @@ namespace RudeBuild
 
         public static string GetDevEvnBaseRegistryKey(VisualStudioVersion version)
         {
+            //TODO: This hack gets us the right registry path for 32-bit software on 64 bit Windows.
+            // The right fix is to either build an x86 target (rather than "Any CPU"), or to build
+            // against .NET Framework 4 (or greater) and use RegistryKey.OpenBaseKey to specify that
+            // we want a 32-bit view on the registry.
+            bool is64Bit = IntPtr.Size == 8;
+            string registrySoftwarePath = string.Format(@"SOFTWARE\{0}", is64Bit ? @"Wow6432Node" : "");
+
             switch (version)
             {
-                case VisualStudioVersion.VS2005: return @"SOFTWARE\Microsoft\VisualStudio\8.0\";
-                case VisualStudioVersion.VS2008: return @"SOFTWARE\Microsoft\VisualStudio\9.0\";
-                case VisualStudioVersion.VS2010: return @"SOFTWARE\Microsoft\VisualStudio\10.0\";
-                case VisualStudioVersion.VS2012: return @"SOFTWARE\Microsoft\VisualStudio\11.0\";
-                case VisualStudioVersion.VS2013: return @"SOFTWARE\Microsoft\VisualStudio\12.0\";
-                case VisualStudioVersion.VS2015: return @"SOFTWARE\Microsoft\VisualStudio\14.0\";
+                case VisualStudioVersion.VS2005: return registrySoftwarePath + @"\Microsoft\VisualStudio\8.0\";
+                case VisualStudioVersion.VS2008: return registrySoftwarePath + @"\Microsoft\VisualStudio\9.0\";
+                case VisualStudioVersion.VS2010: return registrySoftwarePath + @"\Microsoft\VisualStudio\10.0\";
+                case VisualStudioVersion.VS2012: return registrySoftwarePath + @"\Microsoft\VisualStudio\11.0\";
+                case VisualStudioVersion.VS2013: return registrySoftwarePath + @"\Microsoft\VisualStudio\12.0\";
+                case VisualStudioVersion.VS2015: return registrySoftwarePath + @"\Microsoft\VisualStudio\14.0\";
                 default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
             }
         }
