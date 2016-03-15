@@ -4,7 +4,7 @@ using CommandLineParser.Validation;
 
 namespace RudeBuild
 {
-	[ArgumentGroupCertification("rebuild,clean", EArgumentGroupCondition.OneOreNoneUsed)]
+	[ArgumentGroupCertification("rebuild,generateOnly,clean", EArgumentGroupCondition.OneOreNoneUsed)]
     public class BuildOptions
     {
         [FileArgument('s', "solution", FileMustExist = true, Description = "FileName of the solution to build.", Optional = false)]
@@ -15,6 +15,8 @@ namespace RudeBuild
         public string Project;
         [SwitchArgument('r', "rebuild", false, Description = "Does a full rebuild of the build target")]
         public bool Rebuild;
+        [SwitchArgument('g', "generateOnly", false, Description = "Generates the RudeBuild solution, project and intermediate cache files for the build target, but does not proceed to build the target.")]
+        public bool GenerateOnly;
         [SwitchArgument('l', "clean", false, Description = "Cleans the solution. Also deletes all RudeBuild-generated intermediate cache files.")]
         public bool Clean;
         [SwitchArgument('h', "cleanCache", false, Description = "Deletes all RudeBuild-generated intermediate cache files for the given solution, i.e. the cached unity .cpp files and the generated solution and project files.")]
@@ -22,7 +24,7 @@ namespace RudeBuild
 
         public bool ShouldForceWriteCachedFiles()
         {
-            return Rebuild || Clean || CleanCache;
+            return Rebuild || GenerateOnly || Clean || CleanCache;
         }
     }
 }
