@@ -133,7 +133,13 @@ public class CustomActions
     {
         string registryPath = RudeBuild.ProcessLauncher.GetDevEvnBaseRegistryKey(version);
         RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath);
-        return registryKey != null;
+		if (registryKey == null)
+			return false;
+
+		bool isInstalled = registryKey.GetValue("VisualStudioLocation") != null;
+		registryKey.Close();
+
+        return isInstalled;
     }
 
     private static string GetUserPersonalFolder(string versionString, RudeBuild.VisualStudioVersion version)
@@ -237,7 +243,7 @@ public class CustomActions
 		{
 			System.Windows.MessageBox.Show(
 				"Couldn't successfully run the RudeBuild extension installer file '" + filePath + "'.\n" +
-				"You might be able to simply run this file manually to install the extension in Visual Studio.\n" +
+				"You might be able to manually uninstall the RudeBuild extension in Visual Studio.\n" +
 				"Exception message: " + ex.Message,
 				"RudeBuild",
 				System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
