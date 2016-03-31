@@ -34,9 +34,10 @@ class Script
             // The ProductId is a GUID for the current version of RudeBuild and should be regenerated whenever the version changes!
             // See http://blogs.msdn.com/b/pusu/archive/2009/06/10/understanding-msi.aspx
             // In Wix# the project GUID is an essentially an alias for UpgradeCode, so it's enough to set it.
-            Version = new Version("1.4.0.0"),
             GUID = new Guid("DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6"),
-            ProductId = new Guid("D46693C3-3BF1-4761-8A5F-077CEA2F7A86"),
+
+            Version = new Version("1.5.0.0"),
+            ProductId = new Guid("D6090F57-83BD-45B2-8349-10A84C7C2FA3"),   // Change this whenever you change the version above!
            
             Dirs = new[]
             {

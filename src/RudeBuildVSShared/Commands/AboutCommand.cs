@@ -7,7 +7,7 @@ namespace RudeBuildVSShared
         public override void Execute(CommandManager commandManager)
         {
             string aboutMessage = @"
-RudeBuild, Version 1.4
+RudeBuild, Version 1.5
 
 A unity C++ build tool for Visual Studio developed by Martin Ecker.
 This is free, open source software under the zlib license.
