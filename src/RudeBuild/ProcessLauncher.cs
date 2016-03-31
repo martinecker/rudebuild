@@ -147,21 +147,34 @@ namespace RudeBuild
             return true;
         }
 
-        private static string GetSnVs10BuildPath()
+        private static string GetSnVsBuildPath()
         {
             string sceRootPath = Environment.GetEnvironmentVariable("SCE_ROOT_DIR");
             if (string.IsNullOrEmpty(sceRootPath))
                 return null;
-            string result = Path.Combine(sceRootPath, "Common\\SceVSI\\bin\\vs10build.exe");
-            return result;
+
+            // Try to find newest first.
+            string result = Path.Combine(sceRootPath, "Common\\SceVSI-VS14\\bin\\vs14build.exe");
+            if (File.Exists(result))
+                return result;
+
+            result = Path.Combine(sceRootPath, "Common\\SceVSI-VS11\\bin\\vs11build.exe");
+            if (File.Exists(result))
+                return result;
+
+            result = Path.Combine(sceRootPath, "Common\\SceVSI\\bin\\vs10build.exe");
+            if (File.Exists(result))
+                return result;
+
+            return null;
         }
 
         private bool TryToSetupSnVs10BuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
         {
             try
             {
-                info.FileName = GetSnVs10BuildPath();
-                if (string.IsNullOrEmpty(info.FileName) || !File.Exists(info.FileName))
+                info.FileName = GetSnVsBuildPath();
+                if (string.IsNullOrEmpty(info.FileName))
                 {
                     _settings.Output.WriteLine(
                         "Warning: RudeBuild is setup to use SN-DBS, but SN-DBS or VSI doesn't seem to be installed properly.\n" +
@@ -170,7 +183,7 @@ namespace RudeBuild
                     return false;
                 }
 
-                string buildCommand = string.Empty;
+                string buildCommand = "/build";
                 if (_settings.BuildOptions.Clean)
                     buildCommand = "/clean";
                 else if (_settings.BuildOptions.Rebuild)
@@ -179,8 +192,11 @@ namespace RudeBuild
                 info.Arguments = string.Format(" \"{0}\" {1} \"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
                 if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
                 {
-                    string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
-                    info.Arguments += string.Format(" /project \"{0}\"", projectName);
+                    ProjectInfo projectInfo = solutionInfo.GetProjectInfo(_settings.BuildOptions.Project);
+                    if (projectInfo != null)
+                    {
+                        info.Arguments += string.Format(" /project \"{0}\"", _settings.ModifyFileName(projectInfo.FileName));
+                    }
                 }
                 info.Arguments += " /sn-dbs";
             }
