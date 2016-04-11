@@ -187,7 +187,8 @@ namespace RudeBuild
         {
             var globalPropertyGroupElements = from element in projectElement.Elements()
                                               let labelAttribute = element.Attribute("Label")
-                                              where labelAttribute != null && labelAttribute.Value == "Globals" && element.Element(ns + "ProjectGuid") != null
+                                              where labelAttribute != null && labelAttribute.Value == "Globals" && 
+                                                (element.Element(ns + "ProjectGuid") != null || element.Element(ns + "ProjectGUID") != null)        // cmake generates projects with ProjectGUID instead of ProjectGuid
                                               select element;
             if (globalPropertyGroupElements.Count() != 1)
             {
