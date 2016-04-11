@@ -63,9 +63,9 @@ namespace RudeBuild
         {
             Solution = solution;
             FileName = fileName;
-            MergableCppFileNames = mergableCppFileNames;
-            AllCppFileNames = allCppFileNames;
-            IncludeFileNames = allIncludeFileNames;
+            MergableCppFileNames = ExpandMacros(mergableCppFileNames);
+            AllCppFileNames = ExpandMacros(allCppFileNames);
+            IncludeFileNames = ExpandMacros(allIncludeFileNames);
             Name = name;
             SetupPrecompiledHeader(precompiledHeaderName);
         }
@@ -123,7 +123,16 @@ namespace RudeBuild
             return value;
         }
 
-		public string GetProjectRelativePathFromAbsolutePath(string absolutePath)
+        public IList<string> ExpandMacros(IList<string> strings)
+        {
+            for (int i = 0; i < strings.Count(); ++i)
+            {
+                strings[i] = ExpandMacros(strings[i]);
+            }
+            return strings;
+        }
+
+        public string GetProjectRelativePathFromAbsolutePath(string absolutePath)
 		{
 			string relativePath = PathHelpers.GetRelativePath(FileName, absolutePath);
 			if (relativePath.StartsWith(".\\"))
