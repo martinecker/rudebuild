@@ -169,7 +169,7 @@ namespace RudeBuild
             return null;
         }
 
-        private bool TryToSetupSnVs10BuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
+        private bool TryToSetupSnVsBuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
         {
             try
             {
@@ -195,7 +195,12 @@ namespace RudeBuild
                     ProjectInfo projectInfo = solutionInfo.GetProjectInfo(_settings.BuildOptions.Project);
                     if (projectInfo != null)
                     {
-                        info.Arguments += string.Format(" /project \"{0}\"", _settings.ModifyFileName(projectInfo.FileName));
+                        string projectConfigName = null;
+                        SolutionConfigManager.ProjectConfig projectConfig = solutionInfo.ConfigManager.GetProjectByFileName(projectInfo.FileName);
+                        if (projectConfig.SolutionToProjectConfigMap.TryGetValue(_settings.BuildOptions.Config, out projectConfigName))
+                        {
+                            info.Arguments += string.Format(" /project \"{0}\" /projectconfig \"{1}\"", _settings.ModifyFileName(projectInfo.FileName), projectConfigName);
+                        }
                     }
                 }
                 info.Arguments += " /sn-dbs";
@@ -227,7 +232,7 @@ namespace RudeBuild
             bool useDevEnvBuildTool = true;
             if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild && TryToSetupIncrediBuildProcessObject(solutionInfo, ref info))
                 useDevEnvBuildTool = false;
-            else if (_settings.GlobalSettings.BuildTool == BuildTool.SN_DBS && TryToSetupSnVs10BuildProcessObject(solutionInfo, ref info))
+            else if (_settings.GlobalSettings.BuildTool == BuildTool.SN_DBS && TryToSetupSnVsBuildProcessObject(solutionInfo, ref info))
                 useDevEnvBuildTool = false;
 
             if (useDevEnvBuildTool)
