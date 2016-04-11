@@ -361,8 +361,9 @@ namespace RudeBuildVSShared
                                     }
                                     else
                                     {
-                                        string projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(name);
-                                        if (projectInfo.AllCppFileNames.Contains(projectRelativeName))
+                                        string projectRelativeName = null;
+                                        try { projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(name); } catch { }
+                                        if (!string.IsNullOrEmpty(projectRelativeName) && projectInfo.AllCppFileNames.Contains(projectRelativeName))
                                             projectData.Add(new Item(projectRelativeName));
                                     }
                                 }
