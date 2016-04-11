@@ -298,8 +298,11 @@ namespace RudeBuild
             {
                 lock (_processLock)
                 {
-                    _process.Close();
-                    _process = null;
+                    if (_process != null)
+                    {
+                        _process.Close();
+                        _process = null;
+                    }
                 }
 
                 RemoveSolutionFromDevEnvMRUList(solutionInfo);
