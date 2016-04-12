@@ -352,19 +352,40 @@ namespace RudeBuildVSShared
                             {
                                 if (_settings.IsValidCppFileName(name))
                                 {
+                                    string cppFileName = name;
+
                                     ExtractIcon(IconType.CppFile, projectHierarchy, projectItem);
 
                                     // Certain projects contain absolute file names, also handle those. Usually though, the file names in a project are project-relative.
-                                    if (projectInfo.AllCppFileNames.Contains(name))
+                                    if (projectInfo.AllCppFileNames.Contains(cppFileName))
                                     {
-                                        projectData.Add(new Item(name));
+                                        projectData.Add(new Item(cppFileName));
                                     }
                                     else
                                     {
+                                        // Some project use environment variables in the file names (e.g. to access an external SDK), so expand these environment variables first
+                                        string expandedCppFileName = ProjectInfo.ExpandEnvironmentVariables(cppFileName);
+
                                         string projectRelativeName = null;
-                                        try { projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(name); } catch { }
+                                        try { projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(expandedCppFileName); } catch { }
+
                                         if (!string.IsNullOrEmpty(projectRelativeName) && projectInfo.AllCppFileNames.Contains(projectRelativeName))
+                                        {
                                             projectData.Add(new Item(projectRelativeName));
+                                        }
+                                        else
+                                        {
+                                            // Try to find the fully expanded file name in the list of all file names
+                                            foreach (string fileName in projectInfo.AllCppFileNames)
+                                            {
+                                                string expandedFileName = ProjectInfo.ExpandEnvironmentVariables(fileName);
+                                                if (expandedFileName == expandedCppFileName)
+                                                {
+                                                    projectData.Add(new Item(fileName));
+                                                    break;
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

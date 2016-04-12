@@ -128,7 +128,8 @@ namespace RudeBuild
             int currentSourceFileIndex = 1;
             foreach (string cppFileName in cppFileNames)
             {
-                string cppFilePath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
+                string expandedCppFileName = ProjectInfo.ExpandEnvironmentVariables(cppFileName);
+                string cppFilePath = Path.IsPathRooted(expandedCppFileName) ? expandedCppFileName : Path.GetFullPath(Path.Combine(Path.GetDirectoryName(projectInfo.FileName), cppFileName));
                 if (!File.Exists(cppFilePath))
                 {
                     _settings.Output.WriteLine("Input file '" + cppFilePath + "' does not exist. Skipping.");

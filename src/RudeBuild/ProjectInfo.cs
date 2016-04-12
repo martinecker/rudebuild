@@ -73,9 +73,9 @@ namespace RudeBuild
         public SolutionInfo Solution { get; private set; }
         public string FileName { get; private set; }
         public string Name { get; private set; }
-        public IList<string> MergableCppFileNames { get; private set; }
-        public IList<string> AllCppFileNames { get; private set; }
-        public IList<string> IncludeFileNames { get; private set; }
+        public IList<string> MergableCppFileNames { get; private set; } // All C/C++ file names in the project that can be merged into unity files
+        public IList<string> AllCppFileNames { get; private set; } // All C/C++ file names in the project (including those that can't be merged)
+        public IList<string> IncludeFileNames { get; private set; } // All C/C++ include/header file names in the project
         public string PrecompiledHeaderName { get; private set; }
         public string PrecompiledHeaderProjectRelativePath { get; private set; }
         public string PrecompiledHeaderAbsolutePath { get; private set; }
@@ -106,8 +106,8 @@ namespace RudeBuild
 
         private void SetupPrecompiledHeader(string precompiledHeaderName)
         {
-            precompiledHeaderName = ExpandMacros(precompiledHeaderName);
-            string precompiledHeaderProjectRelativePath = ExpandMacros(GetPrecompiledHeaderProjectRelativePath(precompiledHeaderName, IncludeFileNames));
+            precompiledHeaderName = ExpandEnvironmentVariables(ExpandMacros(precompiledHeaderName));
+            string precompiledHeaderProjectRelativePath = ExpandEnvironmentVariables(ExpandMacros(GetPrecompiledHeaderProjectRelativePath(precompiledHeaderName, IncludeFileNames)));
 
             if (string.IsNullOrEmpty(precompiledHeaderName) || string.IsNullOrEmpty(precompiledHeaderProjectRelativePath))
                 return;
@@ -141,11 +141,6 @@ namespace RudeBuild
             value = value.Replace("$(ProjectDir)", Path.GetDirectoryName(projectPath) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
             value = value.Replace("$(ProjectExt)", Path.GetExtension(projectPath), StringComparison.OrdinalIgnoreCase);
 
-            foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
-            {
-                value = value.Replace("$(" + (string)environmentVariable.Key + ")", (string)environmentVariable.Value, StringComparison.OrdinalIgnoreCase);
-            }
-
             return value;
         }
 
@@ -156,6 +151,19 @@ namespace RudeBuild
                 strings[i] = ExpandMacros(strings[i]);
             }
             return strings;
+        }
+
+        public static string ExpandEnvironmentVariables(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
+            {
+                value = value.Replace("$(" + (string)environmentVariable.Key + ")", (string)environmentVariable.Value, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return value;
         }
 
         public string GetProjectRelativePathFromAbsolutePath(string absolutePath)
