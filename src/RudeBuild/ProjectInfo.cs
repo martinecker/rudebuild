@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,26 @@ using System.Runtime.InteropServices;
 
 namespace RudeBuild
 {
+    internal static class StringExtensions
+    {
+        public static string Replace(this string str, string oldValue, string @newValue, StringComparison comparisonType)
+        {
+            @newValue = @newValue ?? string.Empty;
+            if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(oldValue) || oldValue.Equals(@newValue, comparisonType))
+            {
+                return str;
+            }
+
+            int foundAt;
+            while ((foundAt = str.IndexOf(oldValue, 0, comparisonType)) != -1)
+            {
+                str = str.Remove(foundAt, oldValue.Length).Insert(foundAt, @newValue);
+            }
+
+            return str;
+        }
+    }
+
 	internal static class PathHelpers
 	{
 		private const int FILE_ATTRIBUTE_DIRECTORY = 0x10;
@@ -62,11 +83,11 @@ namespace RudeBuild
         public ProjectInfo(SolutionInfo solution, string name, string fileName, IList<string> mergableCppFileNames, IList<string> allCppFileNames, IList<string> allIncludeFileNames, string precompiledHeaderName)
         {
             Solution = solution;
+            Name = name;
             FileName = fileName;
             MergableCppFileNames = ExpandMacros(mergableCppFileNames);
             AllCppFileNames = ExpandMacros(allCppFileNames);
             IncludeFileNames = ExpandMacros(allIncludeFileNames);
-            Name = name;
             SetupPrecompiledHeader(precompiledHeaderName);
         }
 
@@ -108,17 +129,22 @@ namespace RudeBuild
             string solutionPath = Solution.FilePath;
             string projectPath = Path.GetFullPath(FileName);
 
-            value = value.Replace("$(SolutionName)", Solution.Name);
-            value = value.Replace("$(SolutionPath)", solutionPath);
-            value = value.Replace("$(SolutionFileName)", Path.GetFileName(solutionPath));
-            value = value.Replace("$(SolutionDir)", Path.GetDirectoryName(solutionPath) + Path.DirectorySeparatorChar);
-            value = value.Replace("$(SolutionExt)", Path.GetExtension(solutionPath));
+            value = value.Replace("$(SolutionName)", Solution.Name, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(SolutionPath)", solutionPath, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(SolutionFileName)", Path.GetFileName(solutionPath), StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(SolutionDir)", Path.GetDirectoryName(solutionPath) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(SolutionExt)", Path.GetExtension(solutionPath), StringComparison.OrdinalIgnoreCase);
 
-            value = value.Replace("$(ProjectName)", Name);
-            value = value.Replace("$(ProjectPath)", projectPath);
-            value = value.Replace("$(ProjectFileName)", Path.GetFileName(projectPath));
-            value = value.Replace("$(ProjectDir)", Path.GetDirectoryName(projectPath) + Path.DirectorySeparatorChar);
-            value = value.Replace("$(ProjectExt)", Path.GetExtension(projectPath));
+            value = value.Replace("$(ProjectName)", Name, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(ProjectPath)", projectPath, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(ProjectFileName)", Path.GetFileName(projectPath), StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(ProjectDir)", Path.GetDirectoryName(projectPath) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
+            value = value.Replace("$(ProjectExt)", Path.GetExtension(projectPath), StringComparison.OrdinalIgnoreCase);
+
+            foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
+            {
+                value = value.Replace("$(" + (string)environmentVariable.Key + ")", (string)environmentVariable.Value, StringComparison.OrdinalIgnoreCase);
+            }
 
             return value;
         }
