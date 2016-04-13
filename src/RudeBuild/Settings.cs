@@ -77,7 +77,7 @@ namespace RudeBuild
 
 		public bool IsValidCppFileName(string fileName)
 		{
-			string extension = Path.GetExtension(fileName);
+			string extension = Path.GetExtension(fileName).ToLower();
 			return extension == ".cpp" || extension == ".cxx" || extension == ".c" || extension == ".cc";
 		}
 	}

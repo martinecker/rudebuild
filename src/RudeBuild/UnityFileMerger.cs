@@ -144,7 +144,7 @@ namespace RudeBuild
 
                 // Get the Unity file for the file extension. We separate .c and .cpp files because this is what makes
                 // Visual Studio choose if it should do a C-only or a C++ compile. There are subtle compiler differences.
-                string fileExtension = Path.GetExtension(cppFileName);
+                string fileExtension = Path.GetExtension(cppFileName).ToLower();
                 UnityFile unityFile;
                 if (!_unityFiles.TryGetValue(fileExtension, out unityFile))
                 {
