@@ -142,6 +142,8 @@ namespace RudeBuild
                     string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
                     info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
                 }
+
+                info.Arguments += " /UseIDEMonitor";
             }
             catch (Exception ex)
             {
