@@ -173,14 +173,14 @@ namespace RudeBuild
             }
         }
 
-        private static void FixupProjectReferences(XDocument projectDocument, XNamespace ns, string fileNamePrefix)
+        private static void FixupProjectReferences(XDocument projectDocument, XNamespace ns, Settings settings)
         {
             foreach (XElement itemProjectReferenceElement in projectDocument.Descendants(ns + "ProjectReference"))
             {
                 var includeAttribute = itemProjectReferenceElement.Attribute("Include");
                 if (null != includeAttribute)
                 {
-                    includeAttribute.Value = fileNamePrefix + includeAttribute.Value;
+                    includeAttribute.Value = settings.ModifyFileName(includeAttribute.Value);
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace RudeBuild
                     SetBigObjCompilerFlag(projectDocument, ns);
                 }
 
-                FixupProjectReferences(projectDocument, ns, _settings.GlobalSettings.FileNamePrefix);
+                FixupProjectReferences(projectDocument, ns, _settings);
 
                 ReadWriteFilters(projectFileName, projectConfig, merger);
             }
