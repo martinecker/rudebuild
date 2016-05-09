@@ -97,15 +97,18 @@ namespace RudeBuildConsole
                     projectReaderWriter.ReadWrite(solutionInfo);
                     settings.SolutionSettings.UpdateAndSave(settings, solutionInfo);
 
-                    var processLauncher = new ProcessLauncher(settings);
-                    Console.CancelKeyPress += delegate(object sender, ConsoleCancelEventArgs cancelArgs)
+                    if (!options.GenerateOnly)
                     {
-                        _output.WriteLine("Stopping build...");
-                        processLauncher.Stop();
-                        cancelArgs.Cancel = true;
-                    };
+                        var processLauncher = new ProcessLauncher(settings);
+                        Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs cancelArgs)
+                        {
+                            _output.WriteLine("Stopping build...");
+                            processLauncher.Stop();
+                            cancelArgs.Cancel = true;
+                        };
 
-                    exitCode = processLauncher.Run(solutionInfo);
+                        exitCode = processLauncher.Run(solutionInfo);
+                    }
                 }
 
                 stopwatch.Stop();
