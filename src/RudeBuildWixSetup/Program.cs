@@ -54,7 +54,6 @@ class Script
                         new File(@"LICENSE.rtf"),
                         new File(@"LICENSE.txt"),
                         new File(@"README.txt"),
-                        new Dir(@"en-US", new File(@"en-US\RudeBuild.resources.dll"))
                     }
                 )
             },
