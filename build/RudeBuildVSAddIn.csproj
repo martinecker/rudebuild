@@ -166,7 +166,7 @@
     <PreBuildEvent>
     </PreBuildEvent>
     <PostBuildEvent>echo RudeBuildVSAddIn post-build step...
-echo Copying RudeBuild.AddIn to output director
+echo Copying RudeBuild.AddIn to output directory
 copy "$(ProjectDir)..\src\RudeBuildVSAddIn\RudeBuild.AddIn" "$(ProjectDir)$(OutDir)"
 set SDKDIR="C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin"
 mkdir "$(ProjectDir)$(OutDir)en-US"
