@@ -97,8 +97,6 @@ The command line version of RudeBuild is useful for automated builds, for exampl
             AllowDowngrades = false,
             DowngradeErrorMessage = "A later version of [ProductName] is already installed. [ProductName] setup will now exit.",
             AllowSameVersionUpgrades = false,
-            Disallow = true,
-            DisallowUpgradeErrorMessage = "A different version of [ProductName] is already installed. Please first uninstall that version and then re-run this setup.",
             IgnoreRemoveFailure = true,
             Schedule = UpgradeSchedule.afterInstallInitialize
         };
