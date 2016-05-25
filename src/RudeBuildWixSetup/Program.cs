@@ -114,7 +114,9 @@ public class CustomActions
 	private const string GlobalSettingsFileName = "RudeBuild.GlobalSettings.config";
     private const string RudeBuildSetupRegistryPath = @"SOFTWARE\RudeBuildSetup";
 
-    private static void PatchAddInFile(string filePath, string installationPath)
+	[DllImport("User32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+	private static void PatchAddInFile(string filePath, string installationPath)
     {
         XDocument document = XDocument.Load(filePath);
         if (null == document || null == document.Root)
@@ -209,6 +211,7 @@ public class CustomActions
 			var vsixInstallerCommandLine = "\"" + filePath + "\"";
 
 			Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
+			SetForegroundWindow(process.MainWindowHandle);
 			process.WaitForExit();
 		}
 		catch (Exception ex)
