@@ -168,7 +168,7 @@ namespace RudeBuild
 
         public string GetProjectRelativePathFromAbsolutePath(string absolutePath)
 		{
-			string relativePath = PathHelpers.GetRelativePath(FileName, absolutePath);
+			string relativePath = PathHelpers.GetRelativePath(FileName, Path.GetFullPath(absolutePath));
 			if (relativePath.StartsWith(".\\"))
 				relativePath = relativePath.Substring(2);
 			return relativePath;

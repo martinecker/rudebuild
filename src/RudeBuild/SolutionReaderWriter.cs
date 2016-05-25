@@ -79,7 +79,7 @@ namespace RudeBuild
             string destProjectFileName = _settings.ModifyFileName(projectFileName);
             line = line.Substring(0, projectFileNameIndex) + destProjectFileName + line.Substring(extensionIndex + extension.Length);
 
-            configManager.AddProject(Path.Combine(solutionDirectory, projectFileName), projectGuid);
+            configManager.AddProject(Path.GetFullPath(Path.Combine(solutionDirectory, projectFileName)), projectGuid);
 
             return true;
         }
