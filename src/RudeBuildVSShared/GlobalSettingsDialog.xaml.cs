@@ -16,11 +16,11 @@ namespace RudeBuildVSShared
 
         private void OnOK(object sender, RoutedEventArgs e)
         {
-            _globalSettings.Save();
             DialogResult = true;
-        }
+			_globalSettings.Save();
+		}
 
-        private void OnCancel(object sender, RoutedEventArgs e)
+		private void OnCancel(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
