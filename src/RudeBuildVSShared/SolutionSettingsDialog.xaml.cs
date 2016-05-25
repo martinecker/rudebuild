@@ -16,6 +16,7 @@ namespace RudeBuildVSShared
         {
             public enum ItemType
             {
+				Project,
                 Folder,
                 CppFile
             }
@@ -24,18 +25,19 @@ namespace RudeBuildVSShared
             public string Name { get; private set; }
             public List<Item> Items { get; private set; }
 
-            public Item(string folderName, List<Item> items)
-            {
-                Type = ItemType.Folder;
-                Name = folderName;
-                Items = items;
+			public static Item CreateProject(string projectName, List<Item> items)
+			{
+				return new Item { Type = ItemType.Project, Name = projectName, Items = items };
+			}
+
+			public static Item CreateFolder(string folderName, List<Item> items)
+			{
+				return new Item { Type = ItemType.Folder, Name = folderName, Items = items };
             }
 
-            public Item(string cppFileName)
+            public static Item CreateCppFile(string cppFileName)
             {
-                Type = ItemType.CppFile;
-                Name = cppFileName;
-                Items = null;
+				return new Item { Type = ItemType.CppFile, Name = cppFileName, Items = null };
             }
         }
 
@@ -51,7 +53,7 @@ namespace RudeBuildVSShared
 
         private IDictionary<IconType, BitmapSource> _icons = new Dictionary<IconType, BitmapSource>();
 
-        public Dictionary<string, List<Item>> ProjectNameToCppFileNameMap { get; private set; }
+        public IList<Item> TopLevelItems { get; private set; }
 
         private const int MAX_PATH = 260;
         private const int S_OK = 0;
@@ -91,7 +93,7 @@ namespace RudeBuildVSShared
             _icons[IconType.Folder] = null;
             _icons[IconType.CppFile] = null;
 
-            ProjectNameToCppFileNameMap = new Dictionary<string, List<Item>>();
+			TopLevelItems = new List<Item>();
 
             try
             {
@@ -99,7 +101,7 @@ namespace RudeBuildVSShared
             }
             catch
             {
-                ProjectNameToCppFileNameMap.Clear();
+				TopLevelItems.Clear();
             }
         }
 
@@ -266,11 +268,11 @@ namespace RudeBuildVSShared
 
             try
             {
-                // Case 1: Try to get the icon from the hierachy with imagelist
+                // Case 1: Try to get the icon from the hierarchy with imagelist
                 BitmapSource icon = ExtractIconWithImageList(projectHierarchy, projectItemId, FolderState.Open);
                 if (null == icon)
                 {
-                    // Case 2: Try to get the icon from the hierachy without imagelist
+                    // Case 2: Try to get the icon from the hierarchy without imagelist
                     // This is the case, for example, of files of project VS 2010, Database > SQL Server > SQL Server 2005 Database Project
                     icon = ExtractIconWithoutImageList(projectHierarchy, projectItemId, FolderState.Open);
                     if (null == icon)
@@ -297,18 +299,36 @@ namespace RudeBuildVSShared
 
             foreach (EnvDTE.Project project in commandManager.Application.Solution.Projects)
             {
-                var projectInfo = _solutionInfo.GetProjectInfo(project.Name);
-                if (null != projectInfo)
-                {
-                    var projectData = new List<Item>();
-                    ProcessProject(solutionService, project, projectInfo, projectData);
-                    if (projectData.Count > 0)
-                        ProjectNameToCppFileNameMap[project.Name] = projectData;
-                }
-            }
-        }
+				ProcessSolutionFolderOrProject(solutionService, project, TopLevelItems);
+			}
+		}
 
-        private void ProcessProject(IVsSolution solutionService, EnvDTE.Project project, ProjectInfo projectInfo, List<Item> projectData)
+		private void ProcessSolutionFolderOrProject(IVsSolution solutionService, EnvDTE.Project project, IList<Item> projectData)
+		{
+			if (project.Kind == EnvDTE80.ProjectKinds.vsProjectKindSolutionFolder)
+			{
+				var subProjectsData = new List<Item>();
+
+				foreach (EnvDTE.ProjectItem projectItem in project.ProjectItems)
+				{
+					if (projectItem.SubProject != null)
+						ProcessSolutionFolderOrProject(solutionService, projectItem.SubProject, subProjectsData);
+				}
+
+				if (subProjectsData.Count > 0)
+					projectData.Add(Item.CreateFolder(project.Name, subProjectsData));
+			}
+			else
+			{
+				var projectInfo = _solutionInfo.GetProjectInfo(project.Name);
+				if (null != projectInfo)
+				{
+					ProcessProject(solutionService, project, projectInfo, projectData);
+				}
+			}
+		}
+
+		private void ProcessProject(IVsSolution solutionService, EnvDTE.Project project, ProjectInfo projectInfo, IList<Item> parentProjectData)
         {
             IVsHierarchy projectHierarchy = null;
 
@@ -320,12 +340,16 @@ namespace RudeBuildVSShared
                     if (projectHierarchy.ParseCanonicalName(project.FileName, out projectItemId) == 0)
                         ExtractIcon(IconType.Project, projectHierarchy, projectItemId);
 
-                    ProcessProjectItems(solutionService, projectHierarchy, projectInfo, project.ProjectItems, projectData);
+					var projectData = new List<Item>();
+					ProcessProjectItems(solutionService, projectHierarchy, projectInfo, project.ProjectItems, projectData);
+
+					if (projectData.Count > 0)
+						parentProjectData.Add(Item.CreateProject(project.Name, projectData));
                 }
             }
         }
 
-        private void ProcessProjectItems(IVsSolution solutionService, IVsHierarchy projectHierarchy, ProjectInfo projectInfo, EnvDTE.ProjectItems projectItems, List<Item> projectData)
+        private void ProcessProjectItems(IVsSolution solutionService, IVsHierarchy projectHierarchy, ProjectInfo projectInfo, EnvDTE.ProjectItems projectItems, IList<Item> projectData)
         {
             if (projectItems != null)
             {
@@ -339,7 +363,7 @@ namespace RudeBuildVSShared
 
                         if (folderItems.Count > 0)
                         {
-                            projectData.Add(new Item(projectItem.SubProject.Name, folderItems));
+                            projectData.Add(Item.CreateFolder(projectItem.SubProject.Name, folderItems));
                         }
                     }
                     else if (projectItem.FileCount >= 1)
@@ -359,7 +383,7 @@ namespace RudeBuildVSShared
                                     // Certain projects contain absolute file names, also handle those. Usually though, the file names in a project are project-relative.
                                     if (projectInfo.AllCppFileNames.Contains(cppFileName))
                                     {
-                                        projectData.Add(new Item(cppFileName));
+                                        projectData.Add(Item.CreateCppFile(cppFileName));
                                     }
                                     else
                                     {
@@ -371,7 +395,7 @@ namespace RudeBuildVSShared
 
                                         if (!string.IsNullOrEmpty(projectRelativeName) && projectInfo.AllCppFileNames.Contains(projectRelativeName))
                                         {
-                                            projectData.Add(new Item(projectRelativeName));
+                                            projectData.Add(Item.CreateCppFile(projectRelativeName));
                                         }
                                         else
                                         {
@@ -381,7 +405,7 @@ namespace RudeBuildVSShared
                                                 string expandedFileName = ProjectInfo.ExpandEnvironmentVariables(fileName);
                                                 if (expandedFileName == expandedCppFileName)
                                                 {
-                                                    projectData.Add(new Item(fileName));
+                                                    projectData.Add(Item.CreateCppFile(fileName));
                                                     break;
                                                 }
                                             }
@@ -397,7 +421,7 @@ namespace RudeBuildVSShared
                                 var folderItems = new List<Item>();
                                 ProcessProjectItems(solutionService, projectHierarchy, projectInfo, projectItem.ProjectItems, folderItems);
                                 if (folderItems.Count > 0)
-                                    projectData.Add(new Item(name, folderItems));
+                                    projectData.Add(Item.CreateFolder(name, folderItems));
                             }
                         }
                     }
@@ -486,7 +510,7 @@ namespace RudeBuildVSShared
             contextMenu.Items.Add(contextMenuItemExcludeAll);
         }
 
-        private void AddProjectTreeViewItem(TreeView treeView, string projectName, IList<SolutionHierarchy.Item> projectItems)
+        private void AddProjectTreeViewItem(TreeView treeView, TreeViewItem parentTreeViewItem, string projectName, IList<SolutionHierarchy.Item> projectItems)
         {
             ProjectInfo projectInfo = _solutionInfo.GetProjectInfo(projectName);
             if (null == projectInfo)
@@ -505,18 +529,21 @@ namespace RudeBuildVSShared
             stack.Children.Add(label);
             treeViewItem.Header = stack;
 
-            treeView.Items.Add(treeViewItem);
+			if (parentTreeViewItem != null)
+				parentTreeViewItem.Items.Add(treeViewItem);
+			else
+				treeView.Items.Add(treeViewItem);
 
             foreach (var item in projectItems)
             {
                 if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
                     AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
                 else
-                    AddFolderTreeViewItem(projectInfo, treeViewItem, item.Name, item.Items);
+                    AddFolderTreeViewItem(projectInfo, treeView, treeViewItem, item.Name, item.Items);
             }
         }
 
-        private void AddFolderTreeViewItem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, string folderName, IList<SolutionHierarchy.Item> folderItems)
+        private void AddFolderTreeViewItem(ProjectInfo projectInfo, TreeView treeView, TreeViewItem parentTreeViewItem, string folderName, IList<SolutionHierarchy.Item> folderItems)
         {
             var treeViewItem = new TreeViewItem() { FontWeight = FontWeights.Normal };
             treeViewItem.ContextMenu = new ContextMenu();
@@ -530,18 +557,34 @@ namespace RudeBuildVSShared
             stack.Children.Add(label);
             treeViewItem.Header = stack;
 
-            parentTreeViewItem.Items.Add(treeViewItem);
+			if (parentTreeViewItem != null)
+				parentTreeViewItem.Items.Add(treeViewItem);
+			else
+				treeView.Items.Add(treeViewItem);
 
-            foreach (var item in folderItems)
-            {
-                if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
-                    AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
-                else
-                    AddFolderTreeViewItem(projectInfo, treeViewItem, item.Name, item.Items);
-            }
-        }
+			if (projectInfo != null)	// Are we dealing with a project instead of a solution folder?
+			{
+				foreach (var item in folderItems)
+				{
+					if (item.Type == SolutionHierarchy.Item.ItemType.CppFile)
+						AddCppFileTreeViewItem(projectInfo, treeViewItem, item);
+					else
+						AddFolderTreeViewItem(projectInfo, treeView, treeViewItem, item.Name, item.Items);
+				}
+			}
+			else
+			{
+				foreach (var item in folderItems)
+				{
+					if (item.Type == SolutionHierarchy.Item.ItemType.Project)
+						AddProjectTreeViewItem(treeView, treeViewItem, item.Name, item.Items);
+					else
+						AddFolderTreeViewItem(null, treeView, treeViewItem, item.Name, item.Items);
+				}
+			}
+		}
 
-        private void AddCppFileTreeViewItem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, SolutionHierarchy.Item item)
+		private void AddCppFileTreeViewItem(ProjectInfo projectInfo, TreeViewItem parentTreeViewItem, SolutionHierarchy.Item item)
         {
             const string kExcludeFromUnityBuild = "Exclude from Unity Build";
             const string kIncludeInUnityBuild = "Include in Unity Build";
@@ -594,9 +637,12 @@ namespace RudeBuildVSShared
         private void RefreshProjectsTreeView()
         {
             _treeViewProjects.Items.Clear();
-            foreach (var project in _solutionHierarchy.ProjectNameToCppFileNameMap)
+            foreach (var topLevelItem in _solutionHierarchy.TopLevelItems)
             {
-                AddProjectTreeViewItem(_treeViewProjects, project.Key, project.Value);
+				if (topLevelItem.Type == SolutionHierarchy.Item.ItemType.Project)
+					AddProjectTreeViewItem(_treeViewProjects, null, topLevelItem.Name, topLevelItem.Items);
+				else
+					AddFolderTreeViewItem(null, _treeViewProjects, null, topLevelItem.Name, topLevelItem.Items);
             }
         }
 
