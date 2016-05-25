@@ -64,7 +64,7 @@ namespace RudeBuild
             string solutionDirectory = solutionInfo.Name + "_" + GetMD5Hash(solutionInfo.FilePath);
             string config = BuildOptions.Config.Replace('|', '-');
 
-            string cachePath = Path.Combine(GlobalSettings.CachePath, solutionDirectory);
+            string cachePath = Path.Combine(PathHelpers.ExpandEnvironmentVariables(GlobalSettings.CachePath), solutionDirectory);
             cachePath = Path.Combine(cachePath, config);
             return cachePath;
         }

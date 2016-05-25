@@ -66,6 +66,18 @@ namespace RudeBuild
 
 			throw new FileNotFoundException();
 		}
+		public static string ExpandEnvironmentVariables(string value)
+		{
+			if (string.IsNullOrEmpty(value))
+				return value;
+
+			foreach (DictionaryEntry environmentVariable in Environment.GetEnvironmentVariables())
+			{
+				value = value.Replace("%" + (string)environmentVariable.Key + "%", (string)environmentVariable.Value, StringComparison.OrdinalIgnoreCase);
+			}
+
+			return value;
+		}
 	}
 
 	public class ProjectInfo
