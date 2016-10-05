@@ -16,7 +16,7 @@ namespace RudeBuild
         SN_DBS
     }
 
-    public class GlobalSettings
+    public sealed class GlobalSettings
     {
         public const string ConfigFileName = "RudeBuild.GlobalSettings.config";
         public static string ConfigFilePath 

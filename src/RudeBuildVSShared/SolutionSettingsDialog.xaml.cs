@@ -10,9 +10,9 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class SolutionHierarchy
+    public sealed class SolutionHierarchy
     {
-        public class Item
+        public sealed class Item
         {
             public enum ItemType
             {
@@ -432,7 +432,7 @@ namespace RudeBuildVSShared
         }
     }
 
-    public partial class SolutionSettingsDialog : Window
+    public sealed partial class SolutionSettingsDialog : Window
     {
         private readonly CommandManager _commandManager;
         private readonly Settings _settings;

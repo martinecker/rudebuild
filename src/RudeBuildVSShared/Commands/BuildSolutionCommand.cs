@@ -2,7 +2,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class BuildSolutionCommand : BuildCommandBase
+    public sealed class BuildSolutionCommand : BuildCommandBase
     {
         public BuildSolutionCommand(Builder builder, Mode buildMode)
             :   base(builder, buildMode)

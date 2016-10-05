@@ -60,7 +60,7 @@ namespace RudeBuild
         }
     }
 
-    internal class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
+    internal sealed class SingleProjectReaderWriterPostVS2010 : SingleProjectReaderWriterBase
     {
         public SingleProjectReaderWriterPostVS2010(Settings settings)
             : base(settings)
@@ -366,7 +366,7 @@ namespace RudeBuild
         }
     }
 
-    internal class SingleProjectReaderWriterPreVS2010 : SingleProjectReaderWriterBase
+    internal sealed class SingleProjectReaderWriterPreVS2010 : SingleProjectReaderWriterBase
     {
         public SingleProjectReaderWriterPreVS2010(Settings settings)
             : base(settings)
@@ -546,7 +546,7 @@ namespace RudeBuild
         }
     }
 
-    public class ProjectReaderWriter
+    public sealed class ProjectReaderWriter
     {
         private readonly Settings _settings;
 

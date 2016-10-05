@@ -1,17 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using System.Security.Permissions;
 
 namespace RudeBuild
 {
-    [Serializable()]
-    public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable, ISerializable
+	[Serializable]
+    public sealed class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable, ISerializable
     {
         private const string DictionaryNodeName = "Dictionary";
         private const string ItemNodeName = "Item";
@@ -19,7 +16,7 @@ namespace RudeBuild
         private const string ValueNodeName = "Value";
 
         private XmlSerializer _valueSerializer;
-        protected XmlSerializer ValueSerializer
+        private XmlSerializer ValueSerializer
         {
             get
             {

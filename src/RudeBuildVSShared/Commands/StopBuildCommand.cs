@@ -1,6 +1,6 @@
 namespace RudeBuildVSShared
 {
-    public class StopBuildCommand : CommandBase
+    public sealed class StopBuildCommand : CommandBase
     {
         private Builder _builder;
 

@@ -16,9 +16,9 @@ namespace RudeBuild
         VS2015
     }
 
-    public class SolutionConfigManager
+    public sealed class SolutionConfigManager
     {
-        public class ProjectConfig
+        public sealed class ProjectConfig
         {
             public string ProjectGuid;
             public string ProjectFileName;
@@ -91,7 +91,7 @@ namespace RudeBuild
         }
     }
 
-    public class SolutionInfo
+    public sealed class SolutionInfo
     {
         public string FilePath { get; private set; }
         public string Name { get; private set; }

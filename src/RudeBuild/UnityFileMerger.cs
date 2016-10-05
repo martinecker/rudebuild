@@ -22,7 +22,7 @@ namespace RudeBuild
         }
     }
 
-    public class UnityFileMerger
+    public sealed class UnityFileMerger
     {
         private readonly Settings _settings;
         private string _cachePath;
@@ -30,7 +30,7 @@ namespace RudeBuild
         public IList<string> UnityFilePaths { get; private set; }
         public IList<string> MergedCppFileNames { get; private set; }
 
-        private class UnityFile
+        private sealed class UnityFile
         {
             public readonly StringBuilder Contents = new StringBuilder();
             public long TotalMergedSizeInBytes = 0;

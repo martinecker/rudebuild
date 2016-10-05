@@ -80,7 +80,7 @@ namespace RudeBuild
 		}
 	}
 
-	public class ProjectInfo
+	public sealed class ProjectInfo
     {
         public SolutionInfo Solution { get; private set; }
         public string FileName { get; private set; }

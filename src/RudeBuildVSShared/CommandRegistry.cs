@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace RudeBuildVSShared
 {
-    public class CommandRegistry
+    public sealed class CommandRegistry
     {
         private readonly IDictionary<string, ICommand> _commands = new Dictionary<string, ICommand>();
 

@@ -2,7 +2,7 @@ using System.Windows;
 
 namespace RudeBuildVSShared
 {
-    public class AboutCommand : CommandBase
+    public sealed class AboutCommand : CommandBase
     {
         public override void Execute(CommandManager commandManager)
         {

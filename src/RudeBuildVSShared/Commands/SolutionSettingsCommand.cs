@@ -3,7 +3,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class SolutionSettingsCommand : CommandBase
+    public sealed class SolutionSettingsCommand : CommandBase
     {
         private readonly Builder _builder;
         private readonly OutputPane _outputPane;

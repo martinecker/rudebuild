@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RudeBuild
 {
-    public class SolutionReaderWriter
+    public sealed class SolutionReaderWriter
     {
         private readonly Settings _settings;
 
