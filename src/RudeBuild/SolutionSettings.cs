@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 namespace RudeBuild
 {
-    public class SolutionSettings
+    public sealed class SolutionSettings
     {
         public const string ConfigFileNameSuffix = ".RudeBuild.config";
 

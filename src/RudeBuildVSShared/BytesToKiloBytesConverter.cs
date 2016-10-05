@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace RudeBuildVSShared
 {
-    public class BytesToKiloBytesConverter : IValueConverter
+    public sealed class BytesToKiloBytesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

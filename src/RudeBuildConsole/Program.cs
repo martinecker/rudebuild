@@ -4,7 +4,7 @@ using RudeBuild;
 
 namespace RudeBuildConsole
 {
-    public class ConsoleOutput : IOutput
+    public sealed class ConsoleOutput : IOutput
     {
         public void WriteLine(string line)
         {
@@ -28,7 +28,7 @@ namespace RudeBuildConsole
         }
     }
 
-    public class Program
+    public sealed class Program
     {
         private IOutput _output;
 

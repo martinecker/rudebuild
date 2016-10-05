@@ -12,7 +12,7 @@ namespace RudeBuildVSShared
 		EnvDTE.Command RegisterCommand(DTE2 application, int id, string name, string caption, string toolTip, string icon, ICommand command);
 	}
 
-    public class CommandManager
+    public sealed class CommandManager
     {
 		public DTE2 Application { get; private set; }
 

@@ -3,7 +3,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public partial class GlobalSettingsDialog : Window
+    public sealed partial class GlobalSettingsDialog : Window
     {
         private readonly GlobalSettings _globalSettings;
 

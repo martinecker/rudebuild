@@ -28,7 +28,7 @@ namespace RudeBuild
         }
     }
 
-    public class Settings
+    public sealed class Settings
     {
         public GlobalSettings GlobalSettings { get; private set; }
         public BuildOptions BuildOptions { get; private set; }

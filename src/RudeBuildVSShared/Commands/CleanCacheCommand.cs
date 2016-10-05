@@ -2,7 +2,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class CleanCacheCommand : BuildCommandBase
+    public sealed class CleanCacheCommand : BuildCommandBase
     {
         public CleanCacheCommand(Builder builder)
             : base(builder, Mode.CleanCache)

@@ -2,7 +2,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class GlobalSettingsCommand : CommandBase
+    public sealed class GlobalSettingsCommand : CommandBase
     {
         private Builder _builder;
 

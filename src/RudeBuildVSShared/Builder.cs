@@ -5,7 +5,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class Builder
+    public sealed class Builder
     {
         private GlobalSettings _globalSettings;
 

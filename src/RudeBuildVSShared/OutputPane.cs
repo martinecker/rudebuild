@@ -3,7 +3,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-	public class OutputPane : IOutput
+	public sealed class OutputPane : IOutput
 	{
 		private readonly EnvDTE80.DTE2 _application;
 		private readonly string _outputPaneName;

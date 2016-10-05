@@ -5,7 +5,7 @@ using Microsoft.Win32;
 
 namespace RudeBuild
 {
-    public class ProcessLauncher
+    public sealed class ProcessLauncher
     {
         private readonly Settings _settings;
         private readonly object _processLock = new object();

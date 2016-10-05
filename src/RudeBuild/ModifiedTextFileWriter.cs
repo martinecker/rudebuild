@@ -2,7 +2,7 @@ using System.IO;
 
 namespace RudeBuild
 {
-    public class ModifiedTextFileWriter
+    public sealed class ModifiedTextFileWriter
     {
         private readonly string _fileName;
         private readonly bool _forceWrite;

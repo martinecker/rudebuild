@@ -11,7 +11,7 @@ using RudeBuild;
 
 namespace RudeBuildVSShared
 {
-    public class EnumDisplayer : IValueConverter
+    public sealed class EnumDisplayer : IValueConverter
     {
         private Type _type;
         private IDictionary _enumToDisplayValues;
