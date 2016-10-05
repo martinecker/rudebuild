@@ -351,80 +351,82 @@ namespace RudeBuildVSShared
 
         private void ProcessProjectItems(IVsSolution solutionService, IVsHierarchy projectHierarchy, ProjectInfo projectInfo, EnvDTE.ProjectItems projectItems, IList<Item> projectData)
         {
-            if (projectItems != null)
+            if (projectItems == null)
+                return;
+
+            foreach (EnvDTE.ProjectItem projectItem in projectItems)
             {
-                foreach (EnvDTE.ProjectItem projectItem in projectItems)
+                if (projectItem.SubProject != null)
                 {
-                    if (projectItem.SubProject != null)
+                    var folderItems = new List<Item>();
+
+                    ProcessProject(solutionService, projectItem.SubProject, projectInfo, folderItems);
+
+                    if (folderItems.Count > 0)
                     {
-                        var folderItems = new List<Item>();
-
-                        ProcessProject(solutionService, projectItem.SubProject, projectInfo, folderItems);
-
-                        if (folderItems.Count > 0)
-                        {
-                            projectData.Add(Item.CreateFolder(projectItem.SubProject.Name, folderItems));
-                        }
+                        projectData.Add(Item.CreateFolder(projectItem.SubProject.Name, folderItems));
                     }
-                    else if (projectItem.FileCount >= 1)
+                    continue;
+                }
+
+                if (projectItem.FileCount < 1)
+                    continue;
+
+                string name = null;
+                try { name = projectItem.get_FileNames(0); } catch { }
+                if (string.IsNullOrEmpty(name))
+                    continue;
+
+                if (projectItem.FileCount == 1)
+                {
+                    if (!_settings.IsValidCppFileName(name))
+                        continue;
+
+                    string cppFileName = name;
+
+                    ExtractIcon(IconType.CppFile, projectHierarchy, projectItem);
+
+                    // Certain projects contain absolute file names, also handle those. Usually though, the file names in a project are project-relative.
+                    if (projectInfo.AllCppFileNames.Contains(cppFileName))
                     {
-                        string name = null;
-                        try { name = projectItem.get_FileNames(0); } catch { }
-                        if (!string.IsNullOrEmpty(name))
+                        projectData.Add(Item.CreateCppFile(cppFileName));
+                    }
+                    else
+                    {
+                        // Some project use environment variables in the file names (e.g. to access an external SDK), so expand these environment variables first
+                        string expandedCppFileName = ProjectInfo.ExpandEnvironmentVariables(cppFileName);
+
+                        string projectRelativeName = null;
+                        try { projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(expandedCppFileName); } catch { }
+
+                        if (!string.IsNullOrEmpty(projectRelativeName) && projectInfo.AllCppFileNames.Contains(projectRelativeName))
                         {
-                            if (projectItem.FileCount == 1)
+                            projectData.Add(Item.CreateCppFile(projectRelativeName));
+                        }
+                        else
+                        {
+                            // Try to find the fully expanded file name in the list of all file names
+                            foreach (string fileName in projectInfo.AllCppFileNames)
                             {
-                                if (_settings.IsValidCppFileName(name))
+                                string expandedFileName = ProjectInfo.ExpandEnvironmentVariables(fileName);
+                                if (expandedFileName == expandedCppFileName)
                                 {
-                                    string cppFileName = name;
-
-                                    ExtractIcon(IconType.CppFile, projectHierarchy, projectItem);
-
-                                    // Certain projects contain absolute file names, also handle those. Usually though, the file names in a project are project-relative.
-                                    if (projectInfo.AllCppFileNames.Contains(cppFileName))
-                                    {
-                                        projectData.Add(Item.CreateCppFile(cppFileName));
-                                    }
-                                    else
-                                    {
-                                        // Some project use environment variables in the file names (e.g. to access an external SDK), so expand these environment variables first
-                                        string expandedCppFileName = ProjectInfo.ExpandEnvironmentVariables(cppFileName);
-
-                                        string projectRelativeName = null;
-                                        try { projectRelativeName = projectInfo.GetProjectRelativePathFromAbsolutePath(expandedCppFileName); } catch { }
-
-                                        if (!string.IsNullOrEmpty(projectRelativeName) && projectInfo.AllCppFileNames.Contains(projectRelativeName))
-                                        {
-                                            projectData.Add(Item.CreateCppFile(projectRelativeName));
-                                        }
-                                        else
-                                        {
-                                            // Try to find the fully expanded file name in the list of all file names
-                                            foreach (string fileName in projectInfo.AllCppFileNames)
-                                            {
-                                                string expandedFileName = ProjectInfo.ExpandEnvironmentVariables(fileName);
-                                                if (expandedFileName == expandedCppFileName)
-                                                {
-                                                    projectData.Add(Item.CreateCppFile(fileName));
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
+                                    projectData.Add(Item.CreateCppFile(fileName));
+                                    break;
                                 }
                             }
-                            else
-                            {
-                                ExtractIcon(IconType.Folder, projectHierarchy, projectItem);
-
-                                // Enter folder recursively
-                                var folderItems = new List<Item>();
-                                ProcessProjectItems(solutionService, projectHierarchy, projectInfo, projectItem.ProjectItems, folderItems);
-                                if (folderItems.Count > 0)
-                                    projectData.Add(Item.CreateFolder(name, folderItems));
-                            }
                         }
                     }
+                }
+                else
+                {
+                    ExtractIcon(IconType.Folder, projectHierarchy, projectItem);
+
+                    // Enter folder recursively
+                    var folderItems = new List<Item>();
+                    ProcessProjectItems(solutionService, projectHierarchy, projectInfo, projectItem.ProjectItems, folderItems);
+                    if (folderItems.Count > 0)
+                        projectData.Add(Item.CreateFolder(name, folderItems));
                 }
             }
         }
