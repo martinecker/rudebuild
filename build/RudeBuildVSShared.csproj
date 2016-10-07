@@ -25,9 +25,10 @@
     <IncrementalBuild>false</IncrementalBuild>
     <DocumentationFile>
     </DocumentationFile>
+    <DebugType>full</DebugType>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
@@ -36,6 +37,7 @@
     <IncrementalBuild>false</IncrementalBuild>
     <DocumentationFile>
     </DocumentationFile>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>RudeBuildVSShared</RootNamespace>
