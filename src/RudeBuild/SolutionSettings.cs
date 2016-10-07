@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using System.ComponentModel;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace RudeBuild
@@ -34,31 +35,17 @@ namespace RudeBuild
         private bool RemoveNoLongerExistingProjects(SolutionInfo solutionInfo)
         {
             bool changed = false;
-            IList<string> projectNames = new List<string>(ProjectNameToExcludedCppFileNameMap.Keys);
+            var projectNames = new List<string>(ProjectNameToExcludedCppFileNameMap.Keys);
             foreach (string projectName in projectNames)
             {
                 // Check if the projects we have stored settings for still exists. If they don't, remove them.
-                if (solutionInfo.GetProjectInfo(projectName) == null)
+                if (solutionInfo.GetProjectInfo(projectName) == null || !ProjectNameToExcludedCppFileNameMap[projectName].Any())
                 {
                     ProjectNameToExcludedCppFileNameMap.Remove(projectName);
                     changed = true;
                 }
             }
 
-            return changed;
-        }
-
-        private bool AddNewProjects(SolutionInfo solutionInfo)
-        {
-            bool changed = false;
-            foreach (string projectName in solutionInfo.ProjectNames)
-            {
-                if (!ProjectNameToExcludedCppFileNameMap.ContainsKey(projectName))
-                {
-                    ProjectNameToExcludedCppFileNameMap.Add(projectName, new List<string>());
-                    changed = true;
-                }
-            }
             return changed;
         }
 
@@ -91,7 +78,6 @@ namespace RudeBuild
             }
 
             bool changed = RemoveNoLongerExistingProjects(solutionInfo);
-            changed = AddNewProjects(solutionInfo) || changed;
 
             foreach (string projectName in solutionInfo.ProjectNames)
             {
