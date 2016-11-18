@@ -23,8 +23,8 @@ namespace RudeBuild
         {
             get
             {
-                string installationPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                string configFilePath = Path.Combine(installationPath, ConfigFileName);
+                string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RudeBuild");
+                string configFilePath = Path.Combine(appDataPath, ConfigFileName);
                 return configFilePath;
             }
         }
@@ -113,8 +113,18 @@ namespace RudeBuild
             }
         }
 
+        private void CreateConfigFileDirectoryIfNotExists()
+        {
+            if (!File.Exists(ConfigFilePath))
+            {
+                var directory = System.IO.Path.GetDirectoryName(ConfigFilePath);
+                System.IO.Directory.CreateDirectory(directory);
+            }
+        }
+
         private void SaveInternal()
         {
+            CreateConfigFileDirectoryIfNotExists();
             using (TextWriter textWriter = new StreamWriter(ConfigFilePath))
             {
                 var serializer = new XmlSerializer(typeof(GlobalSettings));
