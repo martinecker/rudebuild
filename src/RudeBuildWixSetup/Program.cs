@@ -116,7 +116,8 @@ public class CustomActions
 
 	[DllImport("User32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-	private static void PatchAddInFile(string filePath, string installationPath)
+    // Returns path to patched file (in temp directory)
+    private static string PatchAddInFile(string filePath, string installationPath)
     {
         XDocument document = XDocument.Load(filePath);
         if (null == document || null == document.Root)
@@ -127,7 +128,10 @@ public class CustomActions
         XNamespace ns = document.Root.Name.Namespace;
         XElement assemblyElement = document.Descendants(ns + "Assembly").Single();
         assemblyElement.Value = System.IO.Path.Combine(installationPath, "RudeBuildVSAddIn.dll");
-        document.Save(filePath);
+
+        var tempFilePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileName(filePath));
+        document.Save(tempFilePath);
+        return tempFilePath;
     }
 
     private static bool IsVisualStudioInstalled(RudeBuild.VisualStudioVersion version)
@@ -382,8 +386,8 @@ public class CustomActions
         {
             string installationPath = session.Property("INSTALLDIR");
 
-			string addInFilePath = System.IO.Path.Combine(installationPath, AddInFileName);
-            PatchAddInFile(addInFilePath, installationPath);
+            string srcAddInFilePath = System.IO.Path.Combine(installationPath, AddInFileName);
+            string addInFilePath = PatchAddInFile(srcAddInFilePath, installationPath);
             InstallAddInFile(addInFilePath, "2008", RudeBuild.VisualStudioVersion.VS2008);
             InstallAddInFile(addInFilePath, "2010", RudeBuild.VisualStudioVersion.VS2010);
             InstallAddInFile(addInFilePath, "2012", RudeBuild.VisualStudioVersion.VS2012);
