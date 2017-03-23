@@ -6,6 +6,7 @@
     <Description xml:space="preserve">RudeBuild - A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.</Description>
     <MoreInfo>https://github.com/martinecker/rudebuild</MoreInfo>
     <License>LICENSE.rtf</License>
+    <Icon>RudeBuildPackage.ico</Icon>
     <Tags>build,c++,unity,bulk</Tags>
   </Metadata>
   <Installation>

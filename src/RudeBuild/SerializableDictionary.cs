@@ -7,7 +7,7 @@ using System.Security.Permissions;
 
 namespace RudeBuild
 {
-	[Serializable]
+    [Serializable]
     public sealed class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IXmlSerializable, ISerializable
     {
         private const string DictionaryNodeName = "Dictionary";

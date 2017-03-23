@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Ecker")]
 [assembly: AssemblyProduct("RudeBuildWixSetup")]
-[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2016")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
