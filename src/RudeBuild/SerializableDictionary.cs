@@ -72,7 +72,7 @@ namespace RudeBuild
 
         #region ISerializable Members
 
-        protected SerializableDictionary(SerializationInfo info, StreamingContext context)
+        private SerializableDictionary(SerializationInfo info, StreamingContext context)
         {
             int itemCount = info.GetInt32("ItemCount");
             for (int i = 0; i < itemCount; i++)

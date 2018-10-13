@@ -34,7 +34,8 @@ namespace RudeBuild
                 case VisualStudioVersion.VS2012: return registrySoftwarePath + @"\Microsoft\VisualStudio\11.0\";
                 case VisualStudioVersion.VS2013: return registrySoftwarePath + @"\Microsoft\VisualStudio\12.0\";
                 case VisualStudioVersion.VS2015: return registrySoftwarePath + @"\Microsoft\VisualStudio\14.0\";
-                default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
+				case VisualStudioVersion.VS2017: return registrySoftwarePath + @"\Microsoft\VisualStudio\15.0\";
+				default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
             }
         }
 

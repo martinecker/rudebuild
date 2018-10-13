@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Martin Ecker")]
 [assembly: AssemblyProduct("RudeBuildConsole")]
-[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2017")]
+[assembly: AssemblyCopyright("Copyright © Martin Ecker 2011-2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

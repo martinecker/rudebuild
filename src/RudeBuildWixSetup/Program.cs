@@ -201,16 +201,34 @@ public class CustomActions
         }
     }
 
-	private static void InstallVSIX(string filePath)
+	private static RudeBuild.VisualStudioVersion[] supportedVSIXVersions = new RudeBuild.VisualStudioVersion[]
+		{
+			// sort from latest to oldest version
+			RudeBuild.VisualStudioVersion.VS2017,
+			RudeBuild.VisualStudioVersion.VS2015,
+		};
+
+	private static RudeBuild.VisualStudioVersion? GetHighestInstalledVSIXVisualStudio()
 	{
 		// Even though VSPackage support started with Visual Studio 2010, the RudeBuild VSIX
-		// only supports 2015, so we only run the VSIX installer if 2015 is installed.
-		if (!IsVisualStudioInstalled(RudeBuild.VisualStudioVersion.VS2015))
+		// only supports 2015 and beyond, so we only run the VSIX installer if 2015+ is installed.
+		foreach (var version in supportedVSIXVersions)
+		{
+			if (IsVisualStudioInstalled(version))
+				return version;
+		}
+		return null;
+	}
+
+	private static void InstallVSIX(string filePath)
+	{
+		RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
+		if (highestVSVersion == null)
 			return;
 
 		try
 		{
-			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(RudeBuild.VisualStudioVersion.VS2015);
+			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
 			var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
 			var vsixInstallerCommandLine = "\"" + filePath + "\"";
 
@@ -231,14 +249,13 @@ public class CustomActions
 
 	private static void UninstallVSIX(string filePath)
 	{
-		// Even though VSPackage support started with Visual Studio 2010, the RudeBuild VSIX
-		// only supports 2015, so we only run the VSIX installer if 2015 is installed.
-		if (!IsVisualStudioInstalled(RudeBuild.VisualStudioVersion.VS2015))
+		RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
+		if (highestVSVersion == null)
 			return;
 
 		try
 		{
-			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(RudeBuild.VisualStudioVersion.VS2015);
+			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
 			var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
 			var vsixInstallerCommandLine = "/quiet /uninstall:RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289";	// The VSIX ID comes from the ProductID in the source.extension.vsixmanifest file!
 
@@ -317,7 +334,8 @@ public class CustomActions
             case RudeBuild.VisualStudioVersion.VS2012: return "VisualStudio.DTE.11.0";
             case RudeBuild.VisualStudioVersion.VS2013: return "VisualStudio.DTE.12.0";
             case RudeBuild.VisualStudioVersion.VS2015: return "VisualStudio.DTE.14.0";
-            default: return null;
+			case RudeBuild.VisualStudioVersion.VS2017: return "VisualStudio.DTE.15.0";
+			default: return null;
         }
     }
 
@@ -434,7 +452,9 @@ public class CustomActions
                 System.IO.File.Delete(globalSettingsPath);
             }
 
-            Registry.CurrentUser.DeleteSubKeyTree(RudeBuildSetupRegistryPath);
+			RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(RudeBuildSetupRegistryPath);
+			if (null != registryKey)
+				Registry.CurrentUser.DeleteSubKeyTree(RudeBuildSetupRegistryPath);
 
 			string vsixFilePath = System.IO.Path.Combine(installationPath, VSIXFileName);
 			UninstallVSIX(vsixFilePath);

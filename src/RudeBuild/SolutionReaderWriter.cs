@@ -134,7 +134,7 @@ namespace RudeBuild
                     else if (ParseSolutionFormatVersion(line, "9.00", VisualStudioVersion.VS2005, ref solutionFormatVersion) ||
                              ParseSolutionFormatVersion(line, "10.00", VisualStudioVersion.VS2008, ref solutionFormatVersion) ||
                              ParseSolutionFormatVersion(line, "11.00", VisualStudioVersion.VS2010, ref solutionFormatVersion) ||
-                             ParseSolutionFormatVersion(line, "12.00", VisualStudioVersion.VS2012, ref solutionFormatVersion))  // Note that VS 2013 and 2015 retain solution formation version 12.00!
+                             ParseSolutionFormatVersion(line, "12.00", VisualStudioVersion.VS2012, ref solutionFormatVersion))  // Note that VS 2013, 2015, and 2017 retain solution formation version 12.00!
                     {
                         version = solutionFormatVersion;
                     }
@@ -143,7 +143,8 @@ namespace RudeBuild
                              ParseVisualStudioVersion(line, "10.0", VisualStudioVersion.VS2010, ref visualStudioVersion) ||
                              ParseVisualStudioVersion(line, "11.0", VisualStudioVersion.VS2012, ref visualStudioVersion) ||
                              ParseVisualStudioVersion(line, "12.0", VisualStudioVersion.VS2013, ref visualStudioVersion) ||
-                             ParseVisualStudioVersion(line, "14.0", VisualStudioVersion.VS2015, ref visualStudioVersion))
+                             ParseVisualStudioVersion(line, "14.0", VisualStudioVersion.VS2015, ref visualStudioVersion) ||
+							 ParseVisualStudioVersion(line, "15.0", VisualStudioVersion.VS2017, ref visualStudioVersion))
                     {
                         version = visualStudioVersion;
                     }
