@@ -163,8 +163,12 @@ namespace RudeBuild
             if (string.IsNullOrEmpty(sceRootPath))
                 return null;
 
-            // Try to find newest first.
-            string result = Path.Combine(sceRootPath, "Common\\SceVSI-VS14\\bin\\vs14build.exe");
+            // Try to find newest first. May want to consider to match this to the actual VS version we're running with (possibly based on solution version or .vcxproj version if available).
+            string result = Path.Combine(sceRootPath, "Common\\SceVSI-VS15\\bin\\vs15build.exe");
+            if (File.Exists(result))
+                return result;
+
+            result = Path.Combine(sceRootPath, "Common\\SceVSI-VS14\\bin\\vs14build.exe");
             if (File.Exists(result))
                 return result;
 
