@@ -144,7 +144,8 @@ namespace RudeBuild
                              ParseVisualStudioVersion(line, "11.0", VisualStudioVersion.VS2012, ref visualStudioVersion) ||
                              ParseVisualStudioVersion(line, "12.0", VisualStudioVersion.VS2013, ref visualStudioVersion) ||
                              ParseVisualStudioVersion(line, "14.0", VisualStudioVersion.VS2015, ref visualStudioVersion) ||
-							 ParseVisualStudioVersion(line, "15.0", VisualStudioVersion.VS2017, ref visualStudioVersion))
+							 ParseVisualStudioVersion(line, "15.0", VisualStudioVersion.VS2017, ref visualStudioVersion) ||
+                             ParseVisualStudioVersion(line, "16.0", VisualStudioVersion.VS2019, ref visualStudioVersion))
                     {
                         version = visualStudioVersion;
                     }

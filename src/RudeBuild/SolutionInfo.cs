@@ -15,6 +15,7 @@ namespace RudeBuild
         VS2013,
         VS2015,
 		VS2017,
+        VS2019,
     }
 
     public sealed class SolutionConfigManager

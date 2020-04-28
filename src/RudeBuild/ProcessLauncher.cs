@@ -35,7 +35,8 @@ namespace RudeBuild
                 case VisualStudioVersion.VS2013: return registrySoftwarePath + @"\Microsoft\VisualStudio\12.0\";
                 case VisualStudioVersion.VS2015: return registrySoftwarePath + @"\Microsoft\VisualStudio\14.0\";
 				case VisualStudioVersion.VS2017: return registrySoftwarePath + @"\Microsoft\VisualStudio\15.0\";
-				default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
+                case VisualStudioVersion.VS2019: return registrySoftwarePath + @"\Microsoft\VisualStudio\16.0\";
+                default: throw new ArgumentException("Couldn't determine Visual Studio registry key. Your version of Visual Studio is unsupported by this tool.");
             }
         }
 
@@ -163,8 +164,14 @@ namespace RudeBuild
             if (string.IsNullOrEmpty(sceRootPath))
                 return null;
 
+            string result;
+
             // Try to find newest first. May want to consider to match this to the actual VS version we're running with (possibly based on solution version or .vcxproj version if available).
-            string result = Path.Combine(sceRootPath, "Common\\SceVSI-VS15\\bin\\vs15build.exe");
+            result = Path.Combine(sceRootPath, "Common\\SceVSI-VS16\\bin\\vs16build.exe");
+            if (File.Exists(result))
+                return result;
+
+            result = Path.Combine(sceRootPath, "Common\\SceVSI-VS15\\bin\\vs15build.exe");
             if (File.Exists(result))
                 return result;
 

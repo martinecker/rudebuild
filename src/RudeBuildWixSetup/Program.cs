@@ -204,7 +204,8 @@ public class CustomActions
 	private static RudeBuild.VisualStudioVersion[] supportedVSIXVersions = new RudeBuild.VisualStudioVersion[]
 		{
 			// sort from latest to oldest version
-			RudeBuild.VisualStudioVersion.VS2017,
+            RudeBuild.VisualStudioVersion.VS2019,
+            RudeBuild.VisualStudioVersion.VS2017,
 			RudeBuild.VisualStudioVersion.VS2015,
 		};
 
@@ -335,7 +336,8 @@ public class CustomActions
             case RudeBuild.VisualStudioVersion.VS2013: return "VisualStudio.DTE.12.0";
             case RudeBuild.VisualStudioVersion.VS2015: return "VisualStudio.DTE.14.0";
 			case RudeBuild.VisualStudioVersion.VS2017: return "VisualStudio.DTE.15.0";
-			default: return null;
+            case RudeBuild.VisualStudioVersion.VS2019: return "VisualStudio.DTE.15.0";
+            default: return null;
         }
     }
 
