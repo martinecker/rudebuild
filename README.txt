@@ -5,7 +5,8 @@ A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.
 This is free, open source software under the zlib license.
 
 For more information, installer downloads, and latest updates please visit:
-http://rudebuild.sourceforge.net
+http://www.martinecker.com/rudebuild/
+https://github.com/martinecker/rudebuild
 
 ----------------------
 
