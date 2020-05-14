@@ -130,11 +130,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\build\RudeBuild.csproj">
+    <ProjectReference Include="..\RudeBuild\RudeBuild.csproj">
       <Project>{344a8e8a-9f1b-45f8-b03d-03ce5534572d}</Project>
       <Name>RudeBuild</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\build\RudeBuildVSShared.csproj">
+    <ProjectReference Include="..\RudeBuildVSShared\RudeBuildVSShared.csproj">
       <Project>{725d4418-b658-489e-be5b-ca0f147a0496}</Project>
       <Name>RudeBuildVSShared</Name>
     </ProjectReference>

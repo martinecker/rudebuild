@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\Release\</OutputPath>
+    <OutputPath>..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -52,7 +52,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Deployment.WindowsInstaller">
-      <HintPath>..\external\wix\310\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
+      <HintPath>..\..\external\wix\310\Microsoft.Deployment.WindowsInstaller.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -64,19 +64,15 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WixSharp">
-      <HintPath>..\external\WixSharp\WixSharp.dll</HintPath>
+      <HintPath>..\..\external\WixSharp\WixSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../src/RudeBuildWixSetup/Program.cs">
-      <Link>Program.cs</Link>
-    </Compile>
-    <Compile Include="../src/RudeBuildWixSetup/AssemblyInfo.cs">
-      <Link>AssemblyInfo.cs</Link>
-    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="RudeBuild.csproj">
+    <ProjectReference Include="../RudeBuild/RudeBuild.csproj">
       <Project>{344A8E8A-9F1B-45F8-B03D-03CE5534572D}</Project>
       <Name>RudeBuild</Name>
     </ProjectReference>
@@ -86,8 +82,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>set WIXSHARP_WIXDIR=$(ProjectDir)..\external\WixSharp\Wix_bin\bin
-set WIXSHARP_DIR=$(ProjectDir)..\external\WixSharp
+    <PostBuildEvent>set WIXSHARP_WIXDIR=$(ProjectDir)..\..\external\WixSharp\Wix_bin\bin
+set WIXSHARP_DIR=$(ProjectDir)..\..\external\WixSharp
 $(TargetPath)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

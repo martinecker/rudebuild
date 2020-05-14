@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\Release\</OutputPath>
+    <OutputPath>..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,12 +38,12 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\src\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommandLineParser, Version=2.6.0.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\external\CommandLineParser\bin\Release\CommandLineParser.dll</HintPath>
+      <HintPath>..\..\external\CommandLineParser\bin\Release\CommandLineParser.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,61 +53,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\RudeBuild\BuildOptions.cs">
-      <Link>BuildOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\CacheCleaner.cs">
-      <Link>CacheCleaner.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\DisplayValueAttribute.cs">
-      <Link>DisplayValueAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\GlobalSetings.cs">
-      <Link>GlobalSetings.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\IOutput.cs">
-      <Link>IOutput.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\ModifiedTextFileWriter.cs">
-      <Link>ModifiedTextFileWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\ProcessLauncher.cs">
-      <Link>ProcessLauncher.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\ProjectInfo.cs" />
-    <Compile Include="..\src\RudeBuild\AssemblyInfo.cs" />
-    <Compile Include="..\src\RudeBuild\ProjectReaderWriter.cs">
-      <Link>ProjectReaderWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\SerializableDictionary.cs">
-      <Link>SerializableDictionary.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\Settings.cs">
-      <Link>Settings.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\SolutionInfo.cs">
-      <Link>SolutionInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\SolutionReaderWriter.cs">
-      <Link>SolutionReaderWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\SolutionSettings.cs">
-      <Link>SolutionSettings.cs</Link>
-    </Compile>
-    <Compile Include="..\src\RudeBuild\UnityFileMerger.cs">
-      <Link>UnityFileMerger.cs</Link>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\LICENSE.rtf" />
-    <Content Include="..\LICENSE.txt" />
-    <Content Include="..\README.txt" />
+    <Compile Include="BuildOptions.cs" />
+    <Compile Include="CacheCleaner.cs" />
+    <Compile Include="DisplayValueAttribute.cs" />
+    <Compile Include="GlobalSetings.cs" />
+    <Compile Include="IOutput.cs" />
+    <Compile Include="ModifiedTextFileWriter.cs" />
+    <Compile Include="ProcessLauncher.cs" />
+    <Compile Include="ProjectInfo.cs" />
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ProjectReaderWriter.cs" />
+    <Compile Include="SerializableDictionary.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SolutionInfo.cs" />
+    <Compile Include="SolutionReaderWriter.cs" />
+    <Compile Include="SolutionSettings.cs" />
+    <Compile Include="UnityFileMerger.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectDir)..\LICENSE.rtf" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)..\LICENSE.txt" "$(ProjectDir)$(OutDir)"
-copy "$(ProjectDir)..\README.txt" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(ProjectDir)..\..\LICENSE.rtf" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)..\..\LICENSE.txt" "$(ProjectDir)$(OutDir)"
+copy "$(ProjectDir)..\..\README.txt" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

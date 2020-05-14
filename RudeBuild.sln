@@ -1,22 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30104.148
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildConsole", "src\RudeBuildConsole\RudeBuildConsole.csproj", "{7DC0315A-DBD6-4790-94EC-4526A8B9300B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuild", "RudeBuild.csproj", "{344A8E8A-9F1B-45F8-B03D-03CE5534572D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuild", "src\RudeBuild\RudeBuild.csproj", "{344A8E8A-9F1B-45F8-B03D-03CE5534572D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildWixSetup", "RudeBuildWixSetup.csproj", "{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildWixSetup", "src\RudeBuildWixSetup\RudeBuildWixSetup.csproj", "{4F48D3BB-92FE-4935-A268-EF01CFD4D01B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{725D4418-B658-489E-BE5B-CA0F147A0496} = {725D4418-B658-489E-BE5B-CA0F147A0496}
 		{7DC0315A-DBD6-4790-94EC-4526A8B9300B} = {7DC0315A-DBD6-4790-94EC-4526A8B9300B}
 		{344A8E8A-9F1B-45F8-B03D-03CE5534572D} = {344A8E8A-9F1B-45F8-B03D-03CE5534572D}
+		{A52B19D3-B14D-420E-A523-B70F43632E07} = {A52B19D3-B14D-420E-A523-B70F43632E07}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSShared", "RudeBuildVSShared.csproj", "{725D4418-B658-489E-BE5B-CA0F147A0496}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSShared", "src\RudeBuildVSShared\RudeBuildVSShared.csproj", "{725D4418-B658-489E-BE5B-CA0F147A0496}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSIX", "..\src\RudeBuildVSIX\RudeBuildVSIX.csproj", "{A52B19D3-B14D-420E-A523-B70F43632E07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RudeBuildVSIX", "src\RudeBuildVSIX\RudeBuildVSIX.csproj", "{A52B19D3-B14D-420E-A523-B70F43632E07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{21BFCDD6-9BA2-4080-ACFA-DBC355C3414C}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.rtf = LICENSE.rtf
+		LICENSE.txt = LICENSE.txt
+		README.txt = README.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
