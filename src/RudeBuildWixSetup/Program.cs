@@ -18,7 +18,7 @@ class Script
     {
         var customActionInstall = new ManagedAction("OnInstall", Return.ignore, When.After, Step.InstallFinalize, Condition.NOT_Installed, Sequence.InstallExecuteSequence);
         var customActionUninstall = new ManagedAction("OnUninstall", Return.ignore, When.Before, Step.RemoveFiles, Condition.Installed, Sequence.InstallExecuteSequence);
-        customActionInstall.RefAssemblies = customActionUninstall.RefAssemblies = new string[] { "CommandLineParser.dll", "RudeBuild.dll", "RudeBuildVSShared.dll", "RudeBuildVSAddIn.dll" };
+        customActionInstall.RefAssemblies = customActionUninstall.RefAssemblies = new string[] { "CommandLineParser.dll", "RudeBuild.dll", "RudeBuildVSShared.dll" };
 
         var project = new Project()
         {
@@ -38,28 +38,25 @@ class Script
 
             Version = new Version("1.5.0.0"),
             ProductId = new Guid("D6090F57-83BD-45B2-8349-10A84C7C2FA3"),   // Change this whenever you change the version above!
-           
+
             Dirs = new[]
             {
-                new Dir(@"%ProgramFiles%\RudeBuild", 
+                new Dir(@"%ProgramFiles%\RudeBuild",
                     new WixEntity[]
                     {
                         new File(@"CommandLineParser.dll"),
-                        new File(@"RudeBuild.AddIn"),
                         new File(@"RudeBuild.dll"),
                         new File(@"RudeBuildVSShared.dll"),
-						new File(@"RudeBuildVSAddIn.dll"),
-						new File(@"RudeBuildConsole.exe"),
-						new File(@"RudeBuildVSIX.vsix"),
+                        new File(@"RudeBuildConsole.exe"),
+                        new File(@"RudeBuildVSIX.vsix"),
                         new File(@"LICENSE.rtf"),
                         new File(@"LICENSE.txt"),
                         new File(@"README.txt"),
-                        new Dir(@"en-US", new File(@"en-US\RudeBuild.resources.dll"))
                     }
                 )
             },
 
-            Actions = new []
+            Actions = new[]
             {
                 customActionInstall,
                 customActionUninstall
@@ -101,7 +98,7 @@ The command line version of RudeBuild is useful for automated builds, for exampl
             Schedule = UpgradeSchedule.afterInstallInitialize
         };
 
-        project.SetNetFxPrerequisite("NETFRAMEWORK35='#1'", "Please install .NET 3.5 first.");
+        //project.SetNetFxPrerequisite(Condition.Net471_Installed, "Please install .NET Framework 4.7.1 first");
 
         Compiler.BuildMsi(project, "RudeBuildSetup.msi");
     }
@@ -109,204 +106,95 @@ The command line version of RudeBuild is useful for automated builds, for exampl
 
 public class CustomActions
 {
-    private const string AddInFileName = "RudeBuild.AddIn";
-	private const string VSIXFileName = "RudeBuildVSIX.vsix";
-	private const string GlobalSettingsFileName = "RudeBuild.GlobalSettings.config";
+    private const string VSIXFileName = "RudeBuildVSIX.vsix";
+    private const string GlobalSettingsFileName = "RudeBuild.GlobalSettings.config";
     private const string RudeBuildSetupRegistryPath = @"SOFTWARE\RudeBuildSetup";
 
-	[DllImport("User32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-    // Returns path to patched file (in temp directory)
-    private static string PatchAddInFile(string filePath, string installationPath)
-    {
-        XDocument document = XDocument.Load(filePath);
-        if (null == document || null == document.Root)
-        {
-            throw new System.IO.InvalidDataException("Couldn't load required add-in file '" + filePath + "'.");
-        }
-
-        XNamespace ns = document.Root.Name.Namespace;
-        XElement assemblyElement = document.Descendants(ns + "Assembly").Single();
-        assemblyElement.Value = System.IO.Path.Combine(installationPath, "RudeBuildVSAddIn.dll");
-
-        var tempFilePath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileName(filePath));
-        document.Save(tempFilePath);
-        return tempFilePath;
-    }
+    [DllImport("User32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
 
     private static bool IsVisualStudioInstalled(RudeBuild.VisualStudioVersion version)
     {
-        string registryPath = RudeBuild.ProcessLauncher.GetDevEvnBaseRegistryKey(version);
-        RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath);
-		if (registryKey == null)
-			return false;
+        try
+        {
+            var devEnvPath = System.IO.Path.Combine(RudeBuild.ProcessLauncher.GetDevEnvDir(version), "devenv.com");
+            return System.IO.File.Exists(devEnvPath);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+     
+    private static RudeBuild.VisualStudioVersion[] supportedVSIXVersions = new RudeBuild.VisualStudioVersion[]
+        {
+            // sort from latest to oldest version
+            RudeBuild.VisualStudioVersion.VS2019,
+            RudeBuild.VisualStudioVersion.VS2017,
+        };
 
-		bool isInstalled = registryKey.GetValue("VisualStudioLocation") != null;
-		registryKey.Close();
-
-        return isInstalled;
+    private static RudeBuild.VisualStudioVersion? GetHighestInstalledVSIXVisualStudio()
+    {
+        // Even though VSPackage support started with Visual Studio 2010, the RudeBuild VSIX
+        // only supports 2017 and beyond, so we only run the VSIX installer if 2017+ is installed.
+        foreach (var version in supportedVSIXVersions)
+        {
+            if (IsVisualStudioInstalled(version))
+                return version;
+        }
+        return null;
     }
 
-    private static string GetUserPersonalFolder(string versionString, RudeBuild.VisualStudioVersion version)
+    private static void InstallVSIX(string filePath)
     {
-        string userPersonalFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-        if (!string.IsNullOrEmpty(userPersonalFolder))
-            return userPersonalFolder;
-
-        string registryPath = RudeBuild.ProcessLauncher.GetDevEvnBaseRegistryKey(version);
-        RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(registryPath);
-        if (null == registryKey)
-            throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
-
-        userPersonalFolder = registryKey.GetValue("MyDocumentsLocation") as string;
-        if (!string.IsNullOrEmpty(userPersonalFolder))
-            return userPersonalFolder;
-
-        throw new ApplicationException("Couldn't determine the user's Documents folder for Visual Studio " + versionString);
-    }
-
-    private static void InstallAddInFile(string filePath, string versionString, RudeBuild.VisualStudioVersion version)
-    {
-        if (!IsVisualStudioInstalled(version))
-            return;
+        RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
+        if (highestVSVersion == null)
+            throw new System.Exception("Couldn't find a supported version of Visual Studio to install the RudeBuild VSIX. Visual Studio 2017 or higher is required.");
 
         try
         {
-            string userPersonalFolder = GetUserPersonalFolder(versionString, version);
-            string installDirectory = System.IO.Path.Combine(userPersonalFolder, "Visual Studio " + versionString);
-            installDirectory = System.IO.Path.Combine(installDirectory, "Addins");
+            var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
+            var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
+            var vsixInstallerCommandLine = "\"" + filePath + "\"";
 
-            if (!System.IO.Directory.Exists(installDirectory))
-                System.IO.Directory.CreateDirectory(installDirectory);
-
-            string installPath = System.IO.Path.Combine(installDirectory, AddInFileName);
-            System.IO.File.Copy(filePath, installPath, true);
-
-            RegistryKey registryKey = Registry.CurrentUser.CreateSubKey(RudeBuildSetupRegistryPath);
-            if (null == registryKey)
-                throw new ArgumentException("Couldn't open RudeBuild setup registry key.");
-            registryKey.SetValue("AddInInstallPath" + versionString, installPath);
-            registryKey.Close();
+            Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
+            SetForegroundWindow(process.MainWindowHandle);
+            process.WaitForExit();
         }
         catch (Exception ex)
         {
-            string installDirectory = System.IO.Path.Combine("Visual Studio " + versionString, "Addins");
             System.Windows.MessageBox.Show(
-                "Couldn't install RudeBuild.AddIn file to Visual Studio add-ins folder '" + installDirectory + "'.\n" +
-                "You might be able to simply copy the file manually to the add-ins folder and Visual Studio should pick it up.\n" +
-                "Alternatively, you can manually install the add-in in Visual Studio by going to Tools/Options/Add-in and adding the RudeBuild installation folder as add-in folder.\n\n" +
+                "Couldn't successfully run the RudeBuild extension installer file '" + filePath + "'.\n" +
+                "You might be able to simply run this file manually to install the extension in Visual Studio.\n" +
                 "Exception message: " + ex.Message,
                 "RudeBuild",
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
-	private static RudeBuild.VisualStudioVersion[] supportedVSIXVersions = new RudeBuild.VisualStudioVersion[]
-		{
-			// sort from latest to oldest version
-            RudeBuild.VisualStudioVersion.VS2019,
-            RudeBuild.VisualStudioVersion.VS2017,
-			RudeBuild.VisualStudioVersion.VS2015,
-		};
-
-	private static RudeBuild.VisualStudioVersion? GetHighestInstalledVSIXVisualStudio()
-	{
-		// Even though VSPackage support started with Visual Studio 2010, the RudeBuild VSIX
-		// only supports 2015 and beyond, so we only run the VSIX installer if 2015+ is installed.
-		foreach (var version in supportedVSIXVersions)
-		{
-			if (IsVisualStudioInstalled(version))
-				return version;
-		}
-		return null;
-	}
-
-	private static void InstallVSIX(string filePath)
-	{
-		RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
-		if (highestVSVersion == null)
-			return;
-
-		try
-		{
-			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
-			var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
-			var vsixInstallerCommandLine = "\"" + filePath + "\"";
-
-			Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
-			SetForegroundWindow(process.MainWindowHandle);
-			process.WaitForExit();
-		}
-		catch (Exception ex)
-		{
-			System.Windows.MessageBox.Show(
-				"Couldn't successfully run the RudeBuild extension installer file '" + filePath + "'.\n" +
-				"You might be able to simply run this file manually to install the extension in Visual Studio.\n" +
-				"Exception message: " + ex.Message,
-				"RudeBuild",
-				System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-		}
-	}
-
-	private static void UninstallVSIX(string filePath)
-	{
-		RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
-		if (highestVSVersion == null)
-			return;
-
-		try
-		{
-			var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
-			var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
-			var vsixInstallerCommandLine = "/quiet /uninstall:RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289";	// The VSIX ID comes from the ProductID in the source.extension.vsixmanifest file!
-
-			Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
-			process.WaitForExit();
-		}
-		catch (Exception ex)
-		{
-			System.Windows.MessageBox.Show(
-				"Couldn't successfully run the RudeBuild extension installer file '" + filePath + "'.\n" +
-				"You might be able to manually uninstall the RudeBuild extension in Visual Studio.\n" +
-				"Exception message: " + ex.Message,
-				"RudeBuild",
-				System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-		}
-	}
-
-	private static void UninstallAddInFile(string versionString, RudeBuild.VisualStudioVersion version)
+    private static void UninstallVSIX(string filePath)
     {
-        RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(RudeBuildSetupRegistryPath);
-        if (null == registryKey)
+        RudeBuild.VisualStudioVersion? highestVSVersion = GetHighestInstalledVSIXVisualStudio();
+        if (highestVSVersion == null)
             return;
 
-        string installPath = registryKey.GetValue("AddInInstallPath" + versionString) as string;
-        registryKey.Close();
-        if (string.IsNullOrEmpty(installPath))
-            return;
-
-        if (System.IO.File.Exists(installPath))
-        {
-            System.IO.File.Delete(installPath);
-        }
-    }
-
-    private static object CreateComObjectFromProgId(string progId)
-    {
         try
         {
-            Type type = Type.GetTypeFromProgID(progId);
-            if (type != null)
-            {
-                return Activator.CreateInstance(type);
-            }
+            var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
+            var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
+            var vsixInstallerCommandLine = "/quiet /uninstall:RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289";  // The VSIX ID comes from the ProductID in the source.extension.vsixmanifest file!
+
+            Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
+            process.WaitForExit();
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(ex.Message);
+            System.Windows.MessageBox.Show(
+                "Couldn't successfully run the RudeBuild extension installer file '" + filePath + "'.\n" +
+                "You might be able to manually uninstall the RudeBuild extension in Visual Studio.\n" +
+                "Exception message: " + ex.Message,
+                "RudeBuild",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
-
-        return null;
     }
 
     private static void DebugBreak()
@@ -325,78 +213,6 @@ public class CustomActions
         //Debugger.Break();
     }
 
-    private static string GetDevEnvProgId(RudeBuild.VisualStudioVersion version)
-    {
-        switch (version)
-        {
-            case RudeBuild.VisualStudioVersion.VS2005: return "VisualStudio.DTE.8.0";
-            case RudeBuild.VisualStudioVersion.VS2008: return "VisualStudio.DTE.9.0";
-            case RudeBuild.VisualStudioVersion.VS2010: return "VisualStudio.DTE.10.0";
-            case RudeBuild.VisualStudioVersion.VS2012: return "VisualStudio.DTE.11.0";
-            case RudeBuild.VisualStudioVersion.VS2013: return "VisualStudio.DTE.12.0";
-            case RudeBuild.VisualStudioVersion.VS2015: return "VisualStudio.DTE.14.0";
-			case RudeBuild.VisualStudioVersion.VS2017: return "VisualStudio.DTE.15.0";
-            case RudeBuild.VisualStudioVersion.VS2019: return "VisualStudio.DTE.15.0";
-            default: return null;
-        }
-    }
-
-    private static void RemoveCommands(string versionString, RudeBuild.VisualStudioVersion version)
-    {
-        DTE2 application = null;
-        try
-        {
-            string devEnvProgId = GetDevEnvProgId(version);
-            if (string.IsNullOrEmpty(devEnvProgId))
-                return;
-            application = CreateComObjectFromProgId(devEnvProgId) as DTE2;
-            if (null == application)
-                return;
-
-            MessageFilter.Register();
-
-            var connect = new RudeBuildVSAddIn.Connect();
-            connect.OnUninstall(application);
-        }
-        catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show("RudeBuild uninstall error while removing commands from Visual Studio " + versionString + "!\n" + ex.Message,
-                "RudeBuild", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-        }
-        finally
-        {
-            if (null != application)
-            {
-                application.Quit();
-                MessageFilter.Revoke();
-            }
-        }
-    }
-
-    private void ResetAddIn(RudeBuild.VisualStudioVersion version)
-    {
-        try
-        {
-            var process = new Process();
-            ProcessStartInfo info = process.StartInfo;
-            info.CreateNoWindow = true;
-            info.UseShellExecute = false;
-            info.WindowStyle = ProcessWindowStyle.Hidden;
-            info.ErrorDialog = false;
-            info.FileName = RudeBuild.ProcessLauncher.GetDevEnvPath(version);
-            info.Arguments = " /ResetAddIn RudeBuildVSAddIn.Connect /Command File.Exit";
-            if (process.Start())
-            {
-                process.WaitForExit();
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Windows.MessageBox.Show("RudeBuild uninstall error! Couldn't reset RudeBuild add-in!\n" + ex.Message, 
-                "RudeBuild", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-        }
-    }
-
     [CustomAction]
     public static ActionResult OnInstall(Session session)
     {
@@ -405,20 +221,12 @@ public class CustomActions
         try
         {
             string installationPath = session.Property("INSTALLDIR");
-
-            string srcAddInFilePath = System.IO.Path.Combine(installationPath, AddInFileName);
-            string addInFilePath = PatchAddInFile(srcAddInFilePath, installationPath);
-            InstallAddInFile(addInFilePath, "2008", RudeBuild.VisualStudioVersion.VS2008);
-            InstallAddInFile(addInFilePath, "2010", RudeBuild.VisualStudioVersion.VS2010);
-            InstallAddInFile(addInFilePath, "2012", RudeBuild.VisualStudioVersion.VS2012);
-            InstallAddInFile(addInFilePath, "2013", RudeBuild.VisualStudioVersion.VS2013);
-
-			string vsixFilePath = System.IO.Path.Combine(installationPath, VSIXFileName);
-			InstallVSIX(vsixFilePath);
+            string vsixFilePath = System.IO.Path.Combine(installationPath, VSIXFileName);
+            InstallVSIX(vsixFilePath);
         }
         catch (Exception ex)
         {
-            System.Windows.MessageBox.Show("RudeBuild install error trying to patch and copy the RudeBuild.AddIn file to the user's Visual Studio add-in folder!\n" + ex.Message,
+            System.Windows.MessageBox.Show("RudeBuild install error trying to install the VSIX!\n" + ex.Message,
                 "RudeBuild", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
 
@@ -432,21 +240,6 @@ public class CustomActions
 
         try
         {
-            RemoveCommands("2008", RudeBuild.VisualStudioVersion.VS2008);
-            RemoveCommands("2010", RudeBuild.VisualStudioVersion.VS2010);
-            RemoveCommands("2012", RudeBuild.VisualStudioVersion.VS2012);
-            RemoveCommands("2013", RudeBuild.VisualStudioVersion.VS2013);
-
-            UninstallAddInFile("2008", RudeBuild.VisualStudioVersion.VS2008);
-            UninstallAddInFile("2010", RudeBuild.VisualStudioVersion.VS2010);
-            UninstallAddInFile("2012", RudeBuild.VisualStudioVersion.VS2012);
-            UninstallAddInFile("2013", RudeBuild.VisualStudioVersion.VS2013);
-
-            //ResetAddIn(VisualStudioVersion.VS2008);
-            //ResetAddIn(VisualStudioVersion.VS2010);
-            //ResetAddIn(VisualStudioVersion.VS2012);
-            //ResetAddIn(VisualStudioVersion.VS2013);
-
             string installationPath = session.Property("INSTALLDIR");
             string globalSettingsPath = System.IO.Path.Combine(installationPath, GlobalSettingsFileName);
             if (System.IO.File.Exists(globalSettingsPath))
@@ -454,88 +247,19 @@ public class CustomActions
                 System.IO.File.Delete(globalSettingsPath);
             }
 
-			RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(RudeBuildSetupRegistryPath);
-			if (null != registryKey)
-				Registry.CurrentUser.DeleteSubKeyTree(RudeBuildSetupRegistryPath);
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(RudeBuildSetupRegistryPath);
+            if (null != registryKey)
+                Registry.CurrentUser.DeleteSubKeyTree(RudeBuildSetupRegistryPath);
 
-			string vsixFilePath = System.IO.Path.Combine(installationPath, VSIXFileName);
-			UninstallVSIX(vsixFilePath);
-		}
-		catch (Exception ex)
+            string vsixFilePath = System.IO.Path.Combine(installationPath, VSIXFileName);
+            UninstallVSIX(vsixFilePath);
+        }
+        catch (Exception ex)
         {
-            System.Windows.MessageBox.Show("RudeBuild uninstall error!\n" + ex.Message, 
+            System.Windows.MessageBox.Show("RudeBuild uninstall error!\n" + ex.Message,
                 "RudeBuild", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
 
         return ActionResult.Success;
     }
-}
-
-// The following message filter class is from https://msdn.microsoft.com/en-us/library/ms228772.aspx 
-//   "How to: Fix 'Application is Busy' and 'Call was Rejected By Callee' Errors"
-// to fix spurious RPC_E_SERVERCALL_RETRYLATER errors from RemoveCommands() when calling into devenv
-// to remove the registered RudeBuild commands.
-
-// Class containing the IOleMessageFilter thread error-handling functions.
-public class MessageFilter : IOleMessageFilter
-{
-    // Start the filter.
-    public static void Register()
-    {
-        IOleMessageFilter newFilter = new MessageFilter();
-        IOleMessageFilter oldFilter = null;
-        CoRegisterMessageFilter(newFilter, out oldFilter);
-    }
-
-    // Done with the filter, close it.
-    public static void Revoke()
-    {
-        IOleMessageFilter oldFilter = null;
-        CoRegisterMessageFilter(null, out oldFilter);
-    }
-
-    // Handle incoming thread requests.
-    int IOleMessageFilter.HandleInComingCall(int dwCallType, System.IntPtr hTaskCaller, int dwTickCount, System.IntPtr lpInterfaceInfo)
-    {
-        //Return the flag SERVERCALL_ISHANDLED.
-        return 0;
-    }
-
-    // Thread call was rejected, so try again.
-    int IOleMessageFilter.RetryRejectedCall(System.IntPtr hTaskCallee, int dwTickCount, int dwRejectType)
-    {
-        if (dwRejectType == 2)
-        // flag = SERVERCALL_RETRYLATER.
-        {
-            // Retry the thread call immediately if return >=0 & 
-            // <100.
-            return 99;
-        }
-        // Too busy; cancel call.
-        return -1;
-    }
-
-    int IOleMessageFilter.MessagePending(System.IntPtr hTaskCallee, int dwTickCount, int dwPendingType)
-    {
-        //Return the flag PENDINGMSG_WAITDEFPROCESS.
-        return 2;
-    }
-
-    // Implement the IOleMessageFilter interface.
-    [DllImport("Ole32.dll")]
-    private static extern int CoRegisterMessageFilter(IOleMessageFilter newFilter, out IOleMessageFilter oldFilter);
-}
-
-[ComImport(), Guid("00000016-0000-0000-C000-000000000046"),
-InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
-interface IOleMessageFilter
-{
-    [PreserveSig]
-    int HandleInComingCall(int dwCallType, IntPtr hTaskCaller, int dwTickCount, IntPtr lpInterfaceInfo);
-
-    [PreserveSig]
-    int RetryRejectedCall(IntPtr hTaskCallee, int dwTickCount, int dwRejectType);
-
-    [PreserveSig]
-    int MessagePending(IntPtr hTaskCallee, int dwTickCount, int dwPendingType);
 }

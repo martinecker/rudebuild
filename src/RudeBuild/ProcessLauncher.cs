@@ -40,18 +40,58 @@ namespace RudeBuild
             }
         }
 
-		public static string GetDevEnvDir(VisualStudioVersion version)
+        private static readonly string[] VS2017Dirs =
+        {
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2017\Community\Common7\IDE",
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2017\Professional\Common7\IDE",
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2017\Enterprise\Common7\IDE"
+        };
+
+        private static readonly string[] VS2019Dirs =
+        {
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2019\Community\Common7\IDE",
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2019\Professional\Common7\IDE",
+            @"%PROGRAMFILES(x86)%\Microsoft Visual Studio\2019\Enterprise\Common7\IDE"
+        };
+
+        public static string GetDevEnvDir(VisualStudioVersion version)
 		{
-			string registryPath = GetDevEvnBaseRegistryKey(version) + @"Setup\VS";
-			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
-			if (null == registryKey)
-				throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+            // The registry key only works up until VS 2015. Newer versions don't write the EnvironmentDirectory registry key.
+            if (version >= VisualStudioVersion.VS2005 && version <= VisualStudioVersion.VS2015)
+            {
+                string registryPath = GetDevEvnBaseRegistryKey(version) + @"Setup\VS";
+                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(registryPath);
+                if (null == registryKey)
+                    throw new ArgumentException("Couldn't open Visual Studio registry key. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
 
-			var devEnvDir = (string)registryKey.GetValue("EnvironmentDirectory");
-			return devEnvDir;
-		}
+                var devEnvDir = (string)registryKey.GetValue("EnvironmentDirectory");
+                return devEnvDir;
+            }
+            else if (version == VisualStudioVersion.VS2017)
+            {
+                foreach (string dir in VS2017Dirs)
+                {
+                    string expandedDir = Environment.ExpandEnvironmentVariables(dir);
+                    if (File.Exists(Path.Combine(expandedDir, "devenv.com")))
+                        return expandedDir;
+                }
+                throw new ArgumentException("Couldn't find Visual Studio devenv path. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+            }
+            else if (version == VisualStudioVersion.VS2019)
+            {
+                foreach (string dir in VS2019Dirs)
+                {
+                    string expandedDir = Environment.ExpandEnvironmentVariables(dir);
+                    if (File.Exists(Path.Combine(expandedDir, "devenv.com")))
+                        return expandedDir;
+                }
+                throw new ArgumentException("Couldn't find Visual Studio devenv path. Your version of Visual Studio is unsupported by this tool or Visual Studio is not installed properly.");
+            }
 
-		public static string GetDevEnvPath(VisualStudioVersion version)
+            throw new ArgumentException("Unsupported Visual Studio version passed to GetDevEnvDir.");
+        }
+
+        public static string GetDevEnvPath(VisualStudioVersion version)
         {
             var devEnvPath = Path.Combine(GetDevEnvDir(version), "devenv.com");
             return devEnvPath;

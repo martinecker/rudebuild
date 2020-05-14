@@ -80,10 +80,6 @@
       <Project>{344A8E8A-9F1B-45F8-B03D-03CE5534572D}</Project>
       <Name>RudeBuild</Name>
     </ProjectReference>
-    <ProjectReference Include="RudeBuildVSAddIn.csproj">
-      <Project>{0F73A40E-95BA-4285-9740-3E3B35D0828F}</Project>
-      <Name>RudeBuildAddIn</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
