@@ -20,6 +20,6 @@ The command line version of RudeBuild is useful for automated builds, for exampl
 
 ----------------------
 
-RudeBuild is written in C# and requires the .NET framework 3.5 or higher.
-RudeBuild uses the CommandLineParser library that is available at https://commandline.codeplex.com as well as Wix# to generate the MSI setup available at https://wixsharp.codeplex.com.
+RudeBuild is written in C# and requires the .NET framework 4.7.1 or higher.
+RudeBuild uses the CommandLineParser library that is available at https://github.com/j-maly/CommandLineParser as well as Wix# to generate the MSI setup available at https://github.com/oleg-shilo/wixsharp.
 
