@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Xml.Linq;
-using System.Xml;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Microsoft.Deployment.WindowsInstaller;
 using WixSharp;
 using WixSharp.CommonTasks;
-using EnvDTE80;
 
 class Script
 {
@@ -98,8 +92,19 @@ The command line version of RudeBuild is useful for automated builds, for exampl
             Schedule = UpgradeSchedule.afterInstallInitialize
         };
 
-        //project.SetNetFxPrerequisite(Condition.Net471_Installed, "Please install .NET Framework 4.7.1 first");
+        project.SetNetFxPrerequisite(Condition.Net471_Installed, "Please install .NET Framework 4.7.1 first");
 
+        // We're writing the target executable of this setup project into ..\..\bin\Release or Debug.
+        // That's also where all the other .dll files that need to be packaged into the installer are located,
+        // so set the source base directory for these files to be the executable target path.
+        project.SourceBaseDir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+        // Get nuget packages folder, which should have the WixSharp.wix.bin package installed
+        // that we need to reference to get the wix compiler/linker executables to build the installer.
+        var settings = NuGet.Configuration.Settings.LoadDefaultSettings(null);
+        string packagesFolder = NuGet.Configuration.SettingsUtility.GetGlobalPackagesFolder(settings);
+
+        Compiler.WixLocation = packagesFolder + @"\wixsharp.wix.bin\3.11.2\tools\bin";
         Compiler.BuildMsi(project, "RudeBuildSetup.msi");
     }
 }
