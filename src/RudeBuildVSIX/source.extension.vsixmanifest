@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289" Version="1.5" Language="en-US" Publisher="Martin Ecker" />
+        <Identity Id="RudeBuild.0d68d53e-21ed-4ee6-8510-8c437e43b090" Version="1.5" Language="en-US" Publisher="Martin Ecker" />
         <DisplayName>RudeBuild</DisplayName>
         <Description xml:space="preserve">RudeBuild - A bulk/unity C++ build tool for Visual Studio, developed by Martin Ecker.</Description>
         <MoreInfo>https://github.com/martinecker/rudebuild</MoreInfo>

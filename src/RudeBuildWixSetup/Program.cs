@@ -181,7 +181,7 @@ public class CustomActions
         {
             var devEnvDir = RudeBuild.ProcessLauncher.GetDevEnvDir(highestVSVersion.Value);
             var vsixInstallerPath = System.IO.Path.Combine(devEnvDir, "VSIXInstaller.exe");
-            var vsixInstallerCommandLine = "/quiet /uninstall:RudeBuild.25450272-5342-4e0e-a5b8-5d77da5de289";  // The VSIX ID comes from the ProductID in the source.extension.vsixmanifest file!
+            var vsixInstallerCommandLine = "/quiet /uninstall:RudeBuild.0d68d53e-21ed-4ee6-8510-8c437e43b090";  // The VSIX ID comes from the ProductID in the source.extension.vsixmanifest file!
 
             Process process = Process.Start(vsixInstallerPath, vsixInstallerCommandLine);
             process.WaitForExit();
