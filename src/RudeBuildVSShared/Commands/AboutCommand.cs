@@ -13,7 +13,7 @@ A unity C++ build tool for Visual Studio developed by Martin Ecker.
 This is free, open source software under the zlib license.
 
 For more information and latest updates please visit:
-http://rudebuild.sourceforge.net
+http://www.martinecker.com/rudebuild/
 ";
 
             MessageBox.Show(aboutMessage, "RudeBuild", MessageBoxButton.OK, MessageBoxImage.Information);

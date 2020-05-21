@@ -40,7 +40,7 @@ namespace RudeBuildConsole
             _output.WriteLine(ApplicationInfo.CopyrightHolder);
             _output.WriteLine();
             _output.WriteLine("For more information and latest updates please visit:");
-            _output.WriteLine("http://rudebuild.sourceforge.net");
+            _output.WriteLine("http://www.martinecker.com/rudebuild/");
 
             _output.WriteLine("Arguments: " + string.Join(" ", args));
             _output.WriteLine();
