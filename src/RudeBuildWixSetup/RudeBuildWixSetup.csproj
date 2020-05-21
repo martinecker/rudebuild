@@ -64,7 +64,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <None Include="wix\RudeBuildWixSetup.g.wxs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../RudeBuild/RudeBuild.csproj">

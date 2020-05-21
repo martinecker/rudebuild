@@ -83,14 +83,17 @@ The command line version of RudeBuild is useful for automated builds, for exampl
 "
         };
 
-        project.MajorUpgrade = new MajorUpgrade()
-        {
-            AllowDowngrades = false,
-            DowngradeErrorMessage = "A later version of [ProductName] is already installed. [ProductName] setup will now exit.",
-            AllowSameVersionUpgrades = false,
-            IgnoreRemoveFailure = true,
-            Schedule = UpgradeSchedule.afterInstallInitialize
-        };
+        project.MajorUpgradeStrategy = MajorUpgradeStrategy.Default;
+        project.MajorUpgradeStrategy.UpgradeVersions = VersionRange.ThisAndOlder;
+        project.MajorUpgradeStrategy.RemoveExistingProductAfter = Step.InstallInitialize;
+
+        // Different way to handle upgrades. To use this can't set up MajorUpgradeStrategy.
+        //project.MajorUpgrade = MajorUpgrade.Default;
+        //project.MajorUpgrade.AllowDowngrades = false;
+        //project.MajorUpgrade.DowngradeErrorMessage = "A later version of [ProductName] is already installed. [ProductName] setup will now exit.";
+        //project.MajorUpgrade.AllowSameVersionUpgrades = false;
+        //project.MajorUpgrade.IgnoreRemoveFailure = true;
+        //project.MajorUpgrade.Schedule = UpgradeSchedule.afterInstallInitialize;
 
         project.SetNetFxPrerequisite(Condition.Net471_Installed, "Please install .NET Framework 4.7.1 first");
 
@@ -103,8 +106,8 @@ The command line version of RudeBuild is useful for automated builds, for exampl
         // that we need to reference to get the wix compiler/linker executables to build the installer.
         var settings = NuGet.Configuration.Settings.LoadDefaultSettings(null);
         string packagesFolder = NuGet.Configuration.SettingsUtility.GetGlobalPackagesFolder(settings);
+        Compiler.WixLocation = System.IO.Path.Combine(packagesFolder, @"wixsharp.wix.bin\3.11.2\tools\bin");
 
-        Compiler.WixLocation = packagesFolder + @"\wixsharp.wix.bin\3.11.2\tools\bin";
         Compiler.BuildMsi(project, "RudeBuildSetup.msi");
     }
 }
