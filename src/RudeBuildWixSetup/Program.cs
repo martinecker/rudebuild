@@ -30,8 +30,8 @@ class Script
             // In Wix# the project GUID is an essentially an alias for UpgradeCode, so it's enough to set it.
             GUID = new Guid("DA0E1E6E-57AE-45B1-8D10-A546E1BCF2E6"),
 
-            Version = new Version("1.5.0.0"),
-            ProductId = new Guid("D6090F57-83BD-45B2-8349-10A84C7C2FA3"),   // Change this whenever you change the version above!
+            Version = new Version("1.6.0.0"),
+            ProductId = new Guid("D04A97EE-2B28-494B-8C2A-939977EEE630"),   // Change this whenever you change the version above!
 
             Dirs = new[]
             {

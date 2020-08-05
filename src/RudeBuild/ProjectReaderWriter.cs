@@ -359,6 +359,21 @@ namespace RudeBuild
 
                 FixupProjectReferences(projectDocument, ns, solutionInfo, _settings);
 
+                // Add the following to the very end of the Project element to turn off Visual Studio's built-in
+                // unity build support for the RudeBuild-generated project:
+                //   <ItemDefinitionGroup>
+                //     <ClCompile>
+                //       <IncludeInUnityFile>false</IncludeInUnityFile>
+                //     </ClCompile>
+                //   </ItemDefinitionGroup>
+                projectElement.Add(
+                    new XElement(ns + "ItemDefinitionGroup", 
+                        new XElement(ns + "ClCompile",
+                            new XElement(ns + "IncludeInUnityFile", "false")
+                        )
+                    )
+                );
+
                 ReadWriteFilters(projectFileName, projectConfig, merger);
             }
 
