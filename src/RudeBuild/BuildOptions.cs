@@ -9,7 +9,7 @@ namespace RudeBuild
     {
         [FileArgument('s', "solution", FileMustExist = true, Description = "FileName of the solution to build.", Optional = false)]
         public FileInfo Solution;
-        [ValueArgument(typeof(string), 'c', "config", Description = "Name of the solution configuration (NOT the project configuration!) to build including platform, e.g. \"Debug|Win32\". Be sure to use quotes around this because | is interpreted as a pipe on the command line otherwise.", Optional = false)]
+        [ValueArgument(typeof(string), 'c', "config", Description = "Name of the solution configuration (NOT the project configuration!) to build including platform, e.g. \"Debug|x64\". Be sure to use quotes around this because | is interpreted as a pipe on the command line otherwise.", Optional = false)]
         public string Config;
         [ValueArgument(typeof(string), 'p', "project", Description = "Name of the project inside the solution to build. If not specified, a solution build is performed.")]
         public string Project;

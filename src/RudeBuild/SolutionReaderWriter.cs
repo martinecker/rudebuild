@@ -83,6 +83,35 @@ namespace RudeBuild
             return true;
         }
 
+        private bool ParseSolutionFolder(string line, out SolutionFolder solutionFolder)
+        {
+            const string solutionFolderProjectGuid = "Project(\"{2150E333-8FDC-42A3-9474-1A3956D46DE8}\")";
+            solutionFolder = null;
+            if (!line.StartsWith(solutionFolderProjectGuid))        // Guid for solution folders
+            {
+                return false;
+            }
+
+            int folderNameBeginIndex = solutionFolderProjectGuid.Length + " = \"".Length;
+            int folderNameEndIndex = line.IndexOf('\"', folderNameBeginIndex);
+            if (folderNameEndIndex <= 0)
+            {
+                throw new InvalidDataException("Solution file is corrupt. Found solution folder without name.");
+            }
+            int folderNameLength = folderNameEndIndex - folderNameBeginIndex;
+            string folderName = line.Substring(folderNameBeginIndex, folderNameLength);
+
+            int folderGuidBeginIndex = line.Length - GuidPlaceholder.Length - 1; // -1 to skip over last "
+            string folderGuid = line.Substring(folderGuidBeginIndex, GuidPlaceholder.Length);
+            if (folderGuid.Length != GuidPlaceholder.Length)
+            {
+                throw new InvalidDataException("Solution file is corrupt. Couldn't correctly parse solution folder GUID.");
+            }
+
+            solutionFolder = new SolutionFolder { Name = folderName, Guid = folderGuid };
+            return true;
+        }
+
         private static bool ParseGlobalSectionStart(string line, ref string currentGlobalSection)
         {
             if (!line.Contains(GlobalSectionStart))
@@ -117,6 +146,8 @@ namespace RudeBuild
             var visualStudioVersion = VisualStudioVersion.VSUnknown;
             var version = VisualStudioVersion.VSUnknown;
             var configManager = new SolutionConfigManager();
+            var solutionFoldersByGuid = new System.Collections.Generic.Dictionary<string, SolutionFolder>();
+            SolutionFolder solutionFolder = null;
             var destSolutionText = new StringBuilder();
             string solutionDirectory = Path.GetDirectoryName(fileName);
             
@@ -151,6 +182,10 @@ namespace RudeBuild
                     }
                     else if (ParseCppProject(ref line, version, solutionDirectory, configManager))
                     {
+                    }
+                    else if (ParseSolutionFolder(line, out solutionFolder))
+                    {
+                        solutionFoldersByGuid.Add(solutionFolder.Guid, solutionFolder);
                     }
                     else if (ParseGlobalSectionStart(line, ref currentGlobalSection))
                     {
@@ -197,6 +232,41 @@ namespace RudeBuild
                             if (activeCfg == "ActiveCfg")
                                 configManager.SetProjectConfig(projectGuid, solutionConfig, projectConfig);
                         }
+                        else if (currentGlobalSection == "NestedProjects")
+                        {
+                            string trimmedLine = line.Trim();
+                            string childGuid = trimmedLine.Substring(0, GuidPlaceholder.Length);
+                            if (childGuid.Length != GuidPlaceholder.Length)
+                                throw new InvalidDataException("Solution file is corrupt. Expected project GUID at beginning of line: " + trimmedLine);
+
+                            int parentGuidStartIndex = GuidPlaceholder.Length + " = ".Length;
+                            string parentGuid = trimmedLine.Substring(parentGuidStartIndex, GuidPlaceholder.Length);
+                            if (parentGuid.Length != GuidPlaceholder.Length)
+                                throw new InvalidDataException("Solution file is corrupt. Expected project GUID at end of line: " + trimmedLine);
+
+                            SolutionFolder parentFolder = null;
+                            if (!solutionFoldersByGuid.TryGetValue(parentGuid, out parentFolder))
+                                throw new InvalidDataException("Solution file is corrupt. Couldn't find solution parent folder with GUID " + parentGuid);
+
+                            SolutionFolder childFolder = null;
+                            if (solutionFoldersByGuid.TryGetValue(childGuid, out childFolder))
+                            {
+                                if (childFolder.ParentFolder != null)
+                                    throw new InvalidDataException("Solution file is corrupt. Solution child folder with GUID " + childGuid + " already has a parent folder");
+                                parentFolder.ChildFolders.Add(childFolder);
+                                childFolder.ParentFolder = parentFolder;
+                            }
+                            else
+                            {
+                                SolutionConfigManager.ProjectConfig projectConfig = configManager.GetProjectByGuid(childGuid);
+                                if (projectConfig == null)
+                                    throw new InvalidDataException("Solution file is corrupt. Couldn't find child solution folder or project with GUID " + childGuid);
+                                if (projectConfig.SolutionFolder != null)
+                                    throw new InvalidDataException("Solution file is corrupt. Project with GUID " + childGuid + " is already associated with solution folder " + projectConfig.SolutionFolder.Name);
+                                parentFolder.ChildProjects.Add(projectConfig.ProjectGuid);
+                                projectConfig.SolutionFolder = parentFolder;
+                            }
+                        }
                     }
 
                     if (line != null)
@@ -211,7 +281,16 @@ namespace RudeBuild
                 throw new InvalidDataException("Solution file '" + fileName + "' is corrupt. It does not contain a Visual Studio version.");
             }
 
-            return new SolutionInfo(fileName, version, configManager, destSolutionText.ToString());
+            var topLevelSolutionFolders = new System.Collections.Generic.List<SolutionFolder>();
+            foreach (System.Collections.Generic.KeyValuePair<string, SolutionFolder> folder in solutionFoldersByGuid)
+            {
+                if (folder.Value.ParentFolder == null)
+                {
+                    topLevelSolutionFolders.Add(folder.Value);
+                }
+            }
+
+            return new SolutionInfo(fileName, version, configManager, topLevelSolutionFolders, destSolutionText.ToString());
         }
 
         public void Write(SolutionInfo solutionInfo)

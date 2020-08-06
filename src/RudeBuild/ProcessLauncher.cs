@@ -97,6 +97,12 @@ namespace RudeBuild
             return devEnvPath;
         }
 
+        public static string GetMSBuildPath(VisualStudioVersion version)
+        {
+            var msbuildPath = Path.Combine(GetDevEnvDir(version), "..\\..\\MSBuild\\Current\\Bin\\MSBuild.exe");
+            return msbuildPath;
+        }
+
         public void RemoveSolutionFromDevEnvMRUList(SolutionInfo solutionInfo)
         {
             try
@@ -144,6 +150,74 @@ namespace RudeBuild
             }
         }
 
+        private string SanitizeMSBuildCmdLineProjectName(string projectName)
+        {
+            // See https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe
+            string sanitizedProjectName = projectName;
+            sanitizedProjectName = sanitizedProjectName.Replace('%', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace('$', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace('@', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace(';', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace('.', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace('(', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace(')', '_');
+            sanitizedProjectName = sanitizedProjectName.Replace('\'', '_');
+            return sanitizedProjectName;
+        }
+
+        private bool TryToSetupMSBuildProcessObject(SolutionInfo solutionInfo, ref ProcessStartInfo info)
+        {
+            info.FileName = GetMSBuildPath(solutionInfo.Version);
+            if (string.IsNullOrEmpty(info.FileName) || !File.Exists(info.FileName))
+            {
+                _settings.Output.WriteLine(
+                    "Warning: RudeBuild is setup to use MSBuild, but couldn't locate MSBuild.exe.\n" +
+                    "Falling back to using a regular Visual Studio build.\n" +
+                    "Error: Couldn't find MSBuild executable: " + info.FileName);
+                return false;
+            }
+
+            string[] configAndPlatform = _settings.BuildOptions.Config.Split('|');
+            if (configAndPlatform.Length != 2)
+                throw new ArgumentException("The solution configuration to build must contain a configuration name and a platform, e.g. Debug|x64");
+
+            info.Arguments = string.Format(" \"{0}\" -m -property:Configuration=\"{1}\" -property:Platform=\"{2}\"",
+                _settings.ModifyFileName(solutionInfo.FilePath), configAndPlatform[0], configAndPlatform[1]);
+
+            string buildCommand = string.Empty;
+            if (_settings.BuildOptions.Clean)
+                buildCommand = ":Clean";
+            else if (_settings.BuildOptions.Rebuild)
+                buildCommand = ":Rebuild";
+
+            if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
+            {
+                ProjectInfo projectInfo = solutionInfo.GetProjectInfo(_settings.BuildOptions.Project);
+                SolutionConfigManager.ProjectConfig projectConfig = solutionInfo.ConfigManager.GetProjectByFileName(projectInfo.FileName);
+                string projectFolders = string.Empty;
+                if (projectConfig.SolutionFolder != null)
+                {
+                    SolutionFolder folder = projectConfig.SolutionFolder;
+                    projectFolders = folder.Name + '\\';
+                    while (folder.ParentFolder != null)
+                    {
+                        folder = folder.ParentFolder;
+                        projectFolders = folder.Name + '\\' + projectFolders;
+                    }
+                }
+
+                string projectName = SanitizeMSBuildCmdLineProjectName(_settings.BuildOptions.Project);
+
+                info.Arguments += string.Format(" -target:\"{0}{1}\"{2}", projectFolders, projectName, buildCommand);
+            }
+            else if (!string.IsNullOrEmpty(buildCommand))
+            {
+                info.Arguments += string.Format(" -target{0}", buildCommand);
+            }
+
+            return true;
+        }
+
         private static string GetIncrediBuildPath()
         {
             const string registryPath = @"SOFTWARE\Xoreax\IncrediBuild\Builder";
@@ -181,7 +255,7 @@ namespace RudeBuild
                 info.Arguments = string.Format(" \"{0}\" {1} /cfg=\"{2}\"", _settings.ModifyFileName(solutionInfo.FilePath), buildCommand, _settings.BuildOptions.Config);
                 if (!string.IsNullOrEmpty(_settings.BuildOptions.Project))
                 {
-                    string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project;
+                    string projectName = _settings.GlobalSettings.FileNamePrefix + _settings.BuildOptions.Project + _settings.GlobalSettings.FileNameSuffix;
                     info.Arguments += string.Format(" /prj=\"{0}\"", projectName);
                 }
 
@@ -291,7 +365,9 @@ namespace RudeBuild
             };
 
             bool useDevEnvBuildTool = true;
-            if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild && TryToSetupIncrediBuildProcessObject(solutionInfo, ref info))
+            if (_settings.GlobalSettings.BuildTool == BuildTool.MSBuild && TryToSetupMSBuildProcessObject(solutionInfo, ref info))
+                useDevEnvBuildTool = false;
+            else if (_settings.GlobalSettings.BuildTool == BuildTool.IncrediBuild && TryToSetupIncrediBuildProcessObject(solutionInfo, ref info))
                 useDevEnvBuildTool = false;
             else if (_settings.GlobalSettings.BuildTool == BuildTool.SN_DBS && TryToSetupSnVsBuildProcessObject(solutionInfo, ref info))
                 useDevEnvBuildTool = false;

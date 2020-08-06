@@ -8,6 +8,8 @@ namespace RudeBuild
 {
     public enum BuildTool
     {
+        [DisplayValue("MSBuild")]
+        MSBuild,
         [DisplayValue("Visual Studio")]
         VisualStudio,
         [DisplayValue("IncrediBuild")]
@@ -53,11 +55,27 @@ namespace RudeBuild
             set
             {
                 char[] invalidChars = Path.GetInvalidFileNameChars();
-                if (string.IsNullOrEmpty(value))
+                if (value == null)
                     throw new ArgumentException("You must specify a valid file name prefix.");
                 if (-1 != value.IndexOfAny(invalidChars))
                     throw new ArgumentException("The file name prefix contains invalid characters for file names.");
                 _fileNamePrefix = value;
+            }
+        }
+
+        private string _fileNameSuffix;
+        [DefaultValue("")]
+        public string FileNameSuffix
+        {
+            get { return _fileNameSuffix; }
+            set
+            {
+                char[] invalidChars = Path.GetInvalidFileNameChars();
+                if (value == null)
+                    throw new ArgumentException("You must specify a valid file name suffix.");
+                if (-1 != value.IndexOfAny(invalidChars))
+                    throw new ArgumentException("The file name suffix contains invalid characters for file names.");
+                _fileNameSuffix = value;
             }
         }
 
@@ -74,7 +92,7 @@ namespace RudeBuild
             }
         }
 
-        [DefaultValue(BuildTool.VisualStudio)]
+        [DefaultValue(BuildTool.MSBuild)]
         public BuildTool BuildTool { get; set; }
 
         [DefaultValue(false)]

@@ -16,11 +16,18 @@ namespace RudeBuildVSShared
 
         private void OnOK(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
-			_globalSettings.Save();
-		}
+            if (string.IsNullOrEmpty(_globalSettings.FileNamePrefix) && string.IsNullOrEmpty(_globalSettings.FileNameSuffix))
+            {
+                ErrorMessage.Content = "Please specify either a file name prefix, suffix, or both.";
+            }
+            else
+            {
+                DialogResult = true;
+                _globalSettings.Save();
+            }
+        }
 
-		private void OnCancel(object sender, RoutedEventArgs e)
+        private void OnCancel(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }

@@ -284,7 +284,7 @@ namespace RudeBuild
                     select new XElement(ns + "ClCompile", new XAttribute("Include", unityFileName)));
             }
 
-            string destProjectFiltersFileName = _settings.ModifyFileName(projectFiltersFileName);
+            string destProjectFiltersFileName = _settings.ModifyFileName(projectFileName) + ".filters";
             var writer = new ModifiedTextFileWriter(destProjectFiltersFileName, _settings.BuildOptions.ShouldForceWriteCachedFiles());
             if (writer.Write(projectFiltersDocument.ToString()))
             {

@@ -71,8 +71,11 @@ namespace RudeBuild
 
         public string ModifyFileName(string fileName)
         {
-            string modifiedFileName = Path.Combine(Path.GetDirectoryName(fileName), GlobalSettings.FileNamePrefix + Path.GetFileName(fileName));
-            return modifiedFileName;
+            if (string.IsNullOrEmpty(GlobalSettings.FileNamePrefix) && string.IsNullOrEmpty(GlobalSettings.FileNameSuffix))
+                throw new ArgumentException("Either a prefix or suffix for file names needs to be specified in the global settings.");
+
+            string modifiedFileName = GlobalSettings.FileNamePrefix + Path.GetFileNameWithoutExtension(fileName) + GlobalSettings.FileNameSuffix + Path.GetExtension(fileName);
+            return Path.Combine(Path.GetDirectoryName(fileName), modifiedFileName);
         }
 
 		public bool IsValidCppFileName(string fileName)

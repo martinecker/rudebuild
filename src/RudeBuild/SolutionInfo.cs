@@ -25,6 +25,7 @@ namespace RudeBuild
             public string ProjectGuid;
             public string ProjectFileName;
             public IDictionary<string, string> SolutionToProjectConfigMap;
+            public SolutionFolder SolutionFolder;
 
             public string GetProjectConfig(string solutionConfig)
             {
@@ -93,9 +94,21 @@ namespace RudeBuild
         }
     }
 
+    public sealed class SolutionFolder
+    {
+        public string Name;
+        public string Guid;
+
+        public SolutionFolder ParentFolder;
+        public IList<SolutionFolder> ChildFolders = new List<SolutionFolder>();
+        public IList<string> ChildProjects = new List<string>();
+    }
+
     public sealed class SolutionInfo
     {
+        // Full path to .sln file, "c:\myprojects\mything.sln"
         public string FilePath { get; private set; }
+        // Only the file name without extension, "mything"
         public string Name { get; private set; }
         public VisualStudioVersion Version { get; private set; }
         public string Contents { get; private set; }
@@ -106,13 +119,16 @@ namespace RudeBuild
         public IDictionary<string, ProjectInfo> Projects { get; private set; }
         public IEnumerable<string> ProjectNames { get { return from projectName in Projects.Keys select projectName; } }
 
-        public SolutionInfo(string filePath, VisualStudioVersion version, SolutionConfigManager configManager, string contents)
+        public IEnumerable<SolutionFolder> TopLevelSolutionFolders { get; private set; }
+
+        public SolutionInfo(string filePath, VisualStudioVersion version, SolutionConfigManager configManager, IEnumerable<SolutionFolder> folders, string contents)
         {
             FilePath = Path.GetFullPath(filePath);
             Name = Path.GetFileNameWithoutExtension(filePath);
             Version = version;
             Contents = contents;
             ConfigManager = configManager;
+            TopLevelSolutionFolders = folders;
             Projects = new Dictionary<string, ProjectInfo>();
         }
 

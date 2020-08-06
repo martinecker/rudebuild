@@ -6,13 +6,14 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:RudeBuild="clr-namespace:RudeBuild;assembly=RudeBuild"
              xmlns:RudeBuildVSShared="clr-namespace:RudeBuildVSShared"
-             Title="RudeBuild Global Settings" Width="649.27" Height="263.451">
+             Title="RudeBuild Global Settings" Width="649.27" Height="305.713">
     <Window.Resources>
         <RudeBuildVSShared:BytesToKiloBytesConverter x:Key="bytesToKiloBytesConverter" />
         <RudeBuildVSShared:EnumDisplayer Type="{x:Type RudeBuild:BuildTool}" x:Key="buildToolEnumValues" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -27,17 +28,20 @@
         <Label Height="25" Target="{Binding ElementName=_textBoxFileNamePrefix}" Margin="8,0,0,0" Grid.Row="1">_Filename Prefix:</Label>
         <TextBox Height="25" Name="_textBoxFileNamePrefix" Width="Auto" Margin="150,5,6,5" Grid.Row="1"
                  Text="{Binding Path=FileNamePrefix,ValidatesOnExceptions=True}"/>
-        <Label Height="25" Target="{Binding ElementName=_textBoxMaxUnityFileSize}" Margin="8,0,0,0" Grid.Row="2">_Max. Unity File Size (KBs):</Label>
-        <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,5,6,5" Grid.Row="2"
+        <Label Height="25" Target="{Binding ElementName=_textBoxFileNameSuffix}" Margin="8,0,0,0" Grid.Row="2">Filename _Suffix:</Label>
+        <TextBox Height="25" Name="_textBoxFileNameSuffix" Width="Auto" Margin="150,5,6,5" Grid.Row="2"
+                 Text="{Binding Path=FileNameSuffix,ValidatesOnExceptions=True}"/>
+        <Label Height="25" Target="{Binding ElementName=_textBoxMaxUnityFileSize}" Margin="8,0,0,0" Grid.Row="3">_Max. Unity File Size (KBs):</Label>
+        <TextBox Height="25" Name="_textBoxMaxUnityFileSize" Width="Auto" Margin="150,5,6,5" Grid.Row="3"
                  Text="{Binding Path=MaxUnityFileSizeInBytes,ValidatesOnExceptions=True, Converter={StaticResource bytesToKiloBytesConverter}}"/>
-        <Label Height="25" Target="{Binding ElementName=_comboBoxBuildTool}" Margin="8,0" Grid.Row="3">_Build Tool:</Label>
-        <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,5,6,5" Grid.Row="3"
+        <Label Height="25" Target="{Binding ElementName=_comboBoxBuildTool}" Margin="8,0" Grid.Row="4">_Build Tool:</Label>
+        <ComboBox Height="25" Name="_comboBoxBuildTool" Width="Auto" Margin="150,5,6,5" Grid.Row="4"
                   ItemsSource="{Binding Source={StaticResource buildToolEnumValues},Path=DisplayValues}" SelectedValue="{Binding Path=BuildTool,Converter={StaticResource buildToolEnumValues}}"/>
-        <CheckBox Content="_Exclude Writable Files from Unity Merge" Margin="8,5" Grid.Row="4"
+        <CheckBox Content="_Exclude Writable Files from Unity Merge" Margin="8,5" Grid.Row="5"
                   IsChecked="{Binding Path=ExcludeWritableFilesFromUnityMerge}" />
-        <CheckBox Content="_Randomize Order of Unity Merged Files per Build" ToolTip="On every build, randomizes which C++ files get merged into a unity file. This is useful for unity build testing on nightly builds and shouldn't be used otherwise." Margin="8,5" Grid.Row="5"
+        <CheckBox Content="_Randomize Order of Unity Merged Files per Build" ToolTip="On every build, randomizes which C++ files get merged into a unity file. This is useful for unity build testing on nightly builds and shouldn't be used otherwise." Margin="8,5" Grid.Row="6"
                   IsChecked="{Binding Path=RandomizeOrderOfUnityMergedFiles}" />
-        <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="8,5">
+        <StackPanel Orientation="Horizontal" Grid.Row="7" Margin="8,5">
             <StackPanel Margin="0" Orientation="Horizontal">
                 <Button IsDefault="True" Height="25" HorizontalAlignment="Right" Width="75" Click="OnOK">
                     <AccessText>_OK</AccessText>
@@ -45,6 +49,7 @@
                 <Button IsCancel="True"  Height="25" HorizontalAlignment="Right" Width="75" Click="OnCancel" Margin="6,0,0,0">
                     <AccessText>_Cancel</AccessText>
                 </Button>
+                <Label Name="ErrorMessage" Foreground="#FF0000" Margin="6,0,0,0"></Label>
             </StackPanel>
         </StackPanel>
     </Grid>
