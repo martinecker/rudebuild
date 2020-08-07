@@ -663,6 +663,46 @@ namespace RudeBuildVSShared
                 treeViewItem.Visibility = Visibility.Collapsed;
         }
 
+        private enum FilterVisibilityMode
+        {
+            OnlyExcludedFiles,
+            OnlyIncludedFiles
+        }
+
+        private void FilterTreeViewItemsVisibility(ItemCollection items, FilterVisibilityMode mode)
+        {
+            foreach (TreeViewItem projectOrFolderItem in items)
+            {
+                ProjectInfo projectInfo = projectOrFolderItem.DataContext as ProjectInfo;
+
+                bool isFolder = projectInfo == null;
+                if (isFolder)
+                {
+                    FilterTreeViewItemsVisibility(projectOrFolderItem.Items, mode);
+                }
+                else
+                {
+                    PerformActionOnTreeViewItems(projectOrFolderItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
+
+                    PerformActionOnTreeViewItems(projectOrFolderItem,
+                        (treeViewItem) =>
+                        {
+                            SolutionHierarchy.Item item = treeViewItem.DataContext as SolutionHierarchy.Item;
+                            if (null != item && item.Type == SolutionHierarchy.Item.ItemType.CppFile)
+                            {
+                                bool isExcluded = _solutionSettings.IsExcludedCppFileNameForProject(projectInfo, item.Name);
+                                bool isVisible = mode == FilterVisibilityMode.OnlyExcludedFiles ? isExcluded : !isExcluded;
+                                treeViewItem.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+                            }
+                            else
+                            {
+                                CollapseTreeViewItemIfAllChildrenCollapsed(treeViewItem);
+                            }
+                        });
+                }
+            }
+        }
+
         private ContextMenu CreateFilterButtonContextMenu()
         {
             var filterContextMenu = new ContextMenu();
@@ -684,27 +724,7 @@ namespace RudeBuildVSShared
             var filterContextMenuItemOnlyExcluded = new MenuItem() { Header = "Show Only Excluded Files" };
             filterContextMenuItemOnlyExcluded.Click += (sender, eventArgs) =>
             {
-                foreach (TreeViewItem projectTreeViewItem in _treeViewProjects.Items)
-                {
-                    ProjectInfo projectInfo = (ProjectInfo)projectTreeViewItem.DataContext;
-
-                    PerformActionOnTreeViewItems(projectTreeViewItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
-
-                    PerformActionOnTreeViewItems(projectTreeViewItem,
-                        (treeViewItem) =>
-                        {
-                            SolutionHierarchy.Item item = treeViewItem.DataContext as SolutionHierarchy.Item;
-                            if (null != item && item.Type == SolutionHierarchy.Item.ItemType.CppFile)
-                            {
-                                treeViewItem.Visibility = _solutionSettings.IsExcludedCppFileNameForProject(projectInfo, item.Name) ?
-                                    Visibility.Visible : Visibility.Collapsed;
-                            }
-                            else
-                            {
-                                CollapseTreeViewItemIfAllChildrenCollapsed(treeViewItem);
-                            }
-                        });
-                }
+                FilterTreeViewItemsVisibility(_treeViewProjects.Items, FilterVisibilityMode.OnlyExcludedFiles);
                 filterContextMenu.IsOpen = false;
             };
             filterContextMenu.Items.Add(filterContextMenuItemOnlyExcluded);
@@ -712,27 +732,7 @@ namespace RudeBuildVSShared
             var filterContextMenuItemOnlyIncluded = new MenuItem() { Header = "Show Only Included Files" };
             filterContextMenuItemOnlyIncluded.Click += (sender, eventArgs) =>
             {
-                foreach (TreeViewItem projectTreeViewItem in _treeViewProjects.Items)
-                {
-                    ProjectInfo projectInfo = (ProjectInfo)projectTreeViewItem.DataContext;
-
-                    PerformActionOnTreeViewItems(projectTreeViewItem, (treeViewItem) => { treeViewItem.Visibility = Visibility.Visible; });
-
-                    PerformActionOnTreeViewItems(projectTreeViewItem,
-                        (treeViewItem) =>
-                        {
-                            SolutionHierarchy.Item item = treeViewItem.DataContext as SolutionHierarchy.Item;
-                            if (null != item && item.Type == SolutionHierarchy.Item.ItemType.CppFile)
-                            {
-                                treeViewItem.Visibility = !_solutionSettings.IsExcludedCppFileNameForProject(projectInfo, item.Name) ?
-                                    Visibility.Visible : Visibility.Collapsed;
-                            }
-                            else
-                            {
-                                CollapseTreeViewItemIfAllChildrenCollapsed(treeViewItem);
-                            }
-                        });
-                }
+                FilterTreeViewItemsVisibility(_treeViewProjects.Items, FilterVisibilityMode.OnlyIncludedFiles);
                 filterContextMenu.IsOpen = false;
             };
             filterContextMenu.Items.Add(filterContextMenuItemOnlyIncluded);
